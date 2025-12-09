@@ -1,0 +1,42 @@
+{
+  "name": "@eliware/project-template",
+  "type": "module",
+  "version": "1.1.0",
+  "description": "A template for starting new Node.js projects.",
+  "main": "project-template.mjs",
+  "scripts": {
+    "start": "node project-template.mjs",
+    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/project-template.git"
+  },
+  "keywords": [
+    "project-template",
+    "nodejs",
+    "starter",
+    "template"
+  ],
+  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eliware/project-template/issues"
+  },
+  "homepage": "https://github.com/eliware/project-template#readme",
+  "devDependencies": {
+    "jest": "^30.0.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/?(*.)+(spec|test).[jt]s?(x)",
+      "**/?(*.)+(spec|test).mjs",
+      "**/?(*.)+(spec|test).cjs"
+    ]
+  },
+  "dependencies": {
+    "@eliware/common": "^1.1.1",
+    "dotenv": "^17.2.0"
+  }
+}
