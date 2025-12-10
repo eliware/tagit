@@ -1,6 +1,6 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-## @eliware/project-template [![npm version](https://img.shields.io/npm/v/@eliware/project-template.svg)](https://www.npmjs.com/package/@eliware/project-template)[![license](https://img.shields.io/github/license/eliware/project-template.svg)](LICENSE)[![build status](https://github.com/eliware/project-template/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/project-template/actions)
+## @eliware/tagit [![npm version](https://img.shields.io/npm/v/@eliware/tagit.svg)](https://www.npmjs.com/package/@eliware/tagit)[![license](https://img.shields.io/github/license/eliware/tagit.svg)](LICENSE)[![build status](https://github.com/eliware/tagit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/tagit/actions)
 
 A starter template for new Node.js projects. Use this as a foundation for your next application or service.
 
@@ -29,8 +29,8 @@ A starter template for new Node.js projects. Use this as a foundation for your n
 1. **Clone this template:**
 
    ```bash
-   git clone https://github.com/eliware/project-template.git
-   cd project-template
+   git clone https://github.com/eliware/tagit.git
+   cd tagit
    rm -rf .git
    git init
    npm install
@@ -43,11 +43,11 @@ A starter template for new Node.js projects. Use this as a foundation for your n
 
 ## Development
 
-- Main entry: `project-template.mjs`
+- Main entry: `tagit.mjs`
 - Start your app:
 
   ```bash
-  node project-template.mjs
+  node tagit.mjs
   ```
 
 - Add your code in new files and import as needed.
@@ -83,7 +83,7 @@ For help, questions, or to chat with the author and community, visit:
 ## Links
 
 - [Home Page](https://eliware.org)
-- [GitHub Repo](https://github.com/eliware/project-template)
+- [GitHub Repo](https://github.com/eliware/tagit)
 - [GitHub Org](https://github.com/eliware)
 - [GitHub Personal](https://github.com/eli-sterling)
 - [Discord](https://discord.gg/M6aTR9eTwN)
