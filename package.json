@@ -1,40 +1,48 @@
 {
-  "name": "@eliware/tagit",
-  "type": "module",
-  "version": "1.1.0",
-  "description": "A template for starting new Node.js projects.",
-  "main": "tagit.mjs",
-  "scripts": {
-    "start": "node tagit.mjs",
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/tagit.git"
-  },
+    "name": "@eliware/tagit",
+    "type": "module",
+    "version": "1.1.0",
+    "description": "Automated version management and Git operations for Node.js and PHP projects.",
+    "main": "tagit.mjs",
+    "scripts": {
+        "start": "node tagit.mjs",
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/eliware/tagit.git"
+    },
     "keywords": [
         "tagit",
-        "nodejs"
+        "versioning",
+        "git",
+        "automation",
+        "nodejs",
+        "composer",
+        "package.json",
+        "composer.json",
+        "release",
+        "cli"
     ],
-  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/eliware/tagit/issues"
-  },
-  "homepage": "https://github.com/eliware/tagit#readme",
-  "devDependencies": {
-    "jest": "^30.0.4"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs",
-      "**/?(*.)+(spec|test).cjs"
-    ]
-  },
-  "dependencies": {
-    "@eliware/common": "^1.1.1",
-    "dotenv": "^17.2.0"
-  }
+    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/eliware/tagit/issues"
+    },
+    "homepage": "https://github.com/eliware/tagit#readme",
+    "devDependencies": {
+        "jest": "^30.0.4"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs",
+            "**/?(*.)+(spec|test).cjs"
+        ]
+    },
+    "dependencies": {
+        "@eliware/common": "^1.1.1",
+        "dotenv": "^17.2.0"
+    }
 }
