@@ -85,5 +85,5 @@ For help, questions, or to chat with the author and community, visit:
 - [Home Page](https://eliware.org)
 - [GitHub Repo](https://github.com/eliware/project-template)
 - [GitHub Org](https://github.com/eliware)
-- [GitHub Personal](https://github.com/reliware)
+- [GitHub Personal](https://github.com/eli-sterling)
 - [Discord](https://discord.gg/M6aTR9eTwN)
