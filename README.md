@@ -17,7 +17,7 @@ Automated version management and Git operations for Node.js and PHP projects.
 - Increments the semantic version in `package.json` and/or `composer.json`
 - Keeps `package.json` and `composer.json` versions in sync when both files exist
 - Runs Composer maintenance commands for PHP projects
-- Runs `npm upgrade` for Node.js projects
+- Runs `npm update` for Node.js projects
 - Detects webpack projects and runs a build before committing
 - Commits all changes with a message like `Version <version> - MM-DD-YYYY`
 - Tags the commit with the new version, for example `1.2.4`
@@ -90,17 +90,23 @@ When run from a target project, `tagit` performs these steps:
 3. If `composer.json` exists, runs:
 
 ```bash
-COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer upgrade
+COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update
 COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump
 ```
 
 4. If `package.json` exists, runs:
 
 ```bash
-npm upgrade
+npm update
 ```
 
-5. If webpack is detected, runs the first available build command:
+5. If `package.json` contains a `test` script, runs:
+
+```bash
+npm test
+```
+
+6. If webpack is detected, runs the first available build command:
 
 ```bash
 npm run build
@@ -108,7 +114,7 @@ npm run webpack
 npx webpack
 ```
 
-6. Stages all changes, commits, tags, and pushes:
+7. Stages all changes, commits, tags, and pushes:
 
 ```bash
 git add -A
@@ -140,7 +146,8 @@ npm test
 
 ## Notes
 
-- `tagit` runs `npm upgrade` and `composer upgrade`, so dependency lock files may change during a release.
+- `tagit` runs `npm update` and `composer update`, so dependency lock files may change during a release.
+- If `npm update`, `npm test`, `npm run build`, or Composer update/bump fails, `tagit` restores the original version contents before exiting.
 - `tagit` commits every staged and unstaged change after running `git add -A`.
 - The GitHub Actions workflow publishes to npm when a tag is pushed.
 

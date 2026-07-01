@@ -20,27 +20,50 @@ function runWebpackBuild(execSync, packageData) {
     execSync('npx webpack', { stdio: 'inherit' });
 }
 
+function restoreFileVersion(fs, file, snapshot) {
+    if (!snapshot) {
+        return;
+    }
+
+    fs.writeFileSync(file, snapshot, 'utf-8');
+}
+
 export function gitOperations(execSync, fs, log, newVersion) {
     const date = new Date().toISOString().split('T')[0];
     const dateFormatted = new Date().toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'}).replace(/\//g, '-');
     let packageData = null;
+    let composerSnapshot = null;
+    let packageSnapshot = null;
 
     log.info('Starting git operations');
 
+    if (fs.existsSync('composer.json')) {
+        composerSnapshot = fs.readFileSync('composer.json', 'utf-8');
+    }
+
+    if (fs.existsSync('package.json')) {
+        packageSnapshot = fs.readFileSync('package.json', 'utf-8');
+    }
+
     try {
         if (fs.existsSync('composer.json')) {
-            log.info('composer.json exists - running composer upgrade');
-            execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer upgrade', { stdio: 'inherit' });
+            log.info('composer.json exists - running composer update');
+            execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
             log.info('Running composer bump');
             execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
         }
 
         if (fs.existsSync('package.json')) {
-            log.info('package.json exists - running npm upgrade');
-            execSync('npm upgrade', { stdio: 'inherit' });
+            log.info('package.json exists - running npm update');
+            execSync('npm update', { stdio: 'inherit' });
 
             const packageContent = fs.readFileSync('package.json', 'utf-8');
             packageData = JSON.parse(packageContent);
+
+            if (packageData?.scripts && packageData.scripts.test) {
+                log.info('package.json has test script - running npm test');
+                execSync('npm test', { stdio: 'inherit' });
+            }
 
             if (usesWebpack(packageData, fs)) {
                 log.info('webpack detected - running webpack build');
@@ -61,7 +84,9 @@ export function gitOperations(execSync, fs, log, newVersion) {
         execSync('git push --tags', { stdio: 'inherit' });
         log.info('Git operations complete');
     } catch (err) {
-        log.error('A command failed during git operations. Halting process.');
+        restoreFileVersion(fs, 'composer.json', composerSnapshot);
+        restoreFileVersion(fs, 'package.json', packageSnapshot);
+        log.error('A command failed during git operations. Version files were restored.');
         throw err;
     }
 }

@@ -12,7 +12,8 @@ describe('gitOperations', () => {
     execSyncMock = jest.fn();
     fsMock = {
       existsSync: jest.fn(),
-      readFileSync: jest.fn()
+      readFileSync: jest.fn(),
+      writeFileSync: jest.fn()
     };
     logMock = {
       info: jest.fn(),
@@ -23,19 +24,21 @@ describe('gitOperations', () => {
   test('runs all git and composer/npm commands when files exist', () => {
     fsMock.existsSync.mockReturnValue(true);
     fsMock.readFileSync.mockReturnValue(JSON.stringify({
-      scripts: { build: 'webpack', webpack: 'webpack' },
+      scripts: { test: 'jest', build: 'webpack', webpack: 'webpack' },
       dependencies: { webpack: '^5.0.0' }
     }));
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
     expect(logMock.info).toHaveBeenCalledWith('Starting git operations');
-    expect(logMock.info).toHaveBeenCalledWith('composer.json exists - running composer upgrade');
-    expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer upgrade', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('composer.json exists - running composer update');
+    expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Running composer bump');
     expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
-    expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm upgrade');
-    expect(execSyncMock).toHaveBeenCalledWith('npm upgrade', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm update');
+    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('package.json has test script - running npm test');
+    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
     expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
@@ -78,7 +81,7 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm upgrade', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
   });
@@ -109,5 +112,85 @@ describe('gitOperations', () => {
     expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+  });
+
+  test('restores version files if npm update fails', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'composer.json' || file === 'package.json');
+    fsMock.readFileSync.mockImplementation((file) => {
+      if (file === 'composer.json') {
+        return JSON.stringify({ version: '1.0.41' });
+      }
+
+      return JSON.stringify({ version: '1.0.41', scripts: {} });
+    });
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'npm update') {
+        throw new Error('npm failed');
+      }
+    });
+
+    expect(() => gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toThrow('npm failed');
+
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('composer.json', JSON.stringify({ version: '1.0.41' }), 'utf-8');
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', JSON.stringify({ version: '1.0.41', scripts: {} }), 'utf-8');
+    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+  });
+
+  test('runs npm test before build when defined', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { test: 'jest', build: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
+  });
+
+  test('restores version files if npm test fails', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      version: '1.0.41',
+      scripts: { test: 'jest', build: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }));
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'npm test') {
+        throw new Error('tests failed');
+      }
+    });
+
+    expect(() => gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toThrow('tests failed');
+
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', JSON.stringify({
+      version: '1.0.41',
+      scripts: { test: 'jest', build: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }), 'utf-8');
+  });
+
+  test('restores version files if build fails', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      version: '1.0.41',
+      scripts: { build: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }));
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'npm run build') {
+        throw new Error('build failed');
+      }
+    });
+
+    expect(() => gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toThrow('build failed');
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', JSON.stringify({
+      version: '1.0.41',
+      scripts: { build: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }), 'utf-8');
   });
 });
