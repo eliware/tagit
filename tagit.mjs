@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import 'dotenv/config';
 import { log, registerHandlers, registerSignals } from '@eliware/common';
 import fs from 'fs';
 import { execSync } from 'child_process';
