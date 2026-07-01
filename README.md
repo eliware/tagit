@@ -8,27 +8,46 @@ Automated version management and Git operations for Node.js and PHP projects.
 
 ---
 
-## Table of Contents
-
-- [What is tagit?](#what-is-tagit)
-- [Features](#features)
-- [Usage](#usage)
-- [Support](#support)
-- [License](#license)
-- [Links](#links)
-
 ## What is tagit?
 
-`tagit` is a CLI utility that automates the process of incrementing your project version, updating version files (`package.json` and/or `composer.json`), committing the changes, tagging the commit, and pushing to your Git repository. It provides detailed logging and robust error handling for a smooth release workflow.
+`tagit` is a Linux-focused CLI utility that automates a release workflow for Node.js and PHP projects. It increments the project version, updates `package.json` and/or `composer.json`, runs dependency/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
 
 ## Features
 
 - Increments the semantic version in `package.json` and/or `composer.json`
-- Writes the new version back to the file(s)
-- Commits all changes with a message like: `Version <version> - MM-DD-YYYY`
-- Tags the commit with the new version
+- Keeps `package.json` and `composer.json` versions in sync when both files exist
+- Runs Composer maintenance commands for PHP projects
+- Runs `npm upgrade` for Node.js projects
+- Detects webpack projects and runs a build before committing
+- Commits all changes with a message like `Version <version> - MM-DD-YYYY`
+- Tags the commit with the new version, for example `1.2.4`
 - Pushes commits and tags to your remote repository
 - Logs each step for transparency
+
+## Requirements
+
+- Linux
+- Node.js 22 or newer is recommended
+- npm
+- Git
+- Composer, if the target project contains `composer.json`
+- A clean, correctly configured Git repository with push access to its remote
+
+## How versioning works
+
+`tagit` increments the final numeric segment of the existing version string:
+
+```text
+1.2.3 -> 1.2.4
+```
+
+When both version files are present, `composer.json` is used as the source version. The resulting new version is then written to both `composer.json` and `package.json`.
+
+If only `package.json` exists, that file is used as the source version.
+
+If only `composer.json` exists, that file is used as the source version.
+
+Each detected version file must contain a `version` field.
 
 ## Installation
 
@@ -50,7 +69,7 @@ sudo ln -s /opt/tagit/tagit.mjs /usr/bin/tagit
 
 ## Usage
 
-Switch to the root directory of the project you want to bump the version for, then run:
+Switch to the root directory of the project you want to release, then run:
 
 ```bash
 tagit
@@ -61,6 +80,69 @@ If you have not created the symlink, you can run it directly with:
 ```bash
 /opt/tagit/tagit.mjs
 ```
+
+## Release flow
+
+When run from a target project, `tagit` performs these steps:
+
+1. Stops immediately if a `.notag` file exists in the current directory.
+2. Updates `composer.json` and/or `package.json` with the next version.
+3. If `composer.json` exists, runs:
+
+```bash
+COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer upgrade
+COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump
+```
+
+4. If `package.json` exists, runs:
+
+```bash
+npm upgrade
+```
+
+5. If webpack is detected, runs the first available build command:
+
+```bash
+npm run build
+npm run webpack
+npx webpack
+```
+
+6. Stages all changes, commits, tags, and pushes:
+
+```bash
+git add -A
+git commit -m 'Version <version> - MM-DD-YYYY'
+git tag <version>
+git push
+git push --tags
+```
+
+Webpack is detected when the project has a `webpack` dependency in `dependencies`, `devDependencies`, `peerDependencies`, or `optionalDependencies`, or when `webpack.config.js` / `webpack.config.mjs` exists.
+
+## Skipping a release
+
+Create a `.notag` file in the target project root to prevent `tagit` from making any changes:
+
+```bash
+touch .notag
+```
+
+Remove the file when releases should be allowed again.
+
+## Testing
+
+Run the test suite with:
+
+```bash
+npm test
+```
+
+## Notes
+
+- `tagit` runs `npm upgrade` and `composer upgrade`, so dependency lock files may change during a release.
+- `tagit` commits every staged and unstaged change after running `git add -A`.
+- The GitHub Actions workflow publishes to npm when a tag is pushed.
 
 ## Support
 
