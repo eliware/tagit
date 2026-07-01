@@ -11,7 +11,8 @@ describe('gitOperations', () => {
   beforeEach(() => {
     execSyncMock = jest.fn();
     fsMock = {
-      existsSync: jest.fn()
+      existsSync: jest.fn(),
+      readFileSync: jest.fn()
     };
     logMock = {
       info: jest.fn(),
@@ -21,6 +22,10 @@ describe('gitOperations', () => {
 
   test('runs all git and composer/npm commands when files exist', () => {
     fsMock.existsSync.mockReturnValue(true);
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { build: 'webpack', webpack: 'webpack' },
+      dependencies: { webpack: '^5.0.0' }
+    }));
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
@@ -31,6 +36,9 @@ describe('gitOperations', () => {
     expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm upgrade');
     expect(execSyncMock).toHaveBeenCalledWith('npm upgrade', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
+    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
     expect(logMock.info).toHaveBeenCalledWith('Adding all changes to git');
     expect(execSyncMock).toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Committing with message: Version ${mockVersion} - ${dateFormatted}`);
@@ -60,5 +68,46 @@ describe('gitOperations', () => {
     expect(logMock.info).toHaveBeenCalledWith('Pushing tags to origin');
     expect(execSyncMock).toHaveBeenCalledWith('git push --tags', { stdio: 'inherit' });
   });
-});
 
+  test('skips webpack build when package.json does not use webpack', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'composer.json' || file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { build: 'vite build' },
+      dependencies: {}
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(execSyncMock).toHaveBeenCalledWith('npm upgrade', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+  });
+
+  test('runs webpack build when webpack.config.js exists', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'webpack.config.js');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: {},
+      dependencies: {}
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
+    expect(execSyncMock).toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
+  });
+
+  test('prefers npm run build over webpack script when both exist', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'webpack.config.mjs');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { build: 'webpack', webpack: 'webpack --mode production' },
+      dependencies: {}
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+  });
+});

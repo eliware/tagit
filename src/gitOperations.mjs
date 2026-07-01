@@ -1,6 +1,29 @@
+function usesWebpack(packageData, fs) {
+    const sections = [packageData?.dependencies, packageData?.devDependencies, packageData?.peerDependencies, packageData?.optionalDependencies];
+    const hasWebpackPackage = sections.some((section) => section && Object.prototype.hasOwnProperty.call(section, 'webpack'));
+    const hasWebpackConfig = fs.existsSync('webpack.config.js') || fs.existsSync('webpack.config.mjs');
+
+    return hasWebpackPackage || hasWebpackConfig;
+}
+
+function runWebpackBuild(execSync, packageData) {
+    if (packageData?.scripts && packageData.scripts.build) {
+        execSync('npm run build', { stdio: 'inherit' });
+        return;
+    }
+
+    if (packageData?.scripts && packageData.scripts.webpack) {
+        execSync('npm run webpack', { stdio: 'inherit' });
+        return;
+    }
+
+    execSync('npx webpack', { stdio: 'inherit' });
+}
+
 export function gitOperations(execSync, fs, log, newVersion) {
     const date = new Date().toISOString().split('T')[0];
     const dateFormatted = new Date().toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'}).replace(/\//g, '-');
+    let packageData = null;
 
     log.info('Starting git operations');
 
@@ -15,6 +38,15 @@ export function gitOperations(execSync, fs, log, newVersion) {
         if (fs.existsSync('package.json')) {
             log.info('package.json exists - running npm upgrade');
             execSync('npm upgrade', { stdio: 'inherit' });
+
+            const packageContent = fs.readFileSync('package.json', 'utf-8');
+            packageData = JSON.parse(packageContent);
+
+            if (usesWebpack(packageData, fs)) {
+                log.info('webpack detected - running webpack build');
+                runWebpackBuild(execSync, packageData);
+                log.info('webpack build complete');
+            }
         }
 
         log.info('Adding all changes to git');
