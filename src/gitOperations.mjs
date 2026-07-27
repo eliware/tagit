@@ -29,7 +29,6 @@ function restoreFileVersion(fs, file, snapshot) {
 }
 
 export function gitOperations(execSync, fs, log, newVersion) {
-    const date = new Date().toISOString().split('T')[0];
     const dateFormatted = new Date().toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: 'numeric'}).replace(/\//g, '-');
     let packageData = null;
     let composerSnapshot = null;
