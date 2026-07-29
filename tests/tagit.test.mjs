@@ -1,12 +1,12 @@
 import { jest } from '@jest/globals';
-import { isCli, runTagit } from '../tagit.mjs';
+import { isCli, runTagit } from '../bin/tagit.mjs';
 
 const makeLog = () => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn() });
 const makeFs = (existsSync = jest.fn(() => false)) => ({ existsSync });
 const noop = jest.fn();
 
 test('detects CLI execution', () => {
-  expect(isCli(['node', '/opt/tagit/tagit.mjs'])).toBe(true);
+  expect(isCli(['node', '/opt/tagit/bin/tagit.mjs'])).toBe(true);
   expect(isCli(['node', '/usr/local/bin/tagit'])).toBe(true);
   expect(isCli(['node', '/opt/test.mjs'])).toBe(false);
   expect(isCli(['node'])).toBe(false);

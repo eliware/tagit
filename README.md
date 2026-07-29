@@ -64,7 +64,7 @@ sudo npm test
 Create a symlink to make `tagit` available system-wide:
 
 ```bash
-sudo ln -s /opt/tagit/tagit.mjs /usr/bin/tagit
+sudo ln -s /opt/tagit/bin/tagit.mjs /usr/bin/tagit
 ```
 
 ## Usage
@@ -78,7 +78,7 @@ tagit
 If you have not created the symlink, you can run it directly with:
 
 ```bash
-/opt/tagit/tagit.mjs
+/opt/tagit/bin/tagit.mjs
 ```
 
 ## Release flow

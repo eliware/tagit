@@ -3,8 +3,8 @@ import { log as defaultLog, registerHandlers, registerSignals } from '@eliware/c
 import fsDefault from 'fs';
 import { execSync as execSyncDefault } from 'child_process';
 import path from 'path';
-import { updateVersionFiles as updateVersionFilesDefault } from './src/updateVersionFiles.mjs';
-import { gitOperations as gitOperationsDefault } from './src/gitOperations.mjs';
+import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVersionFiles.mjs';
+import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,

@@ -3,9 +3,9 @@
     "type": "module",
     "version": "1.1.13",
     "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
-    "main": "tagit.mjs",
+    "main": "bin/tagit.mjs",
     "scripts": {
-        "start": "node tagit.mjs",
+        "start": "node bin/tagit.mjs",
         "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
         "lint": "npx oxlint ."
     },
@@ -54,8 +54,8 @@
         "@eliware/common": "^1.1.4"
     },
     "bin": {
-        "tagit": "tagit.mjs",
-        "push": "bin/push",
-        "upstream": "bin/upstream"
+        "tagit": "bin/tagit.mjs",
+        "push": "bin/push.mjs",
+        "upstream": "bin/upstream.mjs"
     }
 }
