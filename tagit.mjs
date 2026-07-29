@@ -2,6 +2,7 @@
 import { log as defaultLog, registerHandlers, registerSignals } from '@eliware/common';
 import fsDefault from 'fs';
 import { execSync as execSyncDefault } from 'child_process';
+import path from 'path';
 import { updateVersionFiles as updateVersionFilesDefault } from './src/updateVersionFiles.mjs';
 import { gitOperations as gitOperationsDefault } from './src/gitOperations.mjs';
 
@@ -49,7 +50,8 @@ export async function runTagit(overrides) {
 }
 
 export function isCli(argv) {
-  return argv[1]?.endsWith('/tagit.mjs') ?? false;
+  const executable = argv[1] ? path.basename(argv[1]) : '';
+  return executable === 'tagit' || executable === 'tagit.mjs';
 }
 
 // Keep imports safe for tests; execute only when used as the CLI.

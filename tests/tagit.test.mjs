@@ -7,6 +7,7 @@ const noop = jest.fn();
 
 test('detects CLI execution', () => {
   expect(isCli(['node', '/opt/tagit/tagit.mjs'])).toBe(true);
+  expect(isCli(['node', '/usr/local/bin/tagit'])).toBe(true);
   expect(isCli(['node', '/opt/test.mjs'])).toBe(false);
   expect(isCli(['node'])).toBe(false);
 });
