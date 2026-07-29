@@ -144,6 +144,12 @@ Run the test suite with:
 npm test
 ```
 
+Run the linter with:
+
+```bash
+npm run lint
+```
+
 ## Notes
 
 - `tagit` runs `npm update` and `composer update`, so dependency lock files may change during a release.

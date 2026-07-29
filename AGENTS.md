@@ -72,7 +72,7 @@ npx webpack
 - Preserve dependency injection in exported functions where practical; it keeps tests simple and avoids real shell/filesystem side effects.
 - Do not run `tagit.mjs` casually from this repository or another project unless explicitly asked. It can mutate files, commit, tag, and push.
 - Do not run real `git push`, `git tag`, `npm upgrade`, `composer upgrade`, or release commands unless explicitly requested.
-- Run `npm test` after code changes when feasible.
+- Run `npm test` and `npm run lint` after changes when feasible.
 - Update README behavior descriptions when CLI behavior changes.
 - Add or adjust tests for command-order or branching changes in release logic.
 
