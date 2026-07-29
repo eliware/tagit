@@ -100,6 +100,21 @@ describe('gitOperations', () => {
     expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
   });
 
+  test('runs npm run webpack when webpack script is the available build command', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { webpack: 'webpack --mode production' },
+      dependencies: { webpack: '^5.0.0' }
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
+    expect(execSyncMock).toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
+  });
+
   test('prefers npm run build over webpack script when both exist', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'webpack.config.mjs');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({

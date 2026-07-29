@@ -56,6 +56,20 @@ describe('updateVersionFiles', () => {
     expect(logMock.info).toHaveBeenCalled();
   });
 
+  test('syncs package.json to the composer version', async () => {
+    fsMock.existsSync.mockImplementation(file => file === 'composer.json' || file === 'package.json');
+    fsMock.readFileSync.mockImplementation(file => JSON.stringify({
+      version: file === 'composer.json' ? '1.0.0' : '0.9.9'
+    }));
+
+    const newVersion = await updateVersionFiles(fsMock, logMock);
+
+    expect(newVersion).toBe('1.0.1');
+    const packageWrite = fsMock.writeFileSync.mock.calls.find(([file]) => file === 'package.json');
+    expect(JSON.parse(packageWrite[1]).version).toBe('1.0.1');
+    expect(logMock.info).toHaveBeenCalledWith('Syncing package.json version to 1.0.1');
+  });
+
   test('increments version in package.json if composer.json missing', async () => {
     fsMock.existsSync.mockImplementation(file => file === 'package.json');
     fsMock.readFileSync.mockReturnValueOnce(JSON.stringify({ version: '2.1.3' }));

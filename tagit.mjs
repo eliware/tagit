@@ -1,29 +1,39 @@
 #!/usr/bin/env node
-import { log, registerHandlers, registerSignals } from '@eliware/common';
-import fs from 'fs';
-import { execSync } from 'child_process';
-import { updateVersionFiles } from './src/updateVersionFiles.mjs';
-import { gitOperations } from './src/gitOperations.mjs';
+import { log as defaultLog, registerHandlers, registerSignals } from '@eliware/common';
+import fsDefault from 'fs';
+import { execSync as execSyncDefault } from 'child_process';
+import { updateVersionFiles as updateVersionFilesDefault } from './src/updateVersionFiles.mjs';
+import { gitOperations as gitOperationsDefault } from './src/gitOperations.mjs';
 
-(async () => {
-  if (process.env.NODE_ENV === 'test') {
-    return;
-  }
+const defaultDependencies = {
+  fs: fsDefault,
+  execSync: execSyncDefault,
+  log: defaultLog,
+  updateVersionFiles: updateVersionFilesDefault,
+  gitOperations: gitOperationsDefault,
+  registerHandlersFn: registerHandlers,
+  registerSignalsFn: registerSignals,
+  exit: process.exit,
+};
 
-  // Register handlers/signals so logging and cleanup are available
-  registerHandlers({ log });
-  registerSignals({ log });
+export async function runTagit(overrides) {
+  const {
+    fs, execSync, log, updateVersionFiles, gitOperations,
+    registerHandlersFn, registerSignalsFn, exit,
+  } = { ...defaultDependencies, ...overrides };
+  registerHandlersFn({ log });
+  registerSignalsFn({ log });
 
-  // Early abort: if a .notag file exists in the repo root, stop the process.
-  // This allows temporarily preventing tagging/commits without changing scripts.
   try {
     if (fs.existsSync('.notag')) {
       log.warn('.notag file detected — aborting tag/release process.');
-      process.exit(0);
+      exit(0);
+      return;
     }
-  } catch (err) {
-    log.error('Error checking for .notag file:', err);
-    process.exit(1);
+  } catch (error) {
+    log.error('Error checking for .notag file:', error);
+    exit(1);
+    return;
   }
 
   log.info('tagit Started');
@@ -34,6 +44,16 @@ import { gitOperations } from './src/gitOperations.mjs';
     gitOperations(execSync, fs, log, newVersion);
   } catch (error) {
     log.error(error);
-    process.exit(1);
+    exit(1);
   }
-})();
+}
+
+export function isCli(argv) {
+  return argv[1]?.endsWith('/tagit.mjs') ?? false;
+}
+
+// Keep imports safe for tests; execute only when used as the CLI.
+/* istanbul ignore next */
+if (isCli(process.argv)) {
+  await runTagit(defaultDependencies);
+}

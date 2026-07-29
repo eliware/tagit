@@ -53,6 +53,8 @@
         "@eliware/common": "^1.1.4"
     },
     "bin": {
-        "tagit": "tagit.mjs"
+        "tagit": "tagit.mjs",
+        "push": "bin/push",
+        "upstream": "bin/upstream"
     }
 }
