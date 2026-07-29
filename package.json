@@ -2,7 +2,7 @@
     "name": "@eliware/tagit",
     "type": "module",
     "version": "1.1.10",
-    "description": "Automated version management and Git operations for Node.js and PHP projects.",
+    "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
     "main": "tagit.mjs",
     "scripts": {
         "start": "node tagit.mjs",
@@ -16,7 +16,6 @@
     "keywords": [
         "tagit",
         "versioning",
-        "semantic-versioning",
         "git",
         "git-tag",
         "automation",
@@ -29,7 +28,9 @@
         "composer.json",
         "release",
         "publishing",
-        "cli"
+        "cli",
+        "version-bumping",
+        "webpack"
     ],
     "author": "Eli Sterling, eliware.org <eli@eliware.org>",
     "license": "MIT",

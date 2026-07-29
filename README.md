@@ -2,7 +2,7 @@
 
 ## @eliware/tagit [![npm version](https://img.shields.io/npm/v/@eliware/tagit.svg)](https://www.npmjs.com/package/@eliware/tagit) [![license](https://img.shields.io/github/license/eliware/tagit.svg)](LICENSE) [![build status](https://github.com/eliware/tagit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/tagit/actions)
 
-Automated version management and Git operations for Node.js and PHP projects.
+Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.
 
 **Note:** `tagit` is intended for use on Linux systems only.
 
@@ -10,11 +10,11 @@ Automated version management and Git operations for Node.js and PHP projects.
 
 ## What is tagit?
 
-`tagit` is a Linux-focused CLI utility that automates a release workflow for Node.js and PHP projects. It increments the project version, updates `package.json` and/or `composer.json`, runs dependency/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
+`tagit` is a Linux-focused CLI utility that automates a release workflow for Node.js and PHP projects. It increments the project version, updates `package.json` and/or `composer.json`, runs dependency and optional test/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
 
 ## Features
 
-- Increments the semantic version in `package.json` and/or `composer.json`
+- Increments the final numeric version segment in `package.json` and/or `composer.json`
 - Keeps `package.json` and `composer.json` versions in sync when both files exist
 - Runs Composer maintenance commands for PHP projects
 - Runs `npm update` for Node.js projects
@@ -31,7 +31,7 @@ Automated version management and Git operations for Node.js and PHP projects.
 - npm
 - Git
 - Composer, if the target project contains `composer.json`
-- A clean, correctly configured Git repository with push access to its remote
+- A correctly configured Git repository with push access to its remote
 
 ## How versioning works
 
@@ -147,7 +147,7 @@ npm test
 ## Notes
 
 - `tagit` runs `npm update` and `composer update`, so dependency lock files may change during a release.
-- If `npm update`, `npm test`, `npm run build`, or Composer update/bump fails, `tagit` restores the original version contents before exiting.
+- If `npm update`, `npm test`, `npm run build`, or Composer update/bump fails, `tagit` restores the version-file snapshots captured before dependency/test/build/Git commands.
 - `tagit` commits every staged and unstaged change after running `git add -A`.
 - The GitHub Actions workflow publishes to npm when a tag is pushed.
 

@@ -47,9 +47,9 @@ The test suite is local and uses Jest. Existing tests mock shell commands, so th
 Be careful when changing `src/gitOperations.mjs`. The real CLI can run:
 
 ```bash
-COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer upgrade
+COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update
 COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump
-npm upgrade
+npm update
 git add -A
 git commit -m 'Version <version> - MM-DD-YYYY'
 git tag <version>
@@ -78,7 +78,7 @@ npx webpack
 
 ## Current Known Risks
 
-- If no version file exists, `updateVersionFiles` returns `null`; downstream Git operations may still attempt to commit/tag.
+- If no version file exists, `updateVersionFiles` returns `null`; downstream Git operations still attempt to commit/tag.
 - Version strings are not strictly validated.
 - Release commands use shell strings and should be treated carefully.
-- `npm upgrade` and `composer upgrade` can introduce dependency changes during a release.
+- `npm update` and `composer update` can introduce dependency changes during a release.
