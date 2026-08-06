@@ -49,6 +49,15 @@ export async function runTagit(overrides) {
   }
 }
 
+export function getVersion(fs = fsDefault) {
+  const packageJson = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  return packageJson.version;
+}
+
+export function isVersion(argv) {
+  return argv.includes('--version') || argv.includes('-v');
+}
+
 export function isCli(argv) {
   const executable = argv[1] ? path.basename(argv[1]) : '';
   return executable === 'tagit' || executable === 'tagit.mjs';
@@ -57,5 +66,9 @@ export function isCli(argv) {
 // Keep imports safe for tests; execute only when used as the CLI.
 /* istanbul ignore next */
 if (isCli(process.argv)) {
-  await runTagit(defaultDependencies);
+  if (isVersion(process.argv)) {
+    console.log(getVersion());
+  } else {
+    await runTagit(defaultDependencies);
+  }
 }
