@@ -1,7 +1,7 @@
 {
     "name": "@eliware/tagit",
     "type": "module",
-    "version": "1.1.16",
+    "version": "1.1.17",
     "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
     "main": "bin/tagit.mjs",
     "scripts": {
