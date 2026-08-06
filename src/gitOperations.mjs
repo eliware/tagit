@@ -20,6 +20,30 @@ function runWebpackBuild(execSync, packageData) {
     execSync('npx webpack', { stdio: 'inherit' });
 }
 
+
+function updateOutdatedDependencies(execSync, log) {
+    let output = '';
+    try {
+        output = execSync('npm outdated --json', { encoding: 'utf-8' }) || '';
+    } catch (error) {
+        // npm outdated exits with status 1 when outdated packages are found.
+        output = error.stdout || '';
+    }
+    if (!output) return;
+
+    let outdated;
+    try {
+        outdated = JSON.parse(output);
+    } catch {
+        log.warn('Unable to parse npm outdated output; continuing without latest upgrades');
+        return;
+    }
+    for (const name of Object.keys(outdated)) {
+        log.info(`Updating outdated dependency to latest: ${name}`);
+        execSync(`npm install ${name}@latest`, { stdio: 'inherit' });
+    }
+}
+
 function restoreFileVersion(fs, file, snapshot) {
     if (!snapshot) {
         return;
@@ -53,7 +77,10 @@ export function gitOperations(execSync, fs, log, newVersion) {
         }
 
         if (fs.existsSync('package.json')) {
-            log.info('package.json exists - running npm update');
+            log.info('package.json exists - running npm install');
+            execSync('npm install', { stdio: 'inherit' });
+            updateOutdatedDependencies(execSync, log);
+            log.info('Running npm update');
             execSync('npm update', { stdio: 'inherit' });
 
             const packageContent = fs.readFileSync('package.json', 'utf-8');

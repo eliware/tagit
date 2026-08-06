@@ -35,7 +35,14 @@ describe('gitOperations', () => {
     expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Running composer bump');
     expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
-    expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm update');
+    expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm install');
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(logMock.info).toHaveBeenCalledWith('Running npm update');
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
     expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('package.json has test script - running npm test');
     expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
@@ -81,6 +88,10 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
     expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
@@ -148,6 +159,10 @@ describe('gitOperations', () => {
 
     expect(fsMock.writeFileSync).toHaveBeenCalledWith('composer.json', JSON.stringify({ version: '1.0.41' }), 'utf-8');
     expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', JSON.stringify({ version: '1.0.41', scripts: {} }), 'utf-8');
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
     expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
     expect(execSyncMock).not.toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
   });
@@ -161,6 +176,10 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
     expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
     expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
     expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
