@@ -63,3 +63,4 @@ node_modules/
 
 # AgentX
 .agentx_responseid
+.agentx*
