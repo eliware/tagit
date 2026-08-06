@@ -1,62 +1,62 @@
 {
-  "name": "@eliware/tagit",
-  "type": "module",
-  "version": "1.1.15",
-  "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
-  "main": "bin/tagit.mjs",
-  "scripts": {
-    "start": "node bin/tagit.mjs",
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
-    "lint": "npx oxlint .",
-    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/tagit.git"
-  },
-  "keywords": [
-    "tagit",
-    "versioning",
-    "git",
-    "git-tag",
-    "automation",
-    "release-automation",
-    "nodejs",
-    "npm",
-    "php",
-    "composer",
-    "package.json",
-    "composer.json",
-    "release",
-    "publishing",
-    "cli",
-    "version-bumping",
-    "webpack"
-  ],
-  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/eliware/tagit/issues"
-  },
-  "homepage": "https://github.com/eliware/tagit#readme",
-  "devDependencies": {
-    "jest": "^30.0.4",
-    "oxlint": "^1.76.0"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs",
-      "**/?(*.)+(spec|test).cjs"
-    ]
-  },
-  "dependencies": {
-    "@eliware/common": "^1.1.4"
-  },
-  "bin": {
-    "tagit": "bin/tagit.mjs",
-    "push": "bin/push.mjs",
-    "upstream": "bin/upstream.mjs"
-  }
+    "name": "@eliware/tagit",
+    "type": "module",
+    "version": "1.1.16",
+    "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
+    "main": "bin/tagit.mjs",
+    "scripts": {
+        "start": "node bin/tagit.mjs",
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+        "lint": "npx oxlint .",
+        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/eliware/tagit.git"
+    },
+    "keywords": [
+        "tagit",
+        "versioning",
+        "git",
+        "git-tag",
+        "automation",
+        "release-automation",
+        "nodejs",
+        "npm",
+        "php",
+        "composer",
+        "package.json",
+        "composer.json",
+        "release",
+        "publishing",
+        "cli",
+        "version-bumping",
+        "webpack"
+    ],
+    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/eliware/tagit/issues"
+    },
+    "homepage": "https://github.com/eliware/tagit#readme",
+    "devDependencies": {
+        "jest": "^30.0.4",
+        "oxlint": "^1.76.0"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs",
+            "**/?(*.)+(spec|test).cjs"
+        ]
+    },
+    "dependencies": {
+        "@eliware/common": "^1.1.4"
+    },
+    "bin": {
+        "tagit": "bin/tagit.mjs",
+        "push": "bin/push.mjs",
+        "upstream": "bin/upstream.mjs"
+    }
 }
