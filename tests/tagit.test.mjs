@@ -1,5 +1,7 @@
 import { jest } from '@jest/globals';
-import { getBumpVersion, helpText, isCli, isDryRun, isHelp, isYes, runTagit } from '../bin/tagit.mjs';
+import {
+  getBumpVersion, getVersion, helpText, isCli, isDryRun, isHelp, isVersion, isYes, parseOptions, runTagit
+} from '../bin/tagit.mjs';
 
 const makeLog = () => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn() });
 const makeFs = (existsSync = jest.fn(() => false)) => ({ existsSync });
@@ -18,7 +20,51 @@ test('detects supported options and renders help', () => {
   expect(isDryRun(['node', 'tagit', '--dry-run'])).toBe(true);
   expect(isYes(['node', 'tagit', '-y'])).toBe(true);
   expect(getBumpVersion(['node', 'tagit', '-b', '2.4.0'])).toBe('2.4.0');
+  expect(isVersion(['node', 'tagit', '--version'])).toBe(true);
+  expect(isVersion(['node', 'tagit', '-v'])).toBe(true);
+  expect(isVersion(['node', 'tagit'])).toBe(false);
+  expect(isHelp(['node', 'tagit'])).toBe(false);
+  expect(isDryRun(['node', 'tagit'])).toBe(false);
+  expect(isYes(['node', 'tagit'])).toBe(false);
+  expect(getBumpVersion(['node', 'tagit'])).toBe(null);
+  expect(getBumpVersion(['node', 'tagit', '-b'])).toBe(null);
+  expect(getBumpVersion(['node', 'tagit', '-b', '--dry-run'])).toBe(null);
   expect(helpText()).toContain('--dry-run');
+});
+
+test('reads the installed version', () => {
+  const fs = { readFileSync: jest.fn(() => JSON.stringify({ version: '9.8.7' })) };
+
+  expect(getVersion(fs)).toBe('9.8.7');
+  expect(fs.readFileSync).toHaveBeenCalledWith(expect.any(URL), 'utf8');
+  expect(getVersion()).toBe('1.1.17');
+});
+
+test('rejects invalid explicit versions', () => {
+  expect(() => getBumpVersion(['node', 'tagit', '--bump', 'next'])).toThrow('Invalid bump version: next');
+  expect(parseOptions(['--bump', '3.2.1']).bumpVersion).toBe('3.2.1');
+});
+
+test('uses default CLI dependencies for bare invocation', async () => {
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+  await runTagit();
+
+  expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Usage: tagit'));
+  consoleSpy.mockRestore();
+});
+
+test('passes explicit bump version through release and dry-run flows', async () => {
+  const log = makeLog();
+  const fs = makeFs();
+  const updateVersionFiles = jest.fn().mockResolvedValue('2.4.0');
+  const gitOperations = jest.fn();
+
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y', '-b', '2.4.0']);
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['--dry-run', '--bump', '2.4.0']);
+
+  expect(updateVersionFiles).toHaveBeenNthCalledWith(1, fs, log, { targetVersion: '2.4.0' });
+  expect(updateVersionFiles).toHaveBeenNthCalledWith(2, fs, log, { dryRun: true, targetVersion: '2.4.0' });
 });
 
 afterEach(() => jest.clearAllMocks());
