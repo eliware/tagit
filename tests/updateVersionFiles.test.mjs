@@ -98,6 +98,16 @@ describe('updateVersionFiles', () => {
     expect(logMock.info).toHaveBeenCalledWith('Dry run: would write updated version to package.json');
   });
 
+  test('dry-run leaves composer version unwritten', async () => {
+    fsMock.existsSync.mockImplementation(file => file === 'composer.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ version: '1.0.0' }));
+
+    await updateVersionFiles(fsMock, logMock, { dryRun: true });
+
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
+    expect(logMock.info).toHaveBeenCalledWith('Dry run: would write updated version to composer.json');
+  });
+
   test('uses an explicit target version for all version files', async () => {
     fsMock.existsSync.mockImplementation(file => file === 'composer.json' || file === 'package.json');
     fsMock.readFileSync.mockImplementation(file => JSON.stringify({ version: file === 'composer.json' ? '1.0.0' : '0.9.9' }));

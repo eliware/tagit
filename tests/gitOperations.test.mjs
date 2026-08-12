@@ -17,8 +17,96 @@ describe('gitOperations', () => {
     };
     logMock = {
       info: jest.fn(),
+      warn: jest.fn(),
       error: jest.fn()
     };
+  });
+
+  test('dry-run runs package checks without release operations', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'webpack.config.js');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({
+      scripts: { test: 'jest' },
+      dependencies: {}
+    }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
+
+    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith(`Dry run complete: ${mockVersion} was not released`);
+  });
+
+  test('dry-run skips checks when package.json is absent', () => {
+    fsMock.existsSync.mockReturnValue(false);
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
+
+    expect(execSyncMock).not.toHaveBeenCalled();
+    expect(logMock.info).toHaveBeenCalledWith(`Dry run complete: ${mockVersion} was not released`);
+  });
+
+  test('dry-run skips npm test when no test script exists', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
+
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
+  });
+
+  test('continues when npm outdated has no output', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
+    execSyncMock.mockImplementation((command) => command === 'npm outdated --json' ? '' : undefined);
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(logMock.warn).not.toHaveBeenCalled();
+  });
+
+  test('continues when npm outdated output is invalid', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
+    execSyncMock.mockImplementation((command) => command === 'npm outdated --json' ? '{bad json' : undefined);
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(logMock.warn).toHaveBeenCalledWith('Unable to parse npm outdated output; continuing without latest upgrades');
+  });
+
+  test('uses npm outdated error stdout and upgrades listed dependencies', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'npm outdated --json') throw { stdout: JSON.stringify({ lodash: {} }) };
+    });
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(execSyncMock).toHaveBeenCalledWith('npm install lodash@latest', { stdio: 'inherit' });
+  });
+
+  test('ignores npm outdated failures without stdout', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'npm outdated --json') throw new Error('outdated unavailable');
+    });
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(logMock.warn).not.toHaveBeenCalled();
+  });
+
+  test('does not restore absent version snapshots on failure', () => {
+    fsMock.existsSync.mockReturnValue(false);
+    execSyncMock.mockImplementation((command) => {
+      if (command === 'git add -A') throw new Error('git failed');
+    });
+
+    expect(() => gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toThrow('git failed');
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
   });
 
   test('runs all git and composer/npm commands when files exist', () => {
