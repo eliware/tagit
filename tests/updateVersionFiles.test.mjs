@@ -98,4 +98,15 @@ describe('updateVersionFiles', () => {
     expect(logMock.info).toHaveBeenCalledWith('Dry run: would write updated version to package.json');
   });
 
+  test('uses an explicit target version for all version files', async () => {
+    fsMock.existsSync.mockImplementation(file => file === 'composer.json' || file === 'package.json');
+    fsMock.readFileSync.mockImplementation(file => JSON.stringify({ version: file === 'composer.json' ? '1.0.0' : '0.9.9' }));
+
+    const newVersion = await updateVersionFiles(fsMock, logMock, { targetVersion: '7.8.9' });
+
+    expect(newVersion).toBe('7.8.9');
+    expect(fsMock.writeFileSync).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(fsMock.writeFileSync.mock.calls[1][1]).version).toBe('7.8.9');
+  });
+
 });

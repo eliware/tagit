@@ -1,6 +1,6 @@
 import { incrementVersion } from './incrementVersion.mjs';
 
-export async function updateVersionFiles(fs, log, { dryRun = false } = {}) {
+export async function updateVersionFiles(fs, log, { dryRun = false, targetVersion = null } = {}) {
   const composerFile = 'composer.json';
   const packageFile = 'package.json';
   let newVersion = null;
@@ -14,7 +14,7 @@ export async function updateVersionFiles(fs, log, { dryRun = false } = {}) {
       throw new Error('Version not found in composer.json.');
     }
 
-    newVersion = incrementVersion(composerData.version);
+    newVersion = targetVersion ?? incrementVersion(composerData.version);
     log.info(`Incremented composer.json version from ${composerData.version} to ${newVersion}`);
     composerData.version = newVersion;
 
@@ -36,7 +36,7 @@ export async function updateVersionFiles(fs, log, { dryRun = false } = {}) {
     }
 
     if (!newVersion) {
-      newVersion = incrementVersion(packageData.version);
+      newVersion = targetVersion ?? incrementVersion(packageData.version);
       log.info(`Incremented package.json version to ${newVersion}`);
     } else {
       log.info(`Syncing package.json version to ${newVersion}`);

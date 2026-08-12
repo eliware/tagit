@@ -69,10 +69,11 @@ sudo ln -s /opt/tagit/bin/tagit.mjs /usr/bin/tagit
 
 ## Usage
 
-Switch to the root directory of the project you want to release, then run:
+Switch to the root directory of the project you want to release. A bare command
+only displays help; use `-y` or `--yes` to authorize the release:
 
 ```bash
-tagit
+tagit --yes
 ```
 
 Preview a release without changing version files or performing dependency, Git, tag, or push operations:
@@ -81,12 +82,20 @@ Preview a release without changing version files or performing dependency, Git, 
 tagit --dry-run
 ```
 
+To select a specific version, provide it with `-b` or `--bump`; without that
+option, tagit increments the final numeric component automatically:
+
+```bash
+tagit --dry-run --bump 2.0.0
+tagit --yes --bump 2.0.0
+```
+
 Show command help with `tagit --help` (or `tagit -h`).
 
 If you have not created the symlink, you can run it directly with:
 
 ```bash
-/opt/tagit/bin/tagit.mjs
+/opt/tagit/bin/tagit.mjs --yes
 ```
 
 ## Release flow
