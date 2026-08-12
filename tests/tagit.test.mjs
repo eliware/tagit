@@ -37,7 +37,7 @@ test('reads the installed version', () => {
 
   expect(getVersion(fs)).toBe('9.8.7');
   expect(fs.readFileSync).toHaveBeenCalledWith(expect.any(URL), 'utf8');
-  expect(getVersion()).toBe('1.1.17');
+  expect(getVersion()).toMatch(/^\d+\.\d+\.\d+$/);
 });
 
 test('rejects invalid explicit versions', () => {

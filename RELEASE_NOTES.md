@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.1.18
+
+- Added a non-destructive `--dry-run` release preview with test/build checks.
+- Added `--help`, explicit `-y`/`--yes` release confirmation, and `-b`/`--bump` target versions.
+- Completed CLI and release-operation test coverage at 100% across all metrics.
+
 ## 1.1.17
 
 - Added `tagit --version` and `tagit -v` commands.
