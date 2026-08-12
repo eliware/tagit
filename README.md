@@ -75,6 +75,14 @@ Switch to the root directory of the project you want to release, then run:
 tagit
 ```
 
+Preview a release without changing version files or performing dependency, Git, tag, or push operations:
+
+```bash
+tagit --dry-run
+```
+
+Show command help with `tagit --help` (or `tagit -h`).
+
 If you have not created the symlink, you can run it directly with:
 
 ```bash

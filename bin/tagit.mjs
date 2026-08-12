@@ -17,11 +17,16 @@ const defaultDependencies = {
   exit: process.exit,
 };
 
-export async function runTagit(overrides) {
+export async function runTagit(overrides = {}, argv = []) {
   const {
     fs, execSync, log, updateVersionFiles, gitOperations,
     registerHandlersFn, registerSignalsFn, exit,
   } = { ...defaultDependencies, ...overrides };
+  if (isHelp(argv)) {
+    (overrides.output ?? console.log)(helpText());
+    return;
+  }
+  const dryRun = isDryRun(argv);
   registerHandlersFn({ log });
   registerSignalsFn({ log });
 
@@ -40,9 +45,15 @@ export async function runTagit(overrides) {
   log.info('tagit Started');
 
   try {
-    const newVersion = await updateVersionFiles(fs, log);
-    log.info(`Updated version to ${newVersion}`);
-    gitOperations(execSync, fs, log, newVersion);
+    const newVersion = dryRun
+      ? await updateVersionFiles(fs, log, { dryRun: true })
+      : await updateVersionFiles(fs, log);
+    log.info(`${dryRun ? 'Dry run: would update version to' : 'Updated version to'} ${newVersion}`);
+    if (dryRun) {
+      gitOperations(execSync, fs, log, newVersion, { dryRun: true });
+    } else {
+      gitOperations(execSync, fs, log, newVersion);
+    }
   } catch (error) {
     log.error(error);
     exit(1);
@@ -58,6 +69,18 @@ export function isVersion(argv) {
   return argv.includes('--version') || argv.includes('-v');
 }
 
+export function isHelp(argv) {
+  return argv.includes('--help') || argv.includes('-h');
+}
+
+export function isDryRun(argv) {
+  return argv.includes('--dry-run');
+}
+
+export function helpText() {
+  return `Usage: tagit [options]\n\nOptions:\n  --dry-run  Preview the next version and run checks without releasing\n  -h, --help Show this help\n  -v, --version Show the installed tagit version`;
+}
+
 export function isCli(argv) {
   const executable = argv[1] ? path.basename(argv[1]) : '';
   return executable === 'tagit' || executable === 'tagit.mjs';
@@ -69,6 +92,6 @@ if (isCli(process.argv)) {
   if (isVersion(process.argv)) {
     console.log(getVersion());
   } else {
-    await runTagit(defaultDependencies);
+    await runTagit(defaultDependencies, process.argv.slice(2));
   }
 }

@@ -87,4 +87,15 @@ describe('updateVersionFiles', () => {
     expect(logMock.info).toHaveBeenCalled();
   });
 
+  test('dry-run calculates without writing version files', async () => {
+    fsMock.existsSync.mockImplementation(file => file === 'package.json');
+    fsMock.readFileSync.mockReturnValue(JSON.stringify({ version: '2.1.3' }));
+
+    const newVersion = await updateVersionFiles(fsMock, logMock, { dryRun: true });
+
+    expect(newVersion).toBe('2.1.4');
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
+    expect(logMock.info).toHaveBeenCalledWith('Dry run: would write updated version to package.json');
+  });
+
 });

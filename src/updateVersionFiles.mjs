@@ -1,6 +1,6 @@
 import { incrementVersion } from './incrementVersion.mjs';
 
-export async function updateVersionFiles(fs, log) {
+export async function updateVersionFiles(fs, log, { dryRun = false } = {}) {
   const composerFile = 'composer.json';
   const packageFile = 'package.json';
   let newVersion = null;
@@ -19,8 +19,11 @@ export async function updateVersionFiles(fs, log) {
     composerData.version = newVersion;
 
     const newContent = JSON.stringify(composerData, null, 4);
-    fs.writeFileSync(composerFile, newContent);
-    log.info(`Wrote updated version to ${composerFile}`);
+    if (dryRun) log.info(`Dry run: would write updated version to ${composerFile}`);
+    else {
+      fs.writeFileSync(composerFile, newContent);
+      log.info(`Wrote updated version to ${composerFile}`);
+    }
   }
 
   if (fs.existsSync(packageFile)) {
@@ -41,8 +44,11 @@ export async function updateVersionFiles(fs, log) {
     packageData.version = newVersion;
 
     const newPkgContent = JSON.stringify(packageData, null, 4);
-    fs.writeFileSync(packageFile, newPkgContent);
-    log.info(`Wrote updated version to ${packageFile}`);
+    if (dryRun) log.info(`Dry run: would write updated version to ${packageFile}`);
+    else {
+      fs.writeFileSync(packageFile, newPkgContent);
+      log.info(`Wrote updated version to ${packageFile}`);
+    }
   }
 
   return newVersion;
