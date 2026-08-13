@@ -141,8 +141,8 @@ describe('gitOperations', () => {
     expect(execSyncMock).toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Committing with message: Version ${mockVersion} - ${dateFormatted}`);
     expect(execSyncMock).toHaveBeenCalledWith(`git commit -m 'Version ${mockVersion} - ${dateFormatted}'`, { stdio: 'inherit' });
-    expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: ${mockVersion}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git tag ${mockVersion}`, { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: v${mockVersion}`);
+    expect(execSyncMock).toHaveBeenCalledWith(`git tag v${mockVersion}`, { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing commits to origin');
     expect(execSyncMock).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing tags to origin');
@@ -159,8 +159,8 @@ describe('gitOperations', () => {
     expect(execSyncMock).toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Committing with message: Version ${mockVersion} - ${dateFormatted}`);
     expect(execSyncMock).toHaveBeenCalledWith(`git commit -m 'Version ${mockVersion} - ${dateFormatted}'`, { stdio: 'inherit' });
-    expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: ${mockVersion}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git tag ${mockVersion}`, { stdio: 'inherit' });
+    expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: v${mockVersion}`);
+    expect(execSyncMock).toHaveBeenCalledWith(`git tag v${mockVersion}`, { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing commits to origin');
     expect(execSyncMock).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing tags to origin');

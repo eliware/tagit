@@ -20,7 +20,7 @@ Automated version bumping, dependency updates, builds, and Git release operation
 - Runs `npm update` for Node.js projects
 - Detects webpack projects and runs a build before committing
 - Commits all changes with a message like `Version <version> - MM-DD-YYYY`
-- Tags the commit with the new version, for example `1.2.4`
+- Tags the commit with the new version prefixed by `v`, for example `v1.2.4`
 - Pushes commits and tags to your remote repository
 - Logs each step for transparency
 
@@ -136,7 +136,7 @@ npx webpack
 ```bash
 git add -A
 git commit -m 'Version <version> - MM-DD-YYYY'
-git tag <version>
+git tag v<version>
 git push
 git push --tags
 ```

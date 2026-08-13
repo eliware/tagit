@@ -52,7 +52,7 @@ COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump
 npm update
 git add -A
 git commit -m 'Version <version> - MM-DD-YYYY'
-git tag <version>
+git tag v<version>
 git push
 git push --tags
 ```

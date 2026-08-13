@@ -118,8 +118,9 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false } 
         execSync('git add -A', { stdio: 'inherit' });
         log.info(`Committing with message: Version ${newVersion} - ${dateFormatted}`);
         execSync(`git commit -m 'Version ${newVersion} - ${dateFormatted}'`, { stdio: 'inherit' });
-        log.info(`Tagging commit with tag: ${newVersion}`);
-        execSync(`git tag ${newVersion}`, { stdio: 'inherit' });
+        const releaseTag = `v${newVersion}`;
+        log.info(`Tagging commit with tag: ${releaseTag}`);
+        execSync(`git tag ${releaseTag}`, { stdio: 'inherit' });
         log.info('Pushing commits to origin');
         execSync('git push', { stdio: 'inherit' });
         log.info('Pushing tags to origin');
