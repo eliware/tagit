@@ -172,7 +172,7 @@ npm run lint
 - `tagit` runs `npm update` and `composer update`, so dependency lock files may change during a release.
 - If `npm update`, `npm test`, `npm run build`, or Composer update/bump fails, `tagit` restores the version-file snapshots captured before dependency/test/build/Git commands.
 - `tagit` commits every staged and unstaged change after running `git add -A`.
-- The GitHub Actions workflow publishes to npm when a tag is pushed.
+- The GitHub Actions workflow publishes to npm only when a `v*` tag is pushed.
 
 ## Support
 
