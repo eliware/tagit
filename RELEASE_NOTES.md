@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+- Release tags now use the `v<version>` format, for example `v1.1.19`.
+
 ## 1.1.18
 
 - Added a non-destructive `--dry-run` release preview with test/build checks.
