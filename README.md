@@ -92,6 +92,26 @@ tagit --yes --bump 2.0.0
 
 Show command help with `tagit --help` (or `tagit -h`).
 
+Run the guarded release preflight without changing files, committing, tagging, or pushing:
+
+```bash
+npm run release:check
+```
+
+The preflight rejects dirty trees, checks for `.notag`, runs tests with strict
+100x4 coverage, lint, and the production dependency audit. An operator may
+explicitly waive 100x4 with `npm run release:check -- --ignore-100x4`; record
+that waiver and its reason in the release report.
+
+Monitor a specific GitHub Actions run to completion:
+
+```bash
+node /opt/tagit/bin/release-check.mjs --run-id <run-id>
+```
+
+The command fails on a failed, cancelled, timed-out, or uninspectable run. It
+does not modify GitHub, GitOps, or production state.
+
 If you have not created the symlink, you can run it directly with:
 
 ```bash
