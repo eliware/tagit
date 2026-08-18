@@ -1,4 +1,4 @@
-const COVERAGE_RE = /All files\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/;
+const COVERAGE_RE = /All files\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)/;
 
 function command(execSync, command, options = {}) {
   return execSync(command, { encoding: 'utf8', ...options });
