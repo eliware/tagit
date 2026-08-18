@@ -112,6 +112,21 @@ node /opt/tagit/bin/release-check.mjs --run-id <run-id>
 The command fails on a failed, cancelled, timed-out, or uninspectable run. It
 does not modify GitHub, GitOps, or production state.
 
+Update a declared GitOps image pin after CI has published and verified an image:
+
+```bash
+npm run gitops:pin -- --dry-run \
+  --gitops-root /opt/gitops-k8s \
+  --source eliware/ask \
+  --version 1.1.7 \
+  --digest sha256:<64-hex-digest>
+```
+
+Remove `--dry-run` only after reviewing the result. The updater requires an
+explicit registry mapping, writes `vX.Y.Z@sha256:...`, validates the declared
+Kustomize overlay, and refuses missing or unsafe mappings. It does not commit,
+push, sync Argo, or roll back deployments yet.
+
 If you have not created the symlink, you can run it directly with:
 
 ```bash
