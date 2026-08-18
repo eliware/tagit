@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import {
-  getBumpVersion, getVersion, helpText, isCli, isDryRun, isHelp, isVersion, isYes, parseOptions, runTagit
+  getBumpVersion, getVersion, helpText, isCheck, isCli, isDryRun, isHelp, isVersion, isYes, parseOptions, runTagit
 } from '../bin/tagit.mjs';
 
 const makeLog = () => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn() });
@@ -18,6 +18,7 @@ test('detects supported options and renders help', () => {
   expect(isHelp(['node', 'tagit', '--help'])).toBe(true);
   expect(isHelp(['node', 'tagit', '-h'])).toBe(true);
   expect(isDryRun(['node', 'tagit', '--dry-run'])).toBe(true);
+  expect(isCheck(['node', 'tagit', '--check'])).toBe(true);
   expect(isYes(['node', 'tagit', '-y'])).toBe(true);
   expect(getBumpVersion(['node', 'tagit', '-b', '2.4.0'])).toBe('2.4.0');
   expect(isVersion(['node', 'tagit', '--version'])).toBe(true);
@@ -29,7 +30,7 @@ test('detects supported options and renders help', () => {
   expect(getBumpVersion(['node', 'tagit'])).toBe(null);
   expect(getBumpVersion(['node', 'tagit', '-b'])).toBe(null);
   expect(getBumpVersion(['node', 'tagit', '-b', '--dry-run'])).toBe(null);
-  expect(helpText()).toContain('--dry-run');
+  expect(helpText()).toContain('--check');
 });
 
 test('reads the installed version', () => {
@@ -60,8 +61,8 @@ test('passes explicit bump version through release and dry-run flows', async () 
   const updateVersionFiles = jest.fn().mockResolvedValue('2.4.0');
   const gitOperations = jest.fn();
 
-  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y', '-b', '2.4.0']);
-  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['--dry-run', '--bump', '2.4.0']);
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y', '-b', '2.4.0']);
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['--dry-run', '--bump', '2.4.0']);
 
   expect(updateVersionFiles).toHaveBeenNthCalledWith(1, fs, log, { targetVersion: '2.4.0' });
   expect(updateVersionFiles).toHaveBeenNthCalledWith(2, fs, log, { dryRun: true, targetVersion: '2.4.0' });
@@ -75,9 +76,9 @@ test('runs release flow', async () => {
   const updateVersionFiles = jest.fn().mockResolvedValue('1.2.4');
   const gitOperations = jest.fn();
 
-  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
 
-  expect(noop).toHaveBeenCalledTimes(2);
+  expect(noop).toHaveBeenCalledTimes(3);
   expect(updateVersionFiles).toHaveBeenCalledWith(fs, log);
   expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), fs, log, '1.2.4');
   expect(log.info).toHaveBeenCalledWith('Updated version to 1.2.4');
@@ -89,10 +90,10 @@ test('runs dry-run flow without release writes', async () => {
   const updateVersionFiles = jest.fn().mockResolvedValue('1.2.4');
   const gitOperations = jest.fn();
 
-  await runTagit({ fs, log, updateVersionFiles, gitOperations, registerHandlersFn: noop, registerSignalsFn: noop }, ['--dry-run']);
+  await runTagit({ fs, log, updateVersionFiles, gitOperations, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['--dry-run']);
 
   expect(updateVersionFiles).toHaveBeenCalledWith(fs, log, { dryRun: true });
-  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), fs, log, '1.2.4', { dryRun: true });
+  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), fs, log, '1.2.4', { dryRun: true, skipChecks: true });
   expect(log.info).toHaveBeenCalledWith('Dry run: would update version to 1.2.4');
 });
 
@@ -104,6 +105,25 @@ test('bare command displays help without release checks', async () => {
 
   expect(output).toHaveBeenCalledWith(expect.stringContaining('A bare tagit command displays this help.'));
   expect(updateVersionFiles).not.toHaveBeenCalled();
+});
+
+test('check command runs preflight without version or git operations', async () => {
+  const output = jest.fn();
+  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+  const updateVersionFiles = jest.fn();
+
+  await runTagit({ output, runPreflight, updateVersionFiles, registerHandlersFn: noop, registerSignalsFn: noop }, ['--check']);
+
+  expect(runPreflight).toHaveBeenCalled();
+  expect(output).toHaveBeenCalledWith(JSON.stringify({ ok: true, checks: { test: { passed: true } } }));
+  expect(updateVersionFiles).not.toHaveBeenCalled();
+});
+
+test('check command can use the default console output', async () => {
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  await runTagit({ runPreflight: jest.fn(() => ({ ok: true })), registerHandlersFn: noop, registerSignalsFn: noop }, ['--check']);
+  expect(consoleSpy).toHaveBeenCalledWith(JSON.stringify({ ok: true, checks: { ok: true } }));
+  consoleSpy.mockRestore();
 });
 
 test('help exits without release checks', async () => {
@@ -132,7 +152,7 @@ test('aborts when .notag exists', async () => {
   const fs = makeFs(jest.fn(() => true));
   const updateVersionFiles = jest.fn();
 
-  await runTagit({ fs, log, exit, updateVersionFiles, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
+  await runTagit({ fs, log, exit, updateVersionFiles, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
 
   expect(log.warn).toHaveBeenCalled();
   expect(exit).toHaveBeenCalledWith(0);
@@ -155,7 +175,7 @@ test('exits when release fails', async () => {
   const exit = jest.fn();
   const updateVersionFiles = jest.fn().mockRejectedValue(new Error('release failed'));
 
-  await runTagit({ log, exit, updateVersionFiles, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
+  await runTagit({ log, exit, updateVersionFiles, runPreflight: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['-y']);
 
   expect(log.error).toHaveBeenCalledWith(expect.any(Error));
   expect(exit).toHaveBeenCalledWith(1);

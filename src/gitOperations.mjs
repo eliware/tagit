@@ -52,16 +52,16 @@ function restoreFileVersion(fs, file, snapshot) {
     fs.writeFileSync(file, snapshot, 'utf-8');
 }
 
-export function gitOperations(execSync, fs, log, newVersion, { dryRun = false } = {}) {
+export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, skipChecks = false } = {}) {
     if (dryRun) {
         log.info(`Dry run: checking release ${newVersion} without changing Git or dependencies`);
         if (fs.existsSync('package.json')) {
             const packageData = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-            if (packageData?.scripts?.test) {
+            if (!skipChecks && packageData?.scripts?.test) {
                 log.info('Dry run: running npm test');
                 execSync('npm test', { stdio: 'inherit' });
             }
-            if (usesWebpack(packageData, fs)) {
+            if (!skipChecks && usesWebpack(packageData, fs)) {
                 log.info('Dry run: running webpack build');
                 runWebpackBuild(execSync, packageData);
             }

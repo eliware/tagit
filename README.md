@@ -95,22 +95,18 @@ Show command help with `tagit --help` (or `tagit -h`).
 Run the guarded release preflight without changing files, committing, tagging, or pushing:
 
 ```bash
-npm run release:check
+tagit --check
 ```
 
 The preflight rejects dirty trees, checks for `.notag`, runs tests with strict
-100x4 coverage, lint, and the production dependency audit. An operator may
-explicitly waive 100x4 with `npm run release:check -- --ignore-100x4`; record
-that waiver and its reason in the release report.
+100x4 coverage, lint, and the production dependency audit. `tagit --dry-run`
+runs the same preflight and then previews the version/build checks. An operator
+may explicitly waive 100x4 with `tagit --check --ignore-100x4`; record that
+waiver and its reason in the release report.
 
-Monitor a specific GitHub Actions run to completion:
-
-```bash
-node /opt/tagit/bin/release-check.mjs --run-id <run-id>
-```
-
-The command fails on a failed, cancelled, timed-out, or uninspectable run. It
-does not modify GitHub, GitOps, or production state.
+GitHub Actions monitoring remains available as a library capability and will be
+integrated into the release orchestration separately. The current check and
+dry-run commands do not modify GitHub, GitOps, or production state.
 
 Update a declared GitOps image pin after CI has published and verified an image:
 

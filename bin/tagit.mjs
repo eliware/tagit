@@ -5,6 +5,7 @@ import { execSync as execSyncDefault } from 'child_process';
 import path from 'path';
 import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVersionFiles.mjs';
 import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
+import { runPreflight as runPreflightDefault } from '../src/releaseChecks.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -12,6 +13,7 @@ const defaultDependencies = {
   log: defaultLog,
   updateVersionFiles: updateVersionFilesDefault,
   gitOperations: gitOperationsDefault,
+  runPreflight: runPreflightDefault,
   registerHandlersFn: registerHandlers,
   registerSignalsFn: registerSignals,
   exit: process.exit,
@@ -19,11 +21,11 @@ const defaultDependencies = {
 
 export async function runTagit(overrides = {}, argv = []) {
   const {
-    fs, execSync, log, updateVersionFiles, gitOperations,
+    fs, execSync, log, updateVersionFiles, gitOperations, runPreflight,
     registerHandlersFn, registerSignalsFn, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
-  if (options.help || (!options.yes && !options.dryRun)) {
+  if (options.help || (!options.yes && !options.dryRun && !options.check)) {
     (overrides.output ?? console.log)(helpText());
     return;
   }
@@ -46,6 +48,12 @@ export async function runTagit(overrides = {}, argv = []) {
   log.info('tagit Started');
 
   try {
+    const preflight = runPreflight(execSync, fs, log, { ignore100x4: options.ignore100x4 });
+    if (options.check) {
+      log.info('Preflight complete');
+      (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
+      return;
+    }
     const versionOptions = options.bumpVersion ? { targetVersion: options.bumpVersion } : {};
     const newVersion = dryRun
       ? await updateVersionFiles(fs, log, { dryRun: true, ...versionOptions })
@@ -54,7 +62,7 @@ export async function runTagit(overrides = {}, argv = []) {
         : await updateVersionFiles(fs, log);
     log.info(`${dryRun ? 'Dry run: would update version to' : 'Updated version to'} ${newVersion}`);
     if (dryRun) {
-      gitOperations(execSync, fs, log, newVersion, { dryRun: true });
+      gitOperations(execSync, fs, log, newVersion, { dryRun: true, skipChecks: true });
     } else {
       gitOperations(execSync, fs, log, newVersion);
     }
@@ -85,6 +93,14 @@ export function isYes(argv) {
   return argv.includes('--yes') || argv.includes('-y');
 }
 
+export function isCheck(argv) {
+  return argv.includes('--check');
+}
+
+export function isIgnore100x4(argv) {
+  return argv.includes('--ignore-100x4');
+}
+
 export function getBumpVersion(argv) {
   const index = argv.findIndex((argument) => argument === '-b' || argument === '--bump');
   if (index === -1) return null;
@@ -100,13 +116,15 @@ export function parseOptions(argv) {
   return {
     help: isHelp(argv),
     dryRun: isDryRun(argv),
+    check: isCheck(argv),
     yes: isYes(argv),
+    ignore100x4: isIgnore100x4(argv),
     bumpVersion: getBumpVersion(argv),
   };
 }
 
 export function helpText() {
-  return `Usage: tagit [options]\n\nOptions:\n  -y, --yes  Run the release (required for changes, commit, tag, and push)\n  --dry-run  Preview the next version and run checks without releasing\n  -b, --bump <version>  Use an explicit version; omit to auto-calculate\n  -h, --help Show this help\n  -v, --version Show the installed tagit version\n\nA bare tagit command displays this help.`;
+  return `Usage: tagit [options]\n\nOptions:\n  -y, --yes  Run the release (required for changes, commit, tag, and push)\n  --check   Run preflight checks only\n  --dry-run  Run preflight and preview the release without changing files\n  --ignore-100x4  Explicitly waive strict 100x4 coverage\n  -b, --bump <version>  Use an explicit version; omit to auto-calculate\n  -h, --help Show this help\n  -v, --version Show the installed tagit version\n\nA bare tagit command displays this help.`;
 }
 
 export function isCli(argv) {
