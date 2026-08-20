@@ -82,3 +82,7 @@ npx webpack
 - Version strings are not strictly validated.
 - Release commands use shell strings and should be treated carefully.
 - `npm update` and `composer update` can introduce dependency changes during a release.
+- Do not over-engineer simple tasks.
+- Do not guess when confused.
+- Do not make random, pointless changes.
+- Check your own work before saying you're done.
