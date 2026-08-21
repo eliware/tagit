@@ -52,6 +52,22 @@ function restoreFileVersion(fs, file, snapshot) {
     fs.writeFileSync(file, snapshot, 'utf-8');
 }
 
+function ensureReleaseVersion(fs, file, newVersion) {
+    if (!fs.existsSync(file)) return;
+    const data = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    let changed = false;
+    if (data.version !== newVersion) {
+        data.version = newVersion;
+        changed = true;
+    }
+    if (file === 'package-lock.json' && data.packages?.['']?.version !== undefined
+        && data.packages[''].version !== newVersion) {
+        data.packages[''].version = newVersion;
+        changed = true;
+    }
+    if (changed) fs.writeFileSync(file, JSON.stringify(data, null, 4), 'utf-8');
+}
+
 export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, skipChecks = false } = {}) {
     if (dryRun) {
         log.info(`Dry run: checking release ${newVersion} without changing Git or dependencies`);
@@ -98,6 +114,11 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
             updateOutdatedDependencies(execSync, log);
             log.info('Running npm update');
             execSync('npm update', { stdio: 'inherit' });
+
+            // npm may rewrite root package metadata while refreshing dependencies.
+            // Reassert the release version before reading, committing, and tagging.
+            ensureReleaseVersion(fs, 'package.json', newVersion);
+            ensureReleaseVersion(fs, 'package-lock.json', newVersion);
 
             const packageContent = fs.readFileSync('package.json', 'utf-8');
             packageData = JSON.parse(packageContent);

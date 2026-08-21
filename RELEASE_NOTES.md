@@ -1,5 +1,16 @@
 # Release Notes
 
+## 1.1.21
+
+- Reassert package and lockfile root versions after npm dependency updates.
+- Prevent releases from committing or tagging when release metadata drifts.
+- Add regression coverage for rewritten and already-matching package metadata.
+
+Verification:
+
+- `npm test` (100% coverage across statements, branches, functions, and lines)
+- `npm run lint`
+
 ## Unreleased
 
 - Release tags now use the `v<version>` format, for example `v1.1.19`.

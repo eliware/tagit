@@ -150,6 +150,34 @@ describe('gitOperations', () => {
     expect(logMock.info).toHaveBeenCalledWith('Git operations complete');
   });
 
+  test('reasserts the release version after npm rewrites package metadata', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'package-lock.json');
+    let packageReads = 0;
+    fsMock.readFileSync.mockImplementation((file) => {
+      if (file === 'package.json') {
+        packageReads += 1;
+        return JSON.stringify({ version: packageReads === 1 ? '1.0.10' : '1.0.10', scripts: {}, dependencies: {} });
+      }
+      return JSON.stringify({ version: '1.0.10', packages: { '': { version: '1.0.10' } } });
+    });
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', expect.stringContaining('"version": "1.0.42"'), 'utf-8');
+    expect(fsMock.writeFileSync).toHaveBeenCalledWith('package-lock.json', expect.stringContaining('"version": "1.0.42"'), 'utf-8');
+  });
+
+  test('leaves matching package metadata unchanged', () => {
+    fsMock.existsSync.mockImplementation((file) => file === 'package.json' || file === 'package-lock.json');
+    fsMock.readFileSync.mockImplementation((file) => file === 'package.json'
+      ? JSON.stringify({ version: mockVersion, scripts: {}, dependencies: {} })
+      : JSON.stringify({ version: mockVersion, packages: { '': { version: mockVersion } } }));
+
+    gitOperations(execSyncMock, fsMock, logMock, mockVersion);
+
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
+  });
+
   test('skips commands if files do not exist', () => {
     fsMock.existsSync.mockReturnValue(false);
 
