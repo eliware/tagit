@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.1.24
+
+- Run required CI validation on both Ubuntu and Windows for every `main` push.
+- Keep npm publication gated to successful `v*` tag workflows.
+
 ## 1.1.23
 
 - Require an explicit `--bump X.Y.Z` version for release and dry-run invocations.
