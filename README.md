@@ -72,10 +72,10 @@ sudo ln -s /opt/tagit/bin/tagit.mjs /usr/bin/tagit
 ## Usage
 
 Switch to the root directory of the project you want to release. A bare command
-only displays help; use `-y` or `--yes` to authorize the release:
+only displays help; use `-y` or `--yes` with an explicit target version to authorize the release:
 
 ```bash
-tagit --yes
+tagit --yes --bump 2.0.0
 ```
 
 Preview a release without changing version files or performing dependency, Git, tag, or push operations:
@@ -127,7 +127,7 @@ push, sync Argo, or roll back deployments yet.
 If you have not created the symlink, you can run it directly with:
 
 ```bash
-/opt/tagit/bin/tagit.mjs --yes
+<tagit-root>/bin/tagit.mjs --yes --bump 2.0.0
 ```
 
 ## Release flow

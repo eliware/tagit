@@ -31,6 +31,7 @@ test('detects supported options and renders help', () => {
   expect(getBumpVersion(['node', 'tagit', '-b'])).toBe(null);
   expect(getBumpVersion(['node', 'tagit', '-b', '--dry-run'])).toBe(null);
   expect(helpText()).toContain('--check');
+  expect(helpText()).toContain('Required explicit release version');
 });
 
 test('reads the installed version', () => {

@@ -125,7 +125,7 @@ export function parseOptions(argv) {
 }
 
 export function helpText() {
-  return `Usage: tagit [options]\n\nOptions:\n  -y, --yes  Run the release (required for changes, commit, tag, and push)\n  --check   Run preflight checks only\n  --dry-run  Run preflight and preview the release without changing files\n  --ignore-100x4  Explicitly waive strict 100x4 coverage\n  -b, --bump <version>  Use an explicit version; omit to auto-calculate\n  -h, --help Show this help\n  -v, --version Show the installed tagit version\n\nA bare tagit command displays this help.`;
+  return `Usage: tagit [options]\n\nOptions:\n  -y, --yes  Run the release (required for changes, commit, tag, and push)\n  --check   Run preflight checks only\n  --dry-run  Run preflight and preview the release without changing files\n  --ignore-100x4  Explicitly waive strict 100x4 coverage\n  -b, --bump <version>  Required explicit release version (X.Y.Z)\n  -h, --help Show this help\n  -v, --version Show the installed tagit version\n\nA bare tagit command displays this help.`;
 }
 
 export function isCli(argv) {
