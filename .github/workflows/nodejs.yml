@@ -12,10 +12,11 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         node-version: [26.x]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
@@ -25,6 +26,15 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run lint
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Use Node.js 26.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26.x
       - name: Configure npm auth token
         run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
       - name: Publish to npm
