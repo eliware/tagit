@@ -2,7 +2,7 @@
 
 ## @eliware/tagit [![npm version](https://img.shields.io/npm/v/@eliware/tagit.svg)](https://www.npmjs.com/package/@eliware/tagit) [![license](https://img.shields.io/github/license/eliware/tagit.svg)](LICENSE) [![build status](https://github.com/eliware/tagit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/tagit/actions)
 
-Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.
+Automated version selection, dependency updates, builds, and Git release operations for Node.js and PHP projects.
 
 `tagit` supports Node.js projects on Windows and Linux. Composer releases
 still require a Composer installation and may require platform-specific
@@ -12,7 +12,7 @@ configuration.
 
 ## What is tagit?
 
-`tagit` is a Linux-focused CLI utility that automates a release workflow for Node.js and PHP projects. It increments the project version, updates `package.json` and/or `composer.json`, runs dependency and optional test/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
+`tagit` automates a release workflow for Node.js and PHP projects. It updates `package.json` and/or `composer.json` to an explicitly requested version, runs dependency and optional test/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
 
 ## Features
 
@@ -37,7 +37,7 @@ configuration.
 
 ## How versioning works
 
-`tagit` increments the final numeric segment of the existing version string:
+`tagit` requires an explicit target version and never auto-increments versions:
 
 ```text
 1.2.3 -> 1.2.4
@@ -81,11 +81,10 @@ tagit --yes
 Preview a release without changing version files or performing dependency, Git, tag, or push operations:
 
 ```bash
-tagit --dry-run
+tagit --dry-run --bump 2.0.0
 ```
 
-To select a specific version, provide it with `-b` or `--bump`; without that
-option, tagit increments the final numeric component automatically:
+Select the target version with `-b` or `--bump`:
 
 ```bash
 tagit --dry-run --bump 2.0.0
@@ -136,7 +135,7 @@ If you have not created the symlink, you can run it directly with:
 When run from a target project, `tagit` performs these steps:
 
 1. Stops immediately if a `.notag` file exists in the current directory.
-2. Updates `composer.json` and/or `package.json` with the next version.
+2. Requires and writes the explicitly selected version to `composer.json` and/or `package.json`.
 3. If `composer.json` exists, runs:
 
 ```bash

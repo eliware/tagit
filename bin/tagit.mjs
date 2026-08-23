@@ -34,6 +34,9 @@ export async function runTagit(overrides = {}, argv = []) {
   registerSignalsFn({ log });
 
   try {
+    if (!options.check && !options.bumpVersion) {
+      throw new Error('A specific release version is required. Use --bump X.Y.Z.');
+    }
     if (fs.existsSync('.notag')) {
       log.warn('.notag file detected — aborting tag/release process.');
       exit(0);
@@ -54,12 +57,10 @@ export async function runTagit(overrides = {}, argv = []) {
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
       return;
     }
-    const versionOptions = options.bumpVersion ? { targetVersion: options.bumpVersion } : {};
+    const versionOptions = { targetVersion: options.bumpVersion };
     const newVersion = dryRun
       ? await updateVersionFiles(fs, log, { dryRun: true, ...versionOptions })
-      : options.bumpVersion
-        ? await updateVersionFiles(fs, log, versionOptions)
-        : await updateVersionFiles(fs, log);
+      : await updateVersionFiles(fs, log, versionOptions);
     log.info(`${dryRun ? 'Dry run: would update version to' : 'Updated version to'} ${newVersion}`);
     if (dryRun) {
       gitOperations(execSync, fs, log, newVersion, { dryRun: true, skipChecks: true });

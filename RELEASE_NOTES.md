@@ -1,5 +1,13 @@
 # Release Notes
 
+## Unreleased
+
+- Require an explicit `--bump X.Y.Z` version for release and dry-run invocations.
+- Remove automatic version incrementing from the CLI release flow.
+
+- Require an explicit target version for every release or dry-run invocation.
+- Remove automatic version bumping from the CLI release flow.
+
 ## 1.1.22
 
 - Made Git commit messages safe for Windows shells during releases.
