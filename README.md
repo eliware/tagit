@@ -4,7 +4,9 @@
 
 Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.
 
-**Note:** `tagit` is intended for use on Linux systems only.
+`tagit` supports Node.js projects on Windows and Linux. Composer releases
+still require a Composer installation and may require platform-specific
+configuration.
 
 ---
 

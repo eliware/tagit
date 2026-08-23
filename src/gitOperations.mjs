@@ -138,7 +138,12 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
         log.info('Adding all changes to git');
         execSync('git add -A', { stdio: 'inherit' });
         log.info(`Committing with message: Version ${newVersion} - ${dateFormatted}`);
-        execSync(`git commit -m 'Version ${newVersion} - ${dateFormatted}'`, { stdio: 'inherit' });
+        // JSON string quoting produces a shell argument that works in both
+        // POSIX shells and Windows cmd.exe/PowerShell. POSIX single quotes
+        // are passed literally by Windows and make Git treat the message
+        // fragments as pathspecs.
+        const commitMessage = `Version ${newVersion} - ${dateFormatted}`;
+        execSync(`git commit -m ${JSON.stringify(commitMessage)}`, { stdio: 'inherit' });
         const releaseTag = `v${newVersion}`;
         log.info(`Tagging commit with tag: ${releaseTag}`);
         execSync(`git tag ${releaseTag}`, { stdio: 'inherit' });
