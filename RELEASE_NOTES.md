@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.1.22
+
+- Made Git commit messages safe for Windows shells during releases.
+- Added Windows-compatible GitOps path test coverage.
+- Updated documentation for Windows and Linux development environments.
+
 ## 1.1.21
 
 - Reassert package and lockfile root versions after npm dependency updates.

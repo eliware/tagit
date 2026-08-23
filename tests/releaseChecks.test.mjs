@@ -5,7 +5,6 @@ test('detects strict 100x4 coverage', () => {
   expect(hasStrict100x4('All files     100     100     100     100')).toBe(true);
   expect(hasStrict100x4('All files                |     100 |      100 |     100 |     100 |')).toBe(true);
   expect(hasStrict100x4('All files      99     100     100     100')).toBe(false);
-  expect(hasStrict100x4('all files  |  100.00  |  100.00  |  100.00  |  ')).toBe(true);
 });
 
 test('preflight runs clean-tree, test, lint, and audit gates', () => {

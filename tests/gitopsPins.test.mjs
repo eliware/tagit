@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import path from 'node:path';
 import { resolvePins, updateGitOpsPins } from '../src/gitopsPins.mjs';
 
 const digest = `sha256:${'a'.repeat(64)}`;
@@ -19,9 +20,10 @@ test('updates only mapped image references and validates overlays', () => {
     }] }),
     '/gitops/apps/ask/base/deployment.yaml': 'image: ghcr.io/eliware/ask:1.1.6\nimage: busybox:1.36\n',
   };
+  const normalize = file => file.replaceAll('\\', '/').replace(/^.:/, '');
   const fs = {
-    readFileSync: jest.fn(file => files[file]),
-    writeFileSync: jest.fn((file, content) => { files[file] = content; }),
+    readFileSync: jest.fn(file => files[normalize(file)]),
+    writeFileSync: jest.fn((file, content) => { files[normalize(file)] = content; }),
   };
   const execSync = jest.fn();
   const result = updateGitOpsPins(fs, execSync, { info: jest.fn() }, {
@@ -31,7 +33,7 @@ test('updates only mapped image references and validates overlays', () => {
   expect(result.files).toEqual(['apps/ask/base/deployment.yaml']);
   expect(files['/gitops/apps/ask/base/deployment.yaml']).toContain(`ghcr.io/eliware/ask:v1.1.7@${digest}`);
   expect(files['/gitops/apps/ask/base/deployment.yaml']).toContain('busybox:1.36');
-  expect(execSync).toHaveBeenCalledWith('kubectl kustomize .', { cwd: '/gitops/apps/ask/base', stdio: 'inherit' });
+  expect(execSync).toHaveBeenCalledWith('kubectl kustomize .', { cwd: path.resolve('/gitops/apps/ask/base'), stdio: 'inherit' });
 });
 
 test('supports dry-run and rejects unsafe or incomplete updates', () => {
