@@ -50,3 +50,7 @@ Verification:
 - Added automatic `npm outdated --json` inspection.
 - Outdated npm dependencies are upgraded to their `@latest` versions.
 - Existing `npm update`, test, and build verification steps remain enabled.
+## Unreleased
+
+- Add informational SemVer suggestions based on non-generated changes since
+  the latest tag; explicit release versions remain required.

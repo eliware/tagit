@@ -6,6 +6,7 @@ import path from 'path';
 import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVersionFiles.mjs';
 import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
 import { runPreflight as runPreflightDefault } from '../src/releaseChecks.mjs';
+import { suggestVersion as suggestVersionDefault } from '../src/versionSuggestion.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -14,6 +15,7 @@ const defaultDependencies = {
   updateVersionFiles: updateVersionFilesDefault,
   gitOperations: gitOperationsDefault,
   runPreflight: runPreflightDefault,
+  suggestVersion: suggestVersionDefault,
   registerHandlersFn: registerHandlers,
   registerSignalsFn: registerSignals,
   exit: process.exit,
@@ -21,7 +23,7 @@ const defaultDependencies = {
 
 export async function runTagit(overrides = {}, argv = []) {
   const {
-    fs, execSync, log, updateVersionFiles, gitOperations, runPreflight,
+    fs, execSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
     registerHandlersFn, registerSignalsFn, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
@@ -32,6 +34,7 @@ export async function runTagit(overrides = {}, argv = []) {
   registerHandlersFn({ log });
   registerSignalsFn({ log });
   log.info(options.command === 'preflight' ? preflightGuide() : releaseGuide());
+  if (fs.readFileSync && execSync) log.info(`Version suggestion: ${JSON.stringify(suggestVersion(execSync, fs))}`);
 
   try {
     if (options.command === 'release' && !options.version) {

@@ -86,6 +86,12 @@ tagit release --version 2.0.0
 
 These are the only operational commands. Use `tagit --help` for usage.
 
+Both commands print an informational SemVer suggestion based on changes since
+the latest tag. Lockfiles and generated artifacts are ignored; possible API
+breaks suggest a major bump, substantial implementation changes suggest a
+minor bump, and small changes suggest a patch bump. The suggestion never
+selects or changes the requested version.
+
 The preflight rejects dirty trees, checks for `.notag`, runs tests with strict
 100x4 coverage, lint, audit, and package validation, and verifies successful
 Ubuntu and Windows CI for the exact current commit. There is no coverage
