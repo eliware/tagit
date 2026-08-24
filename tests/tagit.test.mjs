@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { getReleaseVersion, helpText, isCli, isHelp, parseOptions, runTagit } from '../bin/tagit.mjs';
+import { getReleaseVersion, helpText, isCli, isHelp, parseOptions, preflightGuide, releaseGuide, runTagit } from '../bin/tagit.mjs';
 
 const noop = jest.fn();
 const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
@@ -11,6 +11,13 @@ test('supports only preflight and release commands', () => {
   expect(() => parseOptions(['release', '--version', 'next'])).toThrow('Invalid release version');
   expect(getReleaseVersion(['release'])).toBe(null);
   expect(helpText()).toContain('tagit <command>');
+});
+
+test('provides complete self-contained operator guidance', () => {
+  expect(preflightGuide()).toContain('npm pack --dry-run');
+  expect(preflightGuide()).toContain('Ubuntu and Windows');
+  expect(releaseGuide()).toContain('tagit release --version X.Y.Z');
+  expect(releaseGuide()).toContain('publish jobs individually');
 });
 
 test('detects CLI', () => {

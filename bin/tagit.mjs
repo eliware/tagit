@@ -31,6 +31,7 @@ export async function runTagit(overrides = {}, argv = []) {
   }
   registerHandlersFn({ log });
   registerSignalsFn({ log });
+  log.info(options.command === 'preflight' ? preflightGuide() : releaseGuide());
 
   try {
     if (options.command === 'release' && !options.version) {
@@ -90,6 +91,33 @@ export function parseOptions(argv) {
 
 export function helpText() {
   return `Usage: tagit <command>\n\nCommands:\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI\n  release --version X.Y.Z  Run preflight, then commit, tag, and push\n\nOptions:\n  -h, --help                Show this help\n  -v, --version             Show the installed tagit version`;
+}
+
+export function preflightGuide() {
+  return `Preflight checklist (all required):
+- Run from the repository root on a clean main worktree.
+- Confirm .notag is absent and no secrets or unexplained changes exist.
+- Confirm package metadata, README, release notes, and CI workflow are current.
+- Run npm test: tests pass with 100% statements, branches, functions, and lines.
+- Run npm run lint: zero errors and zero warnings.
+- Run npm audit --omit=dev --audit-level=moderate: no blocking vulnerabilities.
+- Run npm pack --dry-run: package contents are valid.
+- Confirm gh reports a successful CI run for this exact HEAD, including Ubuntu and Windows.
+- Confirm required smoke, integration, regression, and E2E checks pass when applicable.
+Any missing, stale, pending, cancelled, failed, or mismatched check blocks handoff.`;
+}
+
+export function releaseGuide() {
+  return `Release checklist (all required):
+- Owner pre-release handoff is complete and the exact version is authorized.
+- tagit preflight passes without waivers.
+- The release version is explicit: tagit release --version X.Y.Z.
+- Tagit updates the version, commits, creates vX.Y.Z, and pushes commit and tag.
+- Verify the remote commit and tag point to the expected SHAs.
+- Verify the tag workflow's Ubuntu, Windows, and publish jobs individually.
+- Verify the exact package version and dist-tag in its target registry.
+- Confirm the final worktree is clean; update GitOps only when deployment is authorized.
+Never rerun an interrupted release blindly or bypass a failed gate.`;
 }
 
 export function isCli(argv) {
