@@ -28,8 +28,8 @@ configuration.
 
 ## Requirements
 
-- Linux
-- Node.js 22 or newer is recommended
+- Windows or Linux
+- Node.js 26 or newer
 - npm
 - Git
 - Composer, if the target project contains `composer.json`
