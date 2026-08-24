@@ -71,40 +71,25 @@ sudo ln -s /opt/tagit/bin/tagit.mjs /usr/bin/tagit
 
 ## Usage
 
-Switch to the root directory of the project you want to release. A bare command
-only displays help; use `-y` or `--yes` with an explicit target version to authorize the release:
+Switch to the root directory of the project you want to release. Run the
+read-only preflight first:
 
 ```bash
-tagit --yes --bump 2.0.0
+tagit preflight
 ```
 
-Preview a release without changing version files or performing dependency, Git, tag, or push operations:
+After preflight passes and the owner authorizes the exact version, release it:
 
 ```bash
-tagit --dry-run --bump 2.0.0
+tagit release --version 2.0.0
 ```
 
-Select the target version with `-b` or `--bump`:
-
-```bash
-tagit --dry-run --bump 2.0.0
-tagit --yes --bump 2.0.0
-```
-
-Show command help with `tagit --help` (or `tagit -h`).
-
-Run the guarded release preflight without changing files, committing, tagging, or pushing:
-
-```bash
-tagit --check
-```
+These are the only operational commands. Use `tagit --help` for usage.
 
 The preflight rejects dirty trees, checks for `.notag`, runs tests with strict
 100x4 coverage, lint, audit, and package validation, and verifies successful
-Ubuntu and Windows CI for the exact current commit. `tagit --dry-run`
-runs the same preflight and then previews the version/build checks. An operator
-may explicitly waive 100x4 with `tagit --check --ignore-100x4`; record that
-waiver and its reason in the release report.
+Ubuntu and Windows CI for the exact current commit. There is no coverage
+waiver or dry-run release path.
 
 GitHub Actions monitoring remains available as a library capability and will be
 integrated into the release orchestration separately. The current check and
@@ -128,7 +113,7 @@ push, sync Argo, or roll back deployments yet.
 If you have not created the symlink, you can run it directly with:
 
 ```bash
-<tagit-root>/bin/tagit.mjs --yes --bump 2.0.0
+<tagit-root>/bin/tagit.mjs release --version 2.0.0
 ```
 
 ## Release flow
@@ -202,7 +187,7 @@ npm run lint
 
 ## Notes
 
-- `tagit` runs `npm update` and `composer update`, so dependency lock files may change during a release.
+- `tagit` runs npm dependency maintenance, so dependency lock files may change during a release.
 - If `npm update`, `npm test`, `npm run build`, or Composer update/bump fails, `tagit` restores the version-file snapshots captured before dependency/test/build/Git commands.
 - `tagit` commits every staged and unstaged change after running `git add -A`.
 - The GitHub Actions workflow publishes to npm only when a `v*` tag is pushed.
