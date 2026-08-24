@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { hasStrict100x4, runPreflight, waitForGitHubRun } from '../src/releaseChecks.mjs';
+import { hasStrict100x4, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
 
 test('detects strict 100x4 coverage', () => {
   expect(hasStrict100x4('All files     100     100     100     100')).toBe(true);
@@ -23,7 +23,7 @@ test('preflight runs clean-tree, test, lint, and audit gates', () => {
 
   expect(result.test.passed).toBe(true);
   expect(execSync).toHaveBeenCalledWith('npm run lint', expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith('npm run audit', expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith('npm audit --omit=dev --audit-level=moderate', expect.any(Object));
 });
 
 test('preflight rejects dirty trees before running package commands', () => {
@@ -81,37 +81,52 @@ test('preflight handles failures without captured output', () => {
     .toThrow('Preflight lint failed');
 });
 
-test('waits for a successful GitHub Actions run', async () => {
-  const execSync = jest.fn(() => JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc' }));
-  const result = await waitForGitHubRun(execSync, { info: jest.fn() }, {
-    runId: '123',
-    sleep: async () => {},
+test('verifies a successful exact-head CI run on Ubuntu and Windows', () => {
+  const execSync = jest.fn(command => {
+    if (command.startsWith('gh run list')) return JSON.stringify([
+      { databaseId: 42, status: 'completed', conclusion: 'success', headSha: 'abc' },
+    ]);
+    return JSON.stringify({ headSha: 'abc', jobs: [
+      { name: 'Test (ubuntu-latest)', status: 'completed', conclusion: 'success' },
+      { name: 'Test (windows-latest)', status: 'completed', conclusion: 'success' },
+    ] });
   });
-
-  expect(result.headSha).toBe('abc');
-  expect(execSync).toHaveBeenCalledWith('gh run view 123 --json status,conclusion,headSha', expect.any(Object));
+  expect(verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc', repository: 'eliware/tagit' }))
+    .toEqual({ runId: 42, headSha: 'abc', ubuntu: true, windows: true });
 });
 
-test('fails when GitHub Actions concludes unsuccessfully', async () => {
-  const execSync = jest.fn(() => JSON.stringify({ status: 'completed', conclusion: 'failure' }));
-
-  await expect(waitForGitHubRun(execSync, { info: jest.fn() }, { runId: '123' }))
-    .rejects.toThrow('concluded failure');
+test('rejects missing, malformed, unsuccessful, stale, and incomplete CI evidence', () => {
+  expect(() => verifyLatestCi(jest.fn(), { info: jest.fn() })).toThrow('commit SHA is required');
+  expect(() => verifyLatestCi(jest.fn(() => '{bad'), { info: jest.fn() }, { headSha: 'abc' }))
+    .toThrow('Unable to inspect');
+  const noRun = jest.fn(() => '[]');
+  expect(() => verifyLatestCi(noRun, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
+  const stale = jest.fn(command => command.startsWith('gh run list')
+    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'old' }])
+    : '');
+  expect(() => verifyLatestCi(stale, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
+  const incomplete = jest.fn(command => command.startsWith('gh run list')
+    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
+    : JSON.stringify({ headSha: 'abc', jobs: [{ name: 'Test (ubuntu-latest)', status: 'completed', conclusion: 'success' }] }));
+  expect(() => verifyLatestCi(incomplete, { info: jest.fn() }, { headSha: 'abc' })).toThrow('lacks passing');
+  const noJobs = jest.fn(command => command.startsWith('gh run list')
+    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
+    : JSON.stringify({ headSha: 'abc' }));
+  expect(() => verifyLatestCi(noJobs, { info: jest.fn() }, { headSha: 'abc' })).toThrow('lacks passing');
 });
 
-test('waits through an in-progress run and rejects malformed, missing, and timed-out runs', async () => {
-  let calls = 0;
-  const execSync = jest.fn(() => calls++ === 0
-    ? JSON.stringify({ status: 'in_progress' })
-    : JSON.stringify({ status: 'completed', conclusion: 'success' }));
-  let clock = 0;
-  await expect(waitForGitHubRun(execSync, { info: jest.fn() }, {
-    runId: '123', now: () => clock++, sleep: async () => {},
-  })).resolves.toHaveProperty('status', 'completed');
-  await expect(waitForGitHubRun(jest.fn(() => '{bad'), { info: jest.fn() }, { runId: '123' }))
-    .rejects.toThrow('Unable to inspect');
-  await expect(waitForGitHubRun(jest.fn(() => JSON.stringify({ status: 'queued' })), { info: jest.fn() }, {
-    runId: '123', timeoutMs: 1, intervalMs: 0, now: (() => { const values = [0, 0, 2]; let index = 0; return () => values[index++] ?? 2; })(),
-  })).rejects.toThrow('timeout');
-  expect(() => waitForGitHubRun(jest.fn(), { info: jest.fn() })).toThrow('run ID is required');
+test('preflight verifies CI for the exact current HEAD', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'git rev-parse HEAD') return 'abc';
+    if (command.startsWith('gh run list')) return JSON.stringify([{ databaseId: 42, status: 'completed', conclusion: 'success', headSha: 'abc' }]);
+    if (command.startsWith('gh run view')) return JSON.stringify({ headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
+      { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] });
+    if (command === 'npm test') return 'All files     100     100     100     100';
+    return '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
+  expect(runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toHaveProperty('ci.ubuntu', true);
 });

@@ -9,7 +9,39 @@ export function hasStrict100x4(output) {
   return Boolean(match && match.slice(1).every(value => Number(value) === 100));
 }
 
-export function runPreflight(execSync, fs, log, { ignore100x4 = false } = {}) {
+function readCiRun(execSync, runId) {
+  return JSON.parse(command(execSync, `gh run view ${runId} --json status,conclusion,headSha,jobs`));
+}
+
+export function verifyLatestCi(execSync, log, {
+  headSha,
+  repository = null,
+} = {}) {
+  if (!headSha) throw new Error('A commit SHA is required for CI verification.');
+  const repoArg = repository ? ` --repo ${repository}` : '';
+  let runs;
+  try {
+    runs = JSON.parse(command(execSync, `gh run list --commit ${headSha}${repoArg} --limit 20 --json databaseId,status,conclusion,headSha`));
+  } catch (error) {
+    throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}.`, { cause: error });
+  }
+  const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
+  if (!candidates.length) throw new Error(`No successful GitHub Actions run exists for ${headSha}.`);
+  for (const run of candidates) {
+    const data = readCiRun(execSync, run.databaseId);
+    const jobs = data.jobs ?? [];
+    const successful = job => job.status === 'completed' && job.conclusion === 'success';
+    const ubuntu = jobs.some(job => successful(job) && /ubuntu/i.test(job.name));
+    const windows = jobs.some(job => successful(job) && /windows/i.test(job.name));
+    if (data.headSha === headSha && ubuntu && windows) {
+      log.info(`GitHub Actions CI verified for ${headSha}: Ubuntu and Windows passed.`);
+      return { runId: run.databaseId, headSha, ubuntu: true, windows: true };
+    }
+  }
+  throw new Error(`Successful GitHub Actions run for ${headSha} lacks passing Ubuntu and Windows jobs.`);
+}
+
+export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi = false } = {}) {
   if (fs.existsSync('.notag')) throw new Error('.notag file detected; release is disabled.');
 
   const status = command(execSync, 'git status --short --untracked-files=all').trim();
@@ -17,12 +49,12 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false } = {}) {
 
   const checks = [
     ['lint', 'npm run lint'],
-    ['audit', 'npm run audit'],
+    ['audit', 'npm audit --omit=dev --audit-level=moderate'],
+    ['pack', 'npm pack --dry-run'],
   ];
   if (fs.existsSync('package.json')) {
     const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
     if (packageData.scripts?.test) checks.unshift(['test', 'npm test']);
-    if (!packageData.scripts?.audit) checks[checks.length - 1] = ['audit', 'npm audit --omit=dev --audit-level=moderate'];
   }
 
   const results = {};
@@ -41,33 +73,9 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false } = {}) {
       throw new Error('Preflight test failed strict 100x4 coverage. Use an explicit operator waiver only when authorized.');
     }
   }
+  if (verifyCi) {
+    const headSha = command(execSync, 'git rev-parse HEAD').trim();
+    results.ci = verifyLatestCi(execSync, log, { headSha });
+  }
   return results;
-}
-
-export function waitForGitHubRun(execSync, log, {
-  runId,
-  timeoutMs = 300000,
-  intervalMs = 10000,
-  now = () => Date.now(),
-  sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
-} = {}) {
-  if (!runId) throw new Error('A GitHub Actions run ID is required.');
-  return (async () => {
-    const deadline = now() + timeoutMs;
-    while (now() <= deadline) {
-      let data;
-      try {
-        data = JSON.parse(command(execSync, `gh run view ${runId} --json status,conclusion,headSha`));
-      } catch (error) {
-        throw new Error(`Unable to inspect GitHub Actions run ${runId}.`, { cause: error });
-      }
-      log.info(`GitHub Actions run ${runId}: ${data.status}${data.conclusion ? ` (${data.conclusion})` : ''}`);
-      if (data.status === 'completed') {
-        if (data.conclusion !== 'success') throw new Error(`GitHub Actions run ${runId} concluded ${data.conclusion}.`);
-        return data;
-      }
-      await sleep(Math.min(intervalMs, Math.max(0, deadline - now())));
-    }
-    throw new Error(`GitHub Actions run ${runId} did not complete before the timeout.`);
-  })();
 }

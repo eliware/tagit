@@ -6,7 +6,7 @@ Guidance for coding agents working on this repository.
 
 `@eliware/tagit` is a Node.js ESM CLI for release automation. It bumps a target project's version, updates `composer.json` and/or `package.json`, runs dependency/build commands, commits the result, creates a Git tag, and pushes commits/tags.
 
-The CLI is Linux-focused and intended to be run from the root of the project being released.
+The CLI runs on Windows and Linux and is intended to be run from the root of the project being released.
 
 ## Important Files
 
@@ -23,7 +23,7 @@ The CLI is Linux-focused and intended to be run from the root of the project bei
 npm test
 ```
 
-The test suite is local and uses Jest. Existing tests mock shell commands, so they verify command sequencing and branching rather than real Composer/npm/Git side effects.
+The test suite uses `@eliware/test` and must report 100×4 coverage with zero lint warnings.
 
 ## Runtime Flow
 
@@ -39,7 +39,7 @@ The test suite is local and uses Jest. Existing tests mock shell commands, so th
 - If `composer.json` exists, its `version` is bumped first.
 - If `package.json` also exists, it is synced to the composer-derived version.
 - If only `package.json` exists, its `version` is bumped.
-- The bump logic increments the final dot-separated numeric segment, for example `1.2.3` becomes `1.2.4`.
+- Releases require an explicitly supplied target version; automatic version bumping is not supported.
 - Each detected version file must contain a `version` field.
 
 ## Release Side Effects

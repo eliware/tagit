@@ -51,7 +51,7 @@ export async function runTagit(overrides = {}, argv = []) {
   log.info('tagit Started');
 
   try {
-    const preflight = runPreflight(execSync, fs, log, { ignore100x4: options.ignore100x4 });
+    const preflight = runPreflight(execSync, fs, log, { ignore100x4: options.ignore100x4, verifyCi: true });
     if (options.check) {
       log.info('Preflight complete');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));

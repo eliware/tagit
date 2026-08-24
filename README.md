@@ -12,7 +12,7 @@ configuration.
 
 ## What is tagit?
 
-`tagit` automates a release workflow for Node.js and PHP projects. It updates `package.json` and/or `composer.json` to an explicitly requested version, runs dependency and optional test/build commands, commits the result, creates a Git tag, and pushes the commit and tags to the configured remote.
+`tagit` automates the Eliware release workflow for Node.js projects. It verifies local gates and successful Ubuntu and Windows CI for the exact commit, updates the explicitly requested version, commits the result, creates a Git tag, and pushes the commit and tag to the configured remote.
 
 ## Features
 
@@ -100,7 +100,8 @@ tagit --check
 ```
 
 The preflight rejects dirty trees, checks for `.notag`, runs tests with strict
-100x4 coverage, lint, and the production dependency audit. `tagit --dry-run`
+100x4 coverage, lint, audit, and package validation, and verifies successful
+Ubuntu and Windows CI for the exact current commit. `tagit --dry-run`
 runs the same preflight and then previews the version/build checks. An operator
 may explicitly waive 100x4 with `tagit --check --ignore-100x4`; record that
 waiver and its reason in the release report.
