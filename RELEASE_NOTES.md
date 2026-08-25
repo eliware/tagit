@@ -1,5 +1,16 @@
 # Release Notes
 
+## 2.2.2
+
+### Changed
+
+- Added the `tagit push` command for pushing existing commits without staging
+  or committing files.
+- Added bounded polling so push reports direct workflow and job links after
+  GitHub creates the CI run.
+- Expanded the agent-facing help overview with the complete project-owner to
+  DevOps release handoff.
+
 ## 2.1.0
 
 - Split release execution from release verification: `release` pushes and
