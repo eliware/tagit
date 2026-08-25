@@ -43,9 +43,9 @@ export function verifyLatestCi(execSync, log, {
   }
   const pending = runs.find(run => run.headSha === headSha && run.status !== 'completed');
   if (pending && waitForCompletion) {
-    if (pending.url) log.info(`CI in progress: [workflow run ${pending.databaseId}](${pending.url})`);
+    if (pending.url) log.info(`CI in progress; waiting for completion: [workflow run ${pending.databaseId}](${pending.url})`);
     try {
-      execSync(`gh run watch ${pending.databaseId}${repoArg} --exit-status`, { stdio: 'inherit', timeout: 600000 });
+      execSync(`gh run watch ${pending.databaseId}${repoArg} --exit-status --interval 3`, { timeout: 600000 });
     } catch {
       // Re-read the completed run below so the final error includes its conclusion.
     }

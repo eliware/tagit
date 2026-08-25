@@ -178,7 +178,7 @@ test('waits for an in-progress exact-head CI run', () => {
     ] });
   });
   expect(verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toMatchObject({ runId: 7, ubuntu: true, windows: true });
-  expect(execSync).toHaveBeenCalledWith('gh run watch 7 --exit-status', expect.objectContaining({ timeout: 600000 }));
+  expect(execSync).toHaveBeenCalledWith('gh run watch 7 --exit-status --interval 3', expect.objectContaining({ timeout: 600000 }));
 });
 
 test('re-reads CI after a watch command reports failure', () => {
