@@ -16,7 +16,7 @@ test('reports CI workflow and job links for an exact commit', () => {
 
 test('reports no CI runs and rejects an invalid remote', () => {
   const noRuns = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git' : '[]');
-  expect(reportCiLinks(noRuns, { info: jest.fn() }, 'abc')).toMatchObject({ runs: [] });
+  expect(reportCiLinks(noRuns, { info: jest.fn() }, 'abc', { attempts: 2, delayMs: 0 })).toMatchObject({ runs: [] });
   const noJobs = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git'
     : command.startsWith('gh run list') ? JSON.stringify([{ databaseId: 2, headSha: 'abc', url: 'https://github.com/eliware/demo/actions/runs/2' }]) : '{}');
   expect(reportCiLinks(noJobs, { info: jest.fn() }, 'abc')).toMatchObject({ runs: [{ databaseId: 2 }] });

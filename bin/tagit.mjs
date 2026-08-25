@@ -47,7 +47,7 @@ export async function runTagit(overrides = {}, argv = []) {
     try {
       execSync('git push', { stdio: 'inherit' });
       const headSha = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
-      reportCiLinks(execSync, log, headSha);
+      reportCiLinks(execSync, log, headSha, { attempts: 10, delayMs: 2000 });
       log.info('Push completed; untracked files were not staged.');
     } catch (error) { log.error(error); exit(1); }
     return;
