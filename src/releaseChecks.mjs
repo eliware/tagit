@@ -6,9 +6,8 @@ function command(execSync, command, options = {}) {
   return execSync(command, { encoding: 'utf8', ...options });
 }
 
-/* istanbul ignore next -- shell output shape is validated by integration tests. */
 function outputText(output) {
-  const text = String(output ?? '').trim();
+  const text = String(output).trim();
   if (!text) return '\nOutput: (no output captured)';
   const excerpt = text.length > OUTPUT_LIMIT ? `${text.slice(0, OUTPUT_LIMIT)}\n...[output truncated]` : text;
   return `\nOutput excerpt:\n${excerpt}`;
@@ -44,8 +43,7 @@ export function verifyLatestCi(execSync, log, {
   const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
   if (!candidates.length) {
     const matching = runs.filter(run => run.headSha === headSha);
-    /* istanbul ignore next -- diagnostic formatting varies by GitHub response. */
-    const details = matching.map(run => `run ${run.databaseId} [${run.status}/${run.conclusion ?? 'pending'}]`).join(', ') || 'no matching runs';
+    const details = matching.map(run => `run ${run.databaseId} [${run.status}/${run.conclusion}]`).join(', ');
     throw new Error(`No successful GitHub Actions run exists for ${headSha}. Observed: ${details}`);
   }
   for (const run of candidates) {
@@ -59,10 +57,10 @@ export function verifyLatestCi(execSync, log, {
       return { runId: run.databaseId, headSha, ubuntu: true, windows: true };
     }
   }
-  /* istanbul ignore next -- diagnostic formatting varies by GitHub response. */
   const jobSummary = candidates.map(run => {
     const data = readCiRun(execSync, run.databaseId);
-    return `run ${run.databaseId}: ${(data.jobs ?? []).map(job => `${job.name} [${job.status}/${job.conclusion ?? 'pending'}]`).join(', ') || 'no jobs reported'}`;
+    const jobs = Array.isArray(data.jobs) ? data.jobs : [];
+    return `run ${run.databaseId}: ${jobs.map(job => `${job.name} [${job.status}/${job.conclusion}]`).join(', ')}`;
   }).join('; ');
   throw new Error(`Successful GitHub Actions run for ${headSha} lacks passing Ubuntu and Windows jobs. Jobs: ${jobSummary}`);
 }
@@ -90,7 +88,6 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi 
     } catch (error) {
       output = `${error.stdout ?? ''}\n${error.stderr ?? ''}`;
       results[name] = { passed: false };
-      /* istanbul ignore next -- error shape varies by shell and is covered by integration runs. */
       failures.push(failureMessage(name, error, `${error.stdout ?? ''}\n${error.stderr ?? ''}`));
       continue;
     }

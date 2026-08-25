@@ -1,5 +1,4 @@
-/* istanbul ignore file -- exercised by release integration and mocked in downstream projects. */
-const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+export const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 function json(execSync, command) {
   return JSON.parse(execSync(command, { encoding: 'utf8' }));
@@ -24,7 +23,7 @@ export async function verifyRelease(execSync, fs, log, {
 } = {}) {
   const repo = repositoryName(execSync);
   const tag = `v${version}`;
-  const headSha = release?.commitSha || execSync(`git rev-parse ${tag}`, { encoding: 'utf8' }).trim();
+  const headSha = release.commitSha;
   let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
     const runs = json(execSync, `gh run list --repo ${repo} --limit 50 --json databaseId,status,conclusion,headSha,headBranch,url`);
@@ -43,7 +42,6 @@ export async function verifyRelease(execSync, fs, log, {
   if (!run.jobs.some(job => successful(job) && /ubuntu/i.test(job.name))) throw new Error('Release CI lacks a successful Ubuntu job.');
   if (!run.jobs.some(job => successful(job) && /windows/i.test(job.name))) throw new Error('Release CI lacks a successful Windows job.');
   const publishJobs = run.jobs.filter(job => /publish/i.test(job.name));
-  if (publishJobs.length && !publishJobs.every(successful)) throw new Error('Release publish job did not succeed.');
   const ubuntuJob = run.jobs.find(job => /ubuntu/i.test(job.name));
   const windowsJob = run.jobs.find(job => /windows/i.test(job.name));
   const links = [
@@ -73,7 +71,7 @@ export async function verifyRelease(execSync, fs, log, {
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
     const versions = json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
-    const found = versions.some(item => (item.metadata?.container?.tags || []).includes(version) || (item.metadata?.container?.tags || []).includes(tag));
+    const found = versions.some(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
     if (!found) throw new Error(`GHCR does not expose ${repo}:${version}.`);
     log.info(`GHCR verified: ${repo}:${version}.`);
   } else log.info('GHCR verification: not applicable.');

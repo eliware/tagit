@@ -8,6 +8,7 @@ import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs'
 import { runPreflight as runPreflightDefault } from '../src/releaseChecks.mjs';
 import { suggestVersion as suggestVersionDefault } from '../src/versionSuggestion.mjs';
 import { verifyRelease as verifyReleaseDefault } from '../src/releaseVerification.mjs';
+import { buildNotesReport as buildNotesReportDefault } from '../src/releaseNotesReport.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -18,6 +19,7 @@ const defaultDependencies = {
   runPreflight: runPreflightDefault,
   suggestVersion: suggestVersionDefault,
   verifyRelease: verifyReleaseDefault,
+  buildNotesReport: buildNotesReportDefault,
   registerHandlersFn: registerHandlers,
   registerSignalsFn: registerSignals,
   exit: process.exit,
@@ -26,7 +28,7 @@ const defaultDependencies = {
 export async function runTagit(overrides = {}, argv = []) {
   const {
     fs, execSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
-    registerHandlersFn, registerSignalsFn, verifyRelease, exit,
+    registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
   if (options.help || !options.command) {
@@ -35,6 +37,10 @@ export async function runTagit(overrides = {}, argv = []) {
   }
   registerHandlersFn({ log });
   registerSignalsFn({ log });
+  if (options.command === 'notes') {
+    (overrides.output ?? console.log)(buildNotesReport(execSync, fs));
+    return;
+  }
   try {
     if (options.command === 'release' && !options.version) {
       throw new Error('A specific release version is required. Use tagit release --version X.Y.Z.');
@@ -82,7 +88,7 @@ export function getReleaseVersion(argv) {
 
 export function parseOptions(argv) {
   const command = argv[0];
-  if (command && command !== 'preflight' && command !== 'release') throw new Error(`Unknown command: ${command}`);
+  if (command && !['notes', 'preflight', 'release'].includes(command)) throw new Error(`Unknown command: ${command}`);
   return {
     command,
     help: isHelp(argv),
@@ -91,7 +97,7 @@ export function parseOptions(argv) {
 }
 
 export function helpText() {
-  return `Usage: tagit <command>\n\nCommands:\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI\n  release --version X.Y.Z  Run preflight, then commit, tag, and push\n\nOptions:\n  -h, --help                Show this help\n  -v, --version             Show the installed tagit version`;
+  return `Usage: tagit <command>\n\nCommands:\n  notes                     Report changes since the last tag and guide release-note work\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI\n  release --version X.Y.Z  Run preflight, then commit, tag, and push\n\nOptions:\n  -h, --help                Show this help\n  -v, --version             Show the installed tagit version`;
 }
 
 export function preflightGuide() {
@@ -129,5 +135,3 @@ export function isCli(argv) {
 }
 
 // Keep imports safe for tests; execute only when used as the CLI.
-/* istanbul ignore next */
-if (isCli(process.argv)) await runTagit(defaultDependencies, process.argv.slice(2));

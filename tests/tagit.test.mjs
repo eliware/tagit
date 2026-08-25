@@ -5,6 +5,7 @@ const noop = jest.fn();
 const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
 test('supports only preflight and release commands', () => {
+  expect(parseOptions(['notes'])).toMatchObject({ command: 'notes', version: null });
   expect(parseOptions(['preflight'])).toMatchObject({ command: 'preflight', version: null });
   expect(parseOptions(['release', '--version', '2.4.0'])).toMatchObject({ command: 'release', version: '2.4.0' });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
@@ -43,6 +44,19 @@ test('preflight runs without release side effects', async () => {
   expect(runPreflight).toHaveBeenCalled();
   expect(updateVersionFiles).not.toHaveBeenCalled();
   expect(output).toHaveBeenCalledWith(JSON.stringify({ ok: true, checks: { test: { passed: true } } }));
+});
+
+test('notes prints the generated report without release side effects', async () => {
+  const output = jest.fn();
+  await runTagit({ output, buildNotesReport: jest.fn(() => 'TAGIT NOTES REPORT'), suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
+  expect(output).toHaveBeenCalledWith('TAGIT NOTES REPORT');
+});
+
+test('notes uses console output when no output override is supplied', async () => {
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  await runTagit({ buildNotesReport: jest.fn(() => 'report'), suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
+  expect(consoleSpy).toHaveBeenCalledWith('report');
+  consoleSpy.mockRestore();
 });
 
 test('release runs the release operation for an explicit version', async () => {

@@ -7,6 +7,16 @@ test('detects strict 100x4 coverage', () => {
   expect(hasStrict100x4('All files      99     100     100     100')).toBe(false);
 });
 
+test('reports bounded and empty command output', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'npm test') return 'x'.repeat(5000);
+    return '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('output truncated');
+});
+
 test('preflight runs clean-tree, test, lint, and audit gates', () => {
   const execSync = jest.fn(command => {
     if (command === 'git status --short --untracked-files=all') return '';
@@ -120,6 +130,19 @@ test('rejects missing, malformed, unsuccessful, stale, and incomplete CI evidenc
     ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
     : JSON.stringify({ headSha: 'abc' }));
   expect(() => verifyLatestCi(noJobs, { info: jest.fn() }, { headSha: 'abc' })).toThrow('lacks passing');
+});
+
+test('describes CI jobs when platform coverage is incomplete', () => {
+  const execSync = jest.fn(command => command.startsWith('gh run list')
+    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
+    : JSON.stringify({ headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] }));
+  expect(() => verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toThrow('Jobs:');
+});
+
+test('reports matching but unsuccessful CI runs', () => {
+  const execSync = jest.fn(command => command.startsWith('gh run list')
+    ? JSON.stringify([{ databaseId: 9, status: 'completed', conclusion: 'failure', headSha: 'abc' }]) : '');
+  expect(() => verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toThrow('run 9');
 });
 
 test('preflight verifies CI for the exact current HEAD', () => {

@@ -15,6 +15,3 @@ export function runPush(args = [], execSync, now = new Date()) {
 export function isCli(argv) {
   return argv[1]?.endsWith('/push') || argv[1]?.endsWith('/push.mjs');
 }
-
-/* istanbul ignore next */
-if (isCli(process.argv)) runPush(process.argv.slice(2), defaultExecSync);

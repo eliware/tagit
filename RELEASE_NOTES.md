@@ -1,5 +1,27 @@
 # Release Notes
 
+## 2.1.0
+
+### Added
+
+- Added read-only `tagit notes` reporting for changes since the latest tag.
+- Added post-release CI, npm, and GHCR visibility verification with review links.
+- Added bounded release-check execution with actionable timeout guidance.
+
+### Changed
+
+- Preflight now aggregates independent failures and reports concise, bounded diagnostics.
+- Dirty worktrees explicitly block CI validation until the changes are committed and pushed.
+- Template repositories using `.notag` still run all preflight gates but skip versioning, tagging, and publishing.
+- CLI entrypoints now use dedicated executable wrappers.
+- Updated `@eliware/test` to `2.0.0`.
+
+### Verification
+
+- Tests: 100×4 coverage.
+- Lint: 0 warnings.
+- Release notes and verification paths are covered by tests.
+
 ## 1.1.24
 
 - Run required CI validation on both Ubuntu and Windows for every `main` push.

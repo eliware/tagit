@@ -65,6 +65,12 @@ describe('gitOperations', () => {
     expect(logMock.warn).not.toHaveBeenCalled();
   });
 
+  test('returns the pushed commit SHA', () => {
+    fsMock.existsSync.mockReturnValue(false);
+    execSyncMock.mockImplementation((command) => command === 'git rev-parse HEAD' ? 'abc123\n' : undefined);
+    expect(gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toEqual({ commitSha: 'abc123', tag: `v${mockVersion}` });
+  });
+
   test('continues when npm outdated output is invalid', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));

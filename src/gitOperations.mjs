@@ -153,7 +153,6 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
         execSync('git push --tags', { stdio: 'inherit' });
         log.info('Git operations complete');
         const commitOutput = execSync('git rev-parse HEAD', { encoding: 'utf8' });
-        /* istanbul ignore next -- real Git always returns a SHA; mocks may omit it. */
         return { commitSha: commitOutput ? commitOutput.trim() : null, tag: releaseTag };
     } catch (err) {
         restoreFileVersion(fs, 'composer.json', composerSnapshot);

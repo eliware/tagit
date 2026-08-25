@@ -18,6 +18,3 @@ export function runUpstream(args = [], execSync, now = new Date(), log = console
 export function isCli(argv) {
   return argv[1]?.endsWith('/upstream') || argv[1]?.endsWith('/upstream.mjs');
 }
-
-/* istanbul ignore next */
-if (isCli(process.argv)) runUpstream(process.argv.slice(2), defaultExecSync);
