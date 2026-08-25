@@ -17,6 +17,21 @@ function workflowFiles(fs) {
   return fs.readdirSync(directory).filter(file => /\.(yml|yaml)$/i.test(file));
 }
 
+export function reportCiLinks(execSync, log, headSha) {
+  const remote = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+  const match = remote.match(/[/:]([^/:]+\/[^/]+?)(?:\.git)?$/);
+  if (!match) throw new Error(`Cannot determine GitHub repository from origin: ${remote}`);
+  const runs = json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
+    .filter(run => run.headSha === headSha);
+  if (!runs.length) { log.info(`No CI run exists yet for ${headSha}.`); return { repo: match[1], headSha, runs: [] }; }
+  runs.forEach(run => {
+    log.info(`Workflow: [${run.url}](${run.url})`);
+    const details = json(execSync, `gh run view ${run.databaseId} --repo ${match[1]} --json jobs`);
+    (details.jobs ?? []).forEach(job => { if (job.url) log.info(`${job.name}: [${job.url}](${job.url})`); });
+  });
+  return { repo: match[1], headSha, runs };
+}
+
 export async function verifyRelease(execSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
   npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false,

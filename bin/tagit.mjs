@@ -9,6 +9,7 @@ import { runPreflight as runPreflightDefault } from '../src/releaseChecks.mjs';
 import { suggestVersion as suggestVersionDefault } from '../src/versionSuggestion.mjs';
 import { verifyRelease as verifyReleaseDefault } from '../src/releaseVerification.mjs';
 import { buildNotesReport as buildNotesReportDefault } from '../src/releaseNotesReport.mjs';
+import { reportCiLinks as reportCiLinksDefault } from '../src/releaseVerification.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -20,6 +21,7 @@ const defaultDependencies = {
   suggestVersion: suggestVersionDefault,
   verifyRelease: verifyReleaseDefault,
   buildNotesReport: buildNotesReportDefault,
+  reportCiLinks: reportCiLinksDefault,
   registerHandlersFn: registerHandlers,
   registerSignalsFn: registerSignals,
   exit: process.exit,
@@ -28,7 +30,7 @@ const defaultDependencies = {
 export async function runTagit(overrides = {}, argv = []) {
   const {
     fs, execSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
-    registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, exit,
+    registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
   if (options.help || !options.command) {
@@ -39,6 +41,15 @@ export async function runTagit(overrides = {}, argv = []) {
   registerSignalsFn({ log });
   if (options.command === 'notes') {
     (overrides.output ?? console.log)(buildNotesReport(execSync, fs));
+    return;
+  }
+  if (options.command === 'push') {
+    try {
+      execSync('git push', { stdio: 'inherit' });
+      const headSha = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+      reportCiLinks(execSync, log, headSha);
+      log.info('Push completed; untracked files were not staged.');
+    } catch (error) { log.error(error); exit(1); }
     return;
   }
   try {
@@ -95,7 +106,7 @@ export function getReleaseVersion(argv) {
 
 export function parseOptions(argv) {
   const command = argv[0];
-  if (command && !['notes', 'preflight', 'release', 'release-wait'].includes(command)) throw new Error(`Unknown command: ${command}`);
+  if (command && !['notes', 'preflight', 'push', 'release', 'release-wait'].includes(command)) throw new Error(`Unknown command: ${command}`);
   return {
     command,
     help: isHelp(argv),
@@ -104,7 +115,7 @@ export function parseOptions(argv) {
 }
 
 export function helpText() {
-  return `TAGIT RELEASE WORKFLOW\n\nResponsibility handoff:\n  Project owner  -> runs tagit notes, updates release notes/tests, and resolves all local issues.\n  Project owner  -> commits and pushes the finished work, then confirms CI is green.\n  DevOps admin   -> runs tagit preflight to independently verify the exact pushed HEAD.\n  DevOps admin   -> runs tagit release --version X.Y.Z, then shares the workflow links.\n  DevOps admin   -> runs tagit release-wait to monitor CI and confirm publication.\n\nCommands:\n  notes                     Report changes since the latest tag; read-only.\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI; read-only.\n  release --version X.Y.Z  Preflight, version, commit, tag, push, and print CI links.\n  release-wait              Wait for release CI; verify npm/GHCR and report final links.\n\nRequired gates:\n  100x4 coverage, zero lint warnings, audit, package validation, required project tests,\n  and successful Ubuntu and Windows CI for the exact commit. Failures are blockers.\n\nTemplates:\n  A .notag repository still runs preflight but never versions, tags, pushes, or publishes.\n\nOptions:\n  -h, --help                Show this overview\n  -v, --version             Show the installed tagit version`;
+  return `Usage: tagit <command>\n\nTAGIT RELEASE WORKFLOW\n\nResponsibility handoff:\n  Project owner  -> runs tagit notes, updates release notes/tests, and resolves all local issues.\n  Project owner  -> commits and pushes the finished work, then confirms CI is green.\n  DevOps admin   -> runs tagit preflight to independently verify the exact pushed HEAD.\n  DevOps admin   -> runs tagit release --version X.Y.Z, then shares the workflow links.\n  DevOps admin   -> runs tagit release-wait to monitor CI and confirm publication.\n\nCommands:\n  notes                     Report changes since the latest tag; read-only.\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI; read-only.\n  push                      Push existing commits only; ignore untracked files and print CI links.\n  release --version X.Y.Z  Preflight, version, commit, tag, push, and print CI links.\n  release-wait              Wait for release CI; verify npm/GHCR and report final links.\n\nRequired gates:\n  100x4 coverage, zero lint warnings, audit, package validation, required project tests,\n  and successful Ubuntu and Windows CI for the exact commit. Failures are blockers.\n\nTemplates:\n  A .notag repository still runs preflight but never versions, tags, pushes, or publishes.\n\nOptions:\n  -h, --help                Show this overview\n  -v, --version             Show the installed tagit version`;
 }
 
 export function preflightGuide() {

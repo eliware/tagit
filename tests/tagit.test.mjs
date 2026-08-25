@@ -76,6 +76,21 @@ test('release-wait monitors the latest tag without release side effects', async 
   expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' } });
 });
 
+test('push pushes commits without staging and reports CI links', async () => {
+  const output = jest.fn();
+  const execSync = jest.fn(command => command === 'git rev-parse HEAD' ? 'abc' : '');
+  const reportCiLinks = jest.fn();
+  await runTagit({ output, execSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
+  expect(execSync).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
+  expect(reportCiLinks).toHaveBeenCalledWith(execSync, log, 'abc');
+});
+
+test('push reports failures', async () => {
+  const exit = jest.fn();
+  await runTagit({ execSync: jest.fn(() => { throw new Error('push failed'); }), exit, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
+  expect(exit).toHaveBeenCalledWith(1);
+});
+
 test('release rejects a missing version and handles release failures', async () => {
   const exit = jest.fn();
   const error = jest.fn();

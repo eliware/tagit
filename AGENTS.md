@@ -1,7 +1,7 @@
 # Agent guidance
 
-`@eliware/tagit` provides `tagit preflight`, `tagit release --version X.Y.Z`,
-and `tagit release-wait`. `tagit notes` is a read-only change report
+`@eliware/tagit` provides `tagit preflight`, `tagit push`,
+`tagit release --version X.Y.Z`, and `tagit release-wait`. `tagit notes` is a read-only change report
 for preparing `RELEASE_NOTES.md`. Run from the target repository root on
 Windows or Linux.
 
@@ -27,6 +27,10 @@ It discovers the tag workflow and prints links, then `release-wait` monitors
 CI, verifies required Ubuntu/Windows and publish jobs, checks npm/GHCR when
 applicable, and exits non-zero for post-release failure. Never create release
 branches.
+
+`tagit push` pushes existing commits without staging or committing. Untracked
+files are ignored. It prints available exact-HEAD CI links and exits without
+waiting or tagging.
 
 For template repositories, `.notag` retains all preflight checks but makes
 release validation-only: no version update, commit, tag, push, or publishing.

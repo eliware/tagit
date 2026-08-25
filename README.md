@@ -9,6 +9,7 @@ Run from the target repository root:
 ```text
 tagit notes
 tagit preflight
+tagit push
 tagit release --version X.Y.Z
 ```
 
@@ -21,6 +22,10 @@ functions/lines (100x4), zero-warning lint, audit, package contents, required
 project checks, and successful Ubuntu and Windows CI for the exact HEAD.
 Pending CI is monitored until completion. Failures include bounded output and
 actionable remediation. Dirty changes block CI validation.
+
+`tagit push` pushes existing commits only. It never stages or commits changes,
+ignores untracked files, prints CI workflow/job links for the pushed HEAD, and
+exits without waiting.
 
 `tagit release --version X.Y.Z` requires an explicit version. It runs
 preflight, updates version files, commits, creates `vX.Y.Z`, and pushes the
