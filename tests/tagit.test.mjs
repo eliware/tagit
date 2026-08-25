@@ -12,7 +12,7 @@ test('supports release wait alongside preflight and release commands', () => {
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
   expect(() => parseOptions(['release', '--version', 'next'])).toThrow('Invalid release version');
   expect(getReleaseVersion(['release'])).toBe(null);
-  expect(helpText()).toContain('tagit <command>');
+  expect(helpText()).toContain('TAGIT RELEASE WORKFLOW');
 });
 
 test('provides complete self-contained operator guidance', () => {
@@ -89,10 +89,10 @@ test('release rejects a missing version and handles release failures', async () 
 test('bare invocation displays help', async () => {
   const output = jest.fn();
   await runTagit({ output }, []);
-  expect(output).toHaveBeenCalledWith(expect.stringContaining('tagit <command>'));
+  expect(output).toHaveBeenCalledWith(expect.stringContaining('TAGIT RELEASE WORKFLOW'));
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   await runTagit({}, []);
-  expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('tagit <command>'));
+  expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('TAGIT RELEASE WORKFLOW'));
   consoleSpy.mockRestore();
 });
 
