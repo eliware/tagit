@@ -1,7 +1,7 @@
 {
     "name": "@eliware/tagit",
     "type": "module",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "AI-oriented release notes, preflight validation, and cross-platform Git release automation.",
     "main": "bin/tagit-cli.mjs",
     "scripts": {
