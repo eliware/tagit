@@ -36,14 +36,14 @@ export function verifyLatestCi(execSync, log, {
   const repoArg = repository ? ` --repo ${repository}` : '';
   let runs;
   try {
-    runs = JSON.parse(command(execSync, `gh run list --commit ${headSha}${repoArg} --limit 20 --json databaseId,status,conclusion,headSha`));
+    runs = JSON.parse(command(execSync, `gh run list --commit ${headSha}${repoArg} --limit 20 --json databaseId,status,conclusion,headSha,url`));
   } catch (error) {
     throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}.`, { cause: error });
   }
   const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
   if (!candidates.length) {
     const matching = runs.filter(run => run.headSha === headSha);
-    const details = matching.map(run => `run ${run.databaseId} [${run.status}/${run.conclusion}]`).join(', ');
+    const details = matching.map(run => `${run.url ? `[run ${run.databaseId}](${run.url})` : `run ${run.databaseId}`} [${run.status}/${run.conclusion}]`).join(', ');
     throw new Error(`No successful GitHub Actions run exists for ${headSha}. Observed: ${details}`);
   }
   for (const run of candidates) {
@@ -60,7 +60,7 @@ export function verifyLatestCi(execSync, log, {
   const jobSummary = candidates.map(run => {
     const data = readCiRun(execSync, run.databaseId);
     const jobs = Array.isArray(data.jobs) ? data.jobs : [];
-    return `run ${run.databaseId}: ${jobs.map(job => `${job.name} [${job.status}/${job.conclusion}]`).join(', ')}`;
+    return `${run.url ? `[run ${run.databaseId}](${run.url})` : `run ${run.databaseId}`}: ${jobs.map(job => `${job.url ? `[${job.name}](${job.url})` : job.name} [${job.status}/${job.conclusion}]`).join(', ')}`;
   }).join('; ');
   throw new Error(`Successful GitHub Actions run for ${headSha} lacks passing Ubuntu and Windows jobs. Jobs: ${jobSummary}`);
 }

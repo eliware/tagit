@@ -118,13 +118,15 @@ test('rejects missing, malformed, unsuccessful, stale, and incomplete CI evidenc
     .toThrow('Unable to inspect');
   const noRun = jest.fn(() => '[]');
   expect(() => verifyLatestCi(noRun, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
+  const failedNoUrl = jest.fn(() => JSON.stringify([{ databaseId: 2, status: 'completed', conclusion: 'failure', headSha: 'abc' }]));
+  expect(() => verifyLatestCi(failedNoUrl, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
   const stale = jest.fn(command => command.startsWith('gh run list')
     ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'old' }])
     : '');
   expect(() => verifyLatestCi(stale, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
   const incomplete = jest.fn(command => command.startsWith('gh run list')
-    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
-    : JSON.stringify({ headSha: 'abc', jobs: [{ name: 'Test (ubuntu-latest)', status: 'completed', conclusion: 'success' }] }));
+    ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://github.com/eliware/demo/actions/runs/1' }])
+    : JSON.stringify({ headSha: 'abc', jobs: [{ name: 'Test (ubuntu-latest)', status: 'completed', conclusion: 'success', url: 'https://github.com/eliware/demo/actions/runs/1/jobs/1' }] }));
   expect(() => verifyLatestCi(incomplete, { info: jest.fn() }, { headSha: 'abc' })).toThrow('lacks passing');
   const noJobs = jest.fn(command => command.startsWith('gh run list')
     ? JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }])
@@ -141,7 +143,7 @@ test('describes CI jobs when platform coverage is incomplete', () => {
 
 test('reports matching but unsuccessful CI runs', () => {
   const execSync = jest.fn(command => command.startsWith('gh run list')
-    ? JSON.stringify([{ databaseId: 9, status: 'completed', conclusion: 'failure', headSha: 'abc' }]) : '');
+    ? JSON.stringify([{ databaseId: 9, status: 'completed', conclusion: 'failure', headSha: 'abc', url: 'https://github.com/eliware/demo/actions/runs/9' }]) : '');
   expect(() => verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toThrow('run 9');
 });
 
