@@ -1,11 +1,11 @@
 {
     "name": "@eliware/tagit",
     "type": "module",
-    "version": "2.0.0",
-    "description": "Automated version bumping, dependency updates, builds, and Git release operations for Node.js and PHP projects.",
-    "main": "bin/tagit.mjs",
+    "version": "2.1.0",
+    "description": "AI-oriented release notes, preflight validation, and cross-platform Git release automation.",
+    "main": "bin/tagit-cli.mjs",
     "scripts": {
-        "start": "node bin/tagit.mjs",
+        "start": "node bin/tagit-cli.mjs",
         "test": "eliware-test",
         "lint": "eliware-test --lint",
         "gitops:pin": "node bin/gitops-pin.mjs",

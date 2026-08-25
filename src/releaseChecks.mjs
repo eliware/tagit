@@ -31,6 +31,7 @@ function readCiRun(execSync, runId) {
 export function verifyLatestCi(execSync, log, {
   headSha,
   repository = null,
+  waitForCompletion = true,
 } = {}) {
   if (!headSha) throw new Error('A commit SHA is required for CI verification.');
   const repoArg = repository ? ` --repo ${repository}` : '';
@@ -39,6 +40,16 @@ export function verifyLatestCi(execSync, log, {
     runs = JSON.parse(command(execSync, `gh run list --commit ${headSha}${repoArg} --limit 20 --json databaseId,status,conclusion,headSha,url`));
   } catch (error) {
     throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}.`, { cause: error });
+  }
+  const pending = runs.find(run => run.headSha === headSha && run.status !== 'completed');
+  if (pending && waitForCompletion) {
+    if (pending.url) log.info(`CI in progress: [workflow run ${pending.databaseId}](${pending.url})`);
+    try {
+      execSync(`gh run watch ${pending.databaseId}${repoArg} --exit-status`, { stdio: 'inherit', timeout: 600000 });
+    } catch {
+      // Re-read the completed run below so the final error includes its conclusion.
+    }
+    return verifyLatestCi(execSync, log, { headSha, repository, waitForCompletion: false });
   }
   const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
   if (!candidates.length) {

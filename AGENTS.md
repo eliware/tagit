@@ -1,88 +1,40 @@
-# AGENTS.md
+# Agent guidance
 
-Guidance for coding agents working on this repository.
+`@eliware/tagit` provides `tagit preflight` and
+`tagit release --version X.Y.Z`. `tagit notes` is a read-only change report
+for preparing `RELEASE_NOTES.md`. Run from the target repository root on
+Windows or Linux.
 
-## Project Overview
+## Preflight
 
-`@eliware/tagit` is a Node.js ESM CLI for release automation. It bumps a target project's version, updates `composer.json` and/or `package.json`, runs dependency/build commands, commits the result, creates a Git tag, and pushes commits/tags.
+Preflight aggregates blockers and reports concise, bounded evidence. It must
+confirm a clean `main` worktree, no secrets or unexplained files, correct
+metadata/docs/workflows, no `.notag` conflict, 100x4 coverage, zero lint
+errors/warnings, production audit, package dry-run, applicable project checks,
+and successful Ubuntu and Windows CI for the exact local HEAD.
 
-The CLI runs on Windows and Linux and is intended to be run from the root of the project being released.
+Pending CI is monitored until completion. Missing, stale, mismatched, failed,
+or cancelled CI blocks. Dirty changes block CI validation because CI cannot
+cover them. Reports include failure output and remediation, truncated to
+protect agent context. Do not use Istanbul/c8 coverage exclusions; coverage
+does not replace smoke, integration, regression, or E2E tests when applicable.
 
-## Important Files
+## Release
 
-- `tagit.mjs`: CLI entrypoint.
-- `src/updateVersionFiles.mjs`: Reads and updates `composer.json` / `package.json` versions.
-- `src/incrementVersion.mjs`: Increments the final numeric version segment.
-- `src/gitOperations.mjs`: Runs Composer, npm, webpack, and Git commands.
-- `tests/*.test.mjs`: Jest tests using mocked filesystem and command execution.
-- `.github/workflows/nodejs.yml`: Publishes to npm when a Git tag is pushed.
+Release requires an explicit version; automatic bumping is unsupported. After
+preflight it updates metadata, commits, creates `vX.Y.Z`, and pushes on `main`.
+It monitors the tag workflow, verifies required Ubuntu/Windows and publish
+jobs, checks npm/GHCR when applicable, prints links, and exits non-zero for
+post-release failure. Never create release branches.
 
-## Development Commands
+For template repositories, `.notag` retains all preflight checks but makes
+release validation-only: no version update, commit, tag, push, or publishing.
 
-```bash
-npm test
-```
+## Development rules
 
-The test suite uses `@eliware/test` and must report 100×4 coverage with zero lint warnings.
-
-## Runtime Flow
-
-1. `tagit.mjs` loads environment variables with `dotenv/config`.
-2. It registers handlers/signals from `@eliware/common`.
-3. It exits early when `NODE_ENV === 'test'`.
-4. It exits successfully if `.notag` exists in the current directory.
-5. It calls `updateVersionFiles(fs, log)`.
-6. It calls `gitOperations(execSync, fs, log, newVersion)`.
-
-## Versioning Rules
-
-- If `composer.json` exists, its `version` is bumped first.
-- If `package.json` also exists, it is synced to the composer-derived version.
-- If only `package.json` exists, its `version` is bumped.
-- Releases require an explicitly supplied target version; automatic version bumping is not supported.
-- Each detected version file must contain a `version` field.
-
-## Release Side Effects
-
-Be careful when changing `src/gitOperations.mjs`. The real CLI can run:
-
-```bash
-COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update
-COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump
-npm update
-git add -A
-git commit -m 'Version <version> - MM-DD-YYYY'
-git tag v<version>
-git push
-git push --tags
-```
-
-Webpack builds are run when webpack is detected through dependencies or `webpack.config.js` / `webpack.config.mjs`. Build command preference is:
-
-```bash
-npm run build
-npm run webpack
-npx webpack
-```
-
-## Agent Guidelines
-
-- Prefer small, targeted changes. This project is intentionally compact.
-- Keep source files as ESM `.mjs`.
-- Preserve dependency injection in exported functions where practical; it keeps tests simple and avoids real shell/filesystem side effects.
-- Do not run `tagit.mjs` casually from this repository or another project unless explicitly asked. It can mutate files, commit, tag, and push.
-- Do not run real `git push`, `git tag`, `npm upgrade`, `composer upgrade`, or release commands unless explicitly requested.
-- Run `npm test` and `npm run lint` after changes when feasible.
-- Update README behavior descriptions when CLI behavior changes.
-- Add or adjust tests for command-order or branching changes in release logic.
-
-## Current Known Risks
-
-- If no version file exists, `updateVersionFiles` returns `null`; downstream Git operations still attempt to commit/tag.
-- Version strings are not strictly validated.
-- Release commands use shell strings and should be treated carefully.
-- `npm update` and `composer update` can introduce dependency changes during a release.
-- Do not over-engineer simple tasks.
-- Do not guess when confused.
-- Do not make random, pointless changes.
-- Check your own work before saying you're done.
+- Keep source ESM `.mjs` and preserve dependency injection.
+- Use `bin/*-cli.mjs` wrappers; do not execute library modules casually.
+- Add tests for every branch or command-order change and maintain 100x4.
+- Run `npm test`, `npm run lint`, and `npm run pack` after changes.
+- Never push, tag, publish, or release without explicit authorization.
+- Update README and release notes when behavior changes.

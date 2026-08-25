@@ -163,6 +163,39 @@ test('preflight verifies CI for the exact current HEAD', () => {
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toHaveProperty('ci.ubuntu', true);
 });
 
+test('waits for an in-progress exact-head CI run', () => {
+  let listed = 0;
+  const execSync = jest.fn(command => {
+    if (command.startsWith('gh run list')) {
+      listed += 1;
+      return listed === 1
+        ? JSON.stringify([{ databaseId: 7, status: 'in_progress', conclusion: '', headSha: 'abc', url: 'https://github.com/eliware/demo/actions/runs/7' }])
+        : JSON.stringify([{ databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://github.com/eliware/demo/actions/runs/7' }]);
+    }
+    if (command.startsWith('gh run watch')) return '';
+    return JSON.stringify({ headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' }, { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] });
+  });
+  expect(verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toMatchObject({ runId: 7, ubuntu: true, windows: true });
+  expect(execSync).toHaveBeenCalledWith('gh run watch 7 --exit-status', expect.objectContaining({ timeout: 600000 }));
+});
+
+test('re-reads CI after a watch command reports failure', () => {
+  let listed = 0;
+  const execSync = jest.fn(command => {
+    if (command.startsWith('gh run list')) {
+      listed += 1;
+      return listed === 1
+        ? JSON.stringify([{ databaseId: 8, status: 'in_progress', conclusion: '', headSha: 'abc' }])
+        : JSON.stringify([{ databaseId: 8, status: 'completed', conclusion: 'failure', headSha: 'abc' }]);
+    }
+    if (command.startsWith('gh run watch')) throw new Error('run failed');
+    return '';
+  });
+  expect(() => verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc' })).toThrow('No successful');
+});
+
 test('preflight aggregates CI failures after local checks', () => {
   const execSync = jest.fn(command => {
     if (command === 'git status --short --untracked-files=all') return '';

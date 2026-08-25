@@ -2,6 +2,10 @@
 
 ## 2.1.0
 
+This release aligns the CLI with the current two-stage, AI-agent-friendly
+workflow: inspect with `notes`, validate with `preflight`, then release only
+an explicitly selected version.
+
 ### Added
 
 - Added read-only `tagit notes` reporting for changes since the latest tag.
@@ -21,6 +25,7 @@
 - Tests: 100×4 coverage.
 - Lint: 0 warnings.
 - Release notes and verification paths are covered by tests.
+- Package metadata and lockfile report version `2.1.0`.
 
 ## 1.1.24
 
