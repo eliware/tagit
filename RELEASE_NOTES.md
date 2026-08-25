@@ -2,6 +2,9 @@
 
 ## 2.1.0
 
+- Split release execution from release verification: `release` pushes and
+  prints links; `release-wait` monitors CI and confirms registries.
+
 This release aligns the CLI with the current two-stage, AI-agent-friendly
 workflow: inspect with `notes`, validate with `preflight`, then release only
 an explicitly selected version.
@@ -81,3 +84,15 @@ Verification:
 
 - Add informational SemVer suggestions based on non-generated changes since
   the latest tag; explicit release versions remain required.
+## 2.2.0
+
+### Added
+
+- Split release execution from verification with `tagit release-wait`.
+- Release now prints workflow and job links immediately after pushing.
+- Release-wait verifies npm/GHCR publication and reports the GHCR image digest.
+
+### Changed
+
+- Release monitoring is resumable and no longer requires one uninterrupted
+  release command session.

@@ -4,10 +4,11 @@ import { getReleaseVersion, helpText, isCli, isHelp, parseOptions, preflightGuid
 const noop = jest.fn();
 const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
-test('supports only preflight and release commands', () => {
+test('supports release wait alongside preflight and release commands', () => {
   expect(parseOptions(['notes'])).toMatchObject({ command: 'notes', version: null });
   expect(parseOptions(['preflight'])).toMatchObject({ command: 'preflight', version: null });
   expect(parseOptions(['release', '--version', '2.4.0'])).toMatchObject({ command: 'release', version: '2.4.0' });
+  expect(parseOptions(['release-wait'])).toMatchObject({ command: 'release-wait', version: null });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
   expect(() => parseOptions(['release', '--version', 'next'])).toThrow('Invalid release version');
   expect(getReleaseVersion(['release'])).toBe(null);
@@ -19,6 +20,7 @@ test('provides complete self-contained operator guidance', () => {
   expect(preflightGuide()).toContain('Ubuntu and Windows');
   expect(releaseGuide()).toContain('tagit release --version X.Y.Z');
   expect(releaseGuide()).toContain('publish jobs individually');
+  expect(helpText()).toContain('release-wait');
 });
 
 test('detects CLI', () => {
@@ -65,6 +67,13 @@ test('release runs the release operation for an explicit version', async () => {
   await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
   expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: '2.4.0' });
   expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0');
+});
+
+test('release-wait monitors the latest tag without release side effects', async () => {
+  const execSync = jest.fn(command => command.includes('describe') ? 'v2.4.0' : 'abc');
+  const verifyRelease = jest.fn().mockResolvedValue({});
+  await runTagit({ execSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
+  expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' } });
 });
 
 test('release rejects a missing version and handles release failures', async () => {

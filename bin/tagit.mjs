@@ -52,6 +52,13 @@ export async function runTagit(overrides = {}, argv = []) {
   }
 
   try {
+    if (options.command === 'release-wait') {
+      const version = options.version ?? execSync('git describe --tags --abbrev=0').toString().trim().replace(/^v/, '');
+      const commitSha = execSync(`git rev-list -n 1 v${version}`).toString().trim();
+      await verifyRelease(execSync, fs, log, { version, release: { commitSha } });
+      log.info(`Release ${version} verified successfully.`);
+      return;
+    }
     const preflight = runPreflight(execSync, fs, log, { verifyCi: true });
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
@@ -65,8 +72,8 @@ export async function runTagit(overrides = {}, argv = []) {
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
     const release = gitOperations(execSync, fs, log, newVersion);
-    await verifyRelease(execSync, fs, log, { version: newVersion, release });
-    log.info(`Release ${newVersion} verified successfully.`);
+    await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true });
+    log.info('Run tagit release-wait to monitor CI and confirm publication.');
   } catch (error) {
     log.error(error);
     exit(1);
@@ -88,16 +95,16 @@ export function getReleaseVersion(argv) {
 
 export function parseOptions(argv) {
   const command = argv[0];
-  if (command && !['notes', 'preflight', 'release'].includes(command)) throw new Error(`Unknown command: ${command}`);
+  if (command && !['notes', 'preflight', 'release', 'release-wait'].includes(command)) throw new Error(`Unknown command: ${command}`);
   return {
     command,
     help: isHelp(argv),
-    version: command === 'release' ? getReleaseVersion(argv) : null,
+    version: command === 'release' || command === 'release-wait' ? getReleaseVersion(argv) : null,
   };
 }
 
 export function helpText() {
-  return `Usage: tagit <command>\n\nCommands:\n  notes                     Report changes since the last tag and guide release-note work\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI\n  release --version X.Y.Z  Run preflight, then commit, tag, and push\n\nOptions:\n  -h, --help                Show this help\n  -v, --version             Show the installed tagit version`;
+  return `Usage: tagit <command>\n\nCommands:\n  notes                     Report changes since the last tag and guide release-note work\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI\n  release --version X.Y.Z  Run preflight, then commit, tag, and push\n  release-wait              Monitor release CI and verify publication\n\nOptions:\n  -h, --help                Show this help\n  -v, --version             Show the installed tagit version`;
 }
 
 export function preflightGuide() {

@@ -24,6 +24,22 @@ test('verifies tag CI, npm propagation, and skips GHCR when not configured', asy
   expect(log.info).toHaveBeenCalledWith(expect.stringContaining('Ubuntu:'));
 });
 
+test('reports release links without waiting or registry checks', async () => {
+  const execSync = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git'
+    : command.startsWith('gh run list') ? JSON.stringify([{ databaseId: 2, headSha: 'abc', headBranch: 'v1.0.0', status: 'in_progress', url: 'https://github.com/eliware/demo/actions/runs/2' }])
+      : JSON.stringify({ status: 'in_progress', jobs: [{ name: 'build', url: 'https://github.com/eliware/demo/jobs/3' }] }));
+  const result = await verifyRelease(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, linksOnly: true, sleep: async () => {} });
+  expect(result).toMatchObject({ runId: 2, linksOnly: true });
+  const noJobsExec = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git'
+    : command.startsWith('gh run list') ? JSON.stringify([{ databaseId: 3, headSha: 'abc', headBranch: 'v1.0.0', status: 'in_progress' }])
+      : JSON.stringify({ status: 'in_progress', jobs: [{}] }));
+  await verifyRelease(noJobsExec, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, linksOnly: true, sleep: async () => {} });
+  const undefinedJobsExec = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git'
+    : command.startsWith('gh run list') ? JSON.stringify([{ databaseId: 4, headSha: 'abc', headBranch: 'v1.0.0', status: 'in_progress' }])
+      : JSON.stringify({ status: 'in_progress' }));
+  await verifyRelease(undefinedJobsExec, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, linksOnly: true, sleep: async () => {} });
+});
+
 test('reports failed release jobs', async () => {
   const execSync = jest.fn(command => command === 'git remote get-url origin' ? 'git@github.com:eliware/demo.git'
     : command.startsWith('gh run list') ? JSON.stringify([{ databaseId: 1, headSha: 'abc', headBranch: 'v1.0.0' }])
@@ -64,17 +80,21 @@ test('reports missing CI, invalid remotes, and GHCR misses', async () => {
 });
 
 test('verifies GHCR tags and handles private or absent npm packages', async () => {
+  let includeDigest = false;
   const execSync = jest.fn(command => {
     if (command === 'git remote get-url origin') return 'git@github.com:eliware/demo.git';
     if (command.startsWith('gh run list')) return JSON.stringify([{ databaseId: 1, headSha: 'abc', headBranch: 'v1.0.0' }]);
     if (command.startsWith('gh run view')) return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [
       { name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'windows', status: 'completed', conclusion: 'success' },
     ] });
-    if (command.startsWith('gh api')) return JSON.stringify([{ metadata: { container: { tags: ['v1.0.0'] } } }]);
+    if (command.startsWith('gh api')) return JSON.stringify([{ name: includeDigest ? 'sha256:abc' : 'not-a-digest', metadata: { container: { tags: ['v1.0.0'] } } }]);
+    if (command.startsWith('npm view')) return '1.0.0';
     return '';
   });
-  const fs = { existsSync: jest.fn(file => file === 'package.json' || file === '.github/workflows'), readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ private: true }) : 'image: ghcr.io/eliware/demo'), readdirSync: jest.fn(() => ['ci.yml']) };
-  await expect(verifyRelease(execSync, fs, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, sleep: async () => {} })).resolves.toMatchObject({ npm: false, ghcr: true });
+  const fs = { existsSync: jest.fn(file => file === 'package.json' || file === '.github/workflows'), readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ name: 'demo', private: false }) : 'image: ghcr.io/eliware/demo'), readdirSync: jest.fn(() => ['ci.yml']) };
+  await expect(verifyRelease(execSync, fs, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, initialDelayMs: 0, sleep: async () => {} })).resolves.toMatchObject({ npm: true, ghcr: true });
+  includeDigest = true;
+  await expect(verifyRelease(execSync, fs, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, initialDelayMs: 0, sleep: async () => {} })).resolves.toMatchObject({ imageDigest: 'sha256:abc' });
 });
 
 test('rejects missing platform jobs and npm propagation exhaustion', async () => {

@@ -23,10 +23,13 @@ Pending CI is monitored until completion. Failures include bounded output and
 actionable remediation. Dirty changes block CI validation.
 
 `tagit release --version X.Y.Z` requires an explicit version. It runs
-preflight, updates version files, commits, creates `vX.Y.Z`, pushes the commit
-and tag, monitors the tag workflow, verifies npm/GHCR when applicable, waits
-briefly before npm checks, prints workflow/job links, and exits non-zero on
-post-release failure.
+preflight, updates version files, commits, creates `vX.Y.Z`, and pushes the
+commit and tag. It discovers the release workflow, prints workflow/job links,
+and exits with instructions to run `tagit release-wait`.
+
+`tagit release-wait` resumes the release by monitoring CI to completion,
+verifying npm/GHCR when applicable, waiting briefly before npm checks, and
+exiting non-zero with bounded failure details.
 
 There is no automatic version bump, release dry-run, release branch, coverage
 waiver, or lint-warning waiver.

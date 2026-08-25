@@ -19,7 +19,7 @@ function workflowFiles(fs) {
 
 export async function verifyRelease(execSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
-  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault,
+  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false,
 } = {}) {
   const repo = repositoryName(execSync);
   const tag = `v${version}`;
@@ -30,12 +30,18 @@ export async function verifyRelease(execSync, fs, log, {
     const candidate = runs.find(item => item.headSha === headSha && item.headBranch === tag);
     if (candidate) {
       const details = json(execSync, `gh run view ${candidate.databaseId} --repo ${repo} --json status,conclusion,headSha,jobs,url`);
-      if (details.status === 'completed') { run = { ...candidate, ...details }; break; }
+      if (linksOnly || details.status === 'completed') { run = { ...candidate, ...details }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }
     await sleep(pollMs);
   }
   if (!run) throw new Error(`Release CI did not complete for ${repo}@${tag} (${headSha})`);
+  if (linksOnly) {
+    log.info(`Release CI discovered for ${repo}@${tag}. Run tagit release-wait to monitor it.`);
+    log.info(`Workflow: [${run.url}](${run.url})`);
+    (run.jobs ?? []).forEach(job => { if (job.url) log.info(`${job.name}: [${job.url}](${job.url})`); });
+    return { repo, tag, headSha, runId: run.databaseId, linksOnly: true };
+  }
   const successful = job => job.status === 'completed' && job.conclusion === 'success';
   const failed = run.jobs.filter(job => job.conclusion && job.conclusion !== 'success');
   if (failed.length) throw new Error(`Release CI failed: ${failed.map(job => `${job.name}: ${job.conclusion}`).join('; ')}`);
@@ -71,9 +77,12 @@ export async function verifyRelease(execSync, fs, log, {
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
     const versions = json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
-    const found = versions.some(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
-    if (!found) throw new Error(`GHCR does not expose ${repo}:${version}.`);
+    const image = versions.find(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
+    if (!image) throw new Error(`GHCR does not expose ${repo}:${version}.`);
+    const imageDigest = image.name?.startsWith('sha256:') ? image.name : null;
     log.info(`GHCR verified: ${repo}:${version}.`);
+    if (imageDigest) log.info(`GHCR digest: ${imageDigest}`);
+    return { repo, tag, headSha, ci: true, npm: Boolean(packageData?.name && !packageData.private), ghcr: true, imageDigest };
   } else log.info('GHCR verification: not applicable.');
   return { repo, tag, headSha, ci: true, npm: Boolean(packageData?.name && !packageData.private), ghcr: publishesGhcr };
 }
