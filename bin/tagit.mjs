@@ -7,6 +7,7 @@ import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVe
 import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
 import { runPreflight as runPreflightDefault } from '../src/releaseChecks.mjs';
 import { suggestVersion as suggestVersionDefault } from '../src/versionSuggestion.mjs';
+import { verifyRelease as verifyReleaseDefault } from '../src/releaseVerification.mjs';
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -16,6 +17,7 @@ const defaultDependencies = {
   gitOperations: gitOperationsDefault,
   runPreflight: runPreflightDefault,
   suggestVersion: suggestVersionDefault,
+  verifyRelease: verifyReleaseDefault,
   registerHandlersFn: registerHandlers,
   registerSignalsFn: registerSignals,
   exit: process.exit,
@@ -24,7 +26,7 @@ const defaultDependencies = {
 export async function runTagit(overrides = {}, argv = []) {
   const {
     fs, execSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
-    registerHandlersFn, registerSignalsFn, exit,
+    registerHandlersFn, registerSignalsFn, verifyRelease, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
   if (options.help || !options.command) {
@@ -33,36 +35,32 @@ export async function runTagit(overrides = {}, argv = []) {
   }
   registerHandlersFn({ log });
   registerSignalsFn({ log });
-  log.info(options.command === 'preflight' ? preflightGuide() : releaseGuide());
-  if (fs.readFileSync && execSync) log.info(`Version suggestion: ${JSON.stringify(suggestVersion(execSync, fs))}`);
-
   try {
     if (options.command === 'release' && !options.version) {
       throw new Error('A specific release version is required. Use tagit release --version X.Y.Z.');
     }
-    if (fs.existsSync('.notag')) {
-      log.warn('.notag file detected — aborting tag/release process.');
-      exit(0);
-      return;
-    }
   } catch (error) {
-    log.error('Error checking for .notag file:', error);
+    log.error('Invalid tagit invocation:', error);
     exit(1);
     return;
   }
 
-  log.info('tagit Started');
-
   try {
     const preflight = runPreflight(execSync, fs, log, { verifyCi: true });
     if (options.command === 'preflight') {
-      log.info('Preflight complete');
+      log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
+      return;
+    }
+    if (fs.existsSync('.notag')) {
+      log.info('.notag detected: template release validated; tagging and publishing skipped.');
       return;
     }
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
-    gitOperations(execSync, fs, log, newVersion);
+    const release = gitOperations(execSync, fs, log, newVersion);
+    await verifyRelease(execSync, fs, log, { version: newVersion, release });
+    log.info(`Release ${newVersion} verified successfully.`);
   } catch (error) {
     log.error(error);
     exit(1);
@@ -119,6 +117,8 @@ export function releaseGuide() {
 - Verify the remote commit and tag point to the expected SHAs.
 - Verify the tag workflow's Ubuntu, Windows, and publish jobs individually.
 - Verify the exact package version and dist-tag in its target registry.
+- tagit waits for release CI, then verifies npm after registry propagation delay and GHCR when applicable.
+- Any CI, publish, npm, or GHCR failure is reported and exits nonzero; N/A registries are reported as skipped.
 - Confirm the final worktree is clean; update GitOps only when deployment is authorized.
 Never rerun an interrupted release blindly or bypass a failed gate.`;
 }

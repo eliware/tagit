@@ -30,8 +30,15 @@ test('preflight rejects dirty trees before running package commands', () => {
   const execSync = jest.fn(() => ' M package.json\n');
   const fs = { existsSync: jest.fn(() => false) };
 
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('Working tree is not clean');
-  expect(execSync).toHaveBeenCalledTimes(1);
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('uncommitted changes are present');
+  expect(execSync).toHaveBeenCalledTimes(4);
+});
+
+test('preflight blocks CI evidence when the worktree is dirty', () => {
+  const execSync = jest.fn(command => command === 'git status --short --untracked-files=all' ? ' M file.js\n' : '');
+  const fs = { existsSync: jest.fn(() => false) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true }))
+    .toThrow('uncommitted changes are present');
 });
 
 test('preflight honors an explicit 100x4 waiver and audit fallback', () => {
@@ -52,15 +59,15 @@ test('preflight blocks missing strict 100x4 coverage', () => {
     existsSync: jest.fn(file => file === 'package.json'),
     readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'jest' } })),
   };
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('strict 100x4');
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('100×4 coverage');
 });
 
-test('preflight reports command failures and disabled releases', () => {
+test('preflight reports command failures and allows template releases', () => {
   const fs = { existsSync: jest.fn(() => false) };
   const failingExec = jest.fn(command => command === 'npm run lint' ? (() => { throw { stdout: 'bad', stderr: 'lint' }; })() : '');
-  expect(() => runPreflight(failingExec, fs, { info: jest.fn() })).toThrow('Preflight lint failed');
-  expect(() => runPreflight(jest.fn(), { existsSync: jest.fn(() => true) }, { info: jest.fn() }))
-    .toThrow('.notag file detected');
+  expect(() => runPreflight(failingExec, fs, { info: jest.fn() })).toThrow('lint failed');
+  expect(() => runPreflight(jest.fn(() => ''), { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) }, { info: jest.fn() }))
+    .toThrow('Preflight found 1 issue');
 });
 
 test('preflight supports projects without a test script', () => {
@@ -78,7 +85,7 @@ test('preflight handles failures without captured output', () => {
     throw new Error('failed');
   });
   expect(() => runPreflight(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }))
-    .toThrow('Preflight lint failed');
+    .toThrow('lint failed');
 });
 
 test('verifies a successful exact-head CI run on Ubuntu and Windows', () => {
@@ -129,4 +136,52 @@ test('preflight verifies CI for the exact current HEAD', () => {
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toHaveProperty('ci.ubuntu', true);
+});
+
+test('preflight aggregates CI failures after local checks', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'git rev-parse HEAD') return 'abc';
+    if (command.startsWith('gh run list')) throw new Error('network unavailable');
+    return command === 'npm test' ? 'All files     100     100     100     100' : '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow('GitHub CI verification failed');
+  expect(execSync).toHaveBeenCalledWith('npm run lint', expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith('npm audit --omit=dev --audit-level=moderate', expect.any(Object));
+});
+
+test('preflight gives remediation for a failing test and missing coverage', () => {
+  const failingTest = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'npm test') throw new Error('intentional test failure');
+    return '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(failingTest, fs, { info: jest.fn() })).toThrow(/test failed[\s\S]*fix the reported issue/);
+
+  const missingCoverage = jest.fn(command => command === 'git status --short --untracked-files=all' ? '' : 'Tests passed without a coverage summary');
+  expect(() => runPreflight(missingCoverage, fs, { info: jest.fn() })).toThrow(/100×4 coverage[\s\S]*add tests for the files/);
+});
+
+test('preflight reports hanging checks with timer guidance', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'npm test') throw Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' });
+    return '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow(/exceeded the 120-second limit[\s\S]*unset timers/);
+});
+
+test('preflight aggregates all blocking checks with next actions', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return ' M package.json';
+    if (command === 'npm test') return 'Tests passed without coverage';
+    throw new Error(`${command} failed`);
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow(
+    /uncommitted changes[\s\S]*commit and push[\s\S]*100×4 coverage[\s\S]*fix the reported issue/,
+  );
 });
