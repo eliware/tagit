@@ -96,3 +96,11 @@ Verification:
 
 - Release monitoring is resumable and no longer requires one uninterrupted
   release command session.
+## 2.2.1
+
+### Changed
+
+- Bare `tagit` and `tagit --help` now provide a concise, self-contained
+  workflow guide for AI agents.
+- Documented the project-owner to DevOps handoff between notes, preflight,
+  release, and release-wait.
