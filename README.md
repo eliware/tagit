@@ -14,6 +14,7 @@ tagit notes
 tagit preflight
 tagit push
 tagit release --version X.Y.Z
+tagit release-wait
 ```
 
 `tagit notes` is read-only. It summarizes changes since the latest tag,
@@ -101,6 +102,8 @@ repository root. Both commands are safe to run without release authorization.
 ```bash
 npm test
 npm run lint
+npm run typecheck
+npm audit --omit=dev --audit-level=moderate
 npm run pack
 ```
 

@@ -35,10 +35,10 @@ test('supports top-level help and version flags', async () => {
   await runTagit({ output }, ['--help']);
   expect(output).toHaveBeenCalledWith(expect.stringContaining('Project owners may run only'));
   await runTagit({ output }, ['--version']);
-  expect(output).toHaveBeenLastCalledWith('2.2.2');
+  expect(output).toHaveBeenLastCalledWith('2.3.0');
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   await runTagit({}, ['-v']);
-  expect(consoleSpy).toHaveBeenCalledWith('2.2.2');
+  expect(consoleSpy).toHaveBeenCalledWith('2.3.0');
   consoleSpy.mockRestore();
 });
 

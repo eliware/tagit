@@ -81,9 +81,9 @@ Verification:
 - `npm test` (100% coverage across statements, branches, functions, and lines)
 - `npm run lint`
 
-## Unreleased
+## 1.1.19
 
-- Release tags now use the `v<version>` format, for example `v1.1.19`.
+- Release tags use the `v<version>` format, for example `v1.1.19`.
 
 ## 1.1.18
 
@@ -103,27 +103,3 @@ Verification:
 - Added automatic `npm outdated --json` inspection.
 - Outdated npm dependencies are upgraded to their `@latest` versions.
 - Existing `npm update`, test, and build verification steps remain enabled.
-## Unreleased
-
-- Add informational SemVer suggestions based on non-generated changes since
-  the latest tag; explicit release versions remain required.
-## 2.2.0
-
-### Added
-
-- Split release execution from verification with `tagit release-wait`.
-- Release now prints workflow and job links immediately after pushing.
-- Release-wait verifies npm/GHCR publication and reports the GHCR image digest.
-
-### Changed
-
-- Release monitoring is resumable and no longer requires one uninterrupted
-  release command session.
-## 2.2.1
-
-### Changed
-
-- Bare `tagit` and `tagit --help` now provide a concise, self-contained
-  workflow guide for AI agents.
-- Documented the project-owner to DevOps handoff between notes, preflight,
-  release, and release-wait.
