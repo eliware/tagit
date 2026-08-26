@@ -90,7 +90,7 @@ function validateRepository(execSync, fs, failures) {
       if (!packageData[field]) failures.push(`BLOCKED: package.json is missing metadata: ${field}. Action: correct package metadata and rerun tagit preflight.`);
     }
   } catch (error) { failures.push(failureMessage('package metadata validation', error)); }
-  const secretPattern = /(^|[\\/])(?:\.env(?:\.|$)|id_rsa(?:\.|$)|credentials(?:\.|[\\/]|$)|secrets?(?:\.|[\\/]|$))/i;
+  const secretPattern = /(^|[\\/])(?:\.env(?:$|\.(?!example$))|id_rsa(?:\.|$)|credentials(?:\.|[\\/]|$)|secrets?(?:\.|[\\/]|$))/i;
   try {
     const secrets = command(execSync, 'git ls-files').split(/\r?\n/).filter(file => secretPattern.test(file));
     if (secrets.length) failures.push(`BLOCKED: tracked secret-looking files were found:\n${secrets.join('\n')}\nAction: remove secrets from Git and rerun tagit preflight.`);
