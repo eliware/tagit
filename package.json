@@ -60,14 +60,6 @@
     "devDependencies": {
         "@eliware/test": "^2.0.0"
     },
-    "jest": {
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs",
-            "**/?(*.)+(spec|test).cjs"
-        ]
-    },
     "dependencies": {
         "@eliware/common": "^2.0.0"
     },

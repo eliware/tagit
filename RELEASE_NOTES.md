@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2.2.3 (Unreleased)
+## 2.3.0
 
 ### Changed
 
@@ -8,9 +8,6 @@
 - Expanded strict preflight validation for branch, metadata, required files, and tracked secret-looking files.
 - Clarified that project owners may use only notes, push, and preflight; DevOps owns release and release-wait.
 - Excluded tests and internal deployment guidance from the npm package.
-- Added explicit package exports, package-file allowlisting, public publish
-  metadata, and a cross-platform typecheck gate.
-- Expanded README setup, API, security, operations, and validation guidance.
 - Added explicit package exports, package-file allowlisting, public publish
   metadata, and a cross-platform typecheck gate.
 - Expanded README setup, API, security, operations, and validation guidance.
