@@ -21,6 +21,11 @@ does not replace smoke, integration, regression, or E2E tests when applicable.
 
 ## Release
 
+Project owners may run only `tagit notes`, `tagit push`, and `tagit preflight`.
+They must never run `tagit release` or `tagit release-wait`. Those commands are
+DevOps-only and may run only after the owner handoff and exact-HEAD preflight
+have passed.
+
 Release requires an explicit version; automatic bumping is unsupported. After
 preflight it updates metadata, commits, creates `vX.Y.Z`, and pushes on `main`.
 It discovers the tag workflow and prints links, then `release-wait` monitors
@@ -41,5 +46,6 @@ release validation-only: no version update, commit, tag, push, or publishing.
 - Use `bin/*-cli.mjs` wrappers; do not execute library modules casually.
 - Add tests for every branch or command-order change and maintain 100x4.
 - Run `npm test`, `npm run lint`, and `npm run pack` after changes.
-- Never push, tag, publish, or release without explicit authorization.
+- Project owners must never tag, publish, release, or run release-wait; DevOps
+  owns release and post-release verification after preflight passes.
 - Update README and release notes when behavior changes.

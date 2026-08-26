@@ -1,6 +1,41 @@
 import { jest } from '@jest/globals';
 import { hasStrict100x4, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
 
+test('strict preflight validates repository ownership gates', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'git branch --show-current') return 'main';
+    if (command === 'git ls-files') return 'package.json\nREADME.md\nRELEASE_NOTES.md';
+    if (command === 'npm test') return 'All files 100 100 100 100';
+    return '';
+  });
+  const fs = { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ name: 'x', version: '1.0.0', description: 'x', license: 'MIT', scripts: { test: 'test' } })) };
+  expect(runPreflight(execSync, fs, { info: jest.fn() }, { strictRepository: true })).toHaveProperty('test.passed', true);
+});
+
+test('strict preflight reports branch, required files, metadata, and tracked secrets', () => {
+  const execSync = jest.fn(command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'git branch --show-current') return 'feature/x';
+    if (command === 'git ls-files') return '.env\ncredentials.json';
+    return command === 'npm test' ? 'All files 100 100 100 100' : '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { strictRepository: true })).toThrow(/main[\s\S]*required repository file[\s\S]*metadata[\s\S]*secret-looking/);
+});
+
+test('strict preflight reports validation command and metadata failures', () => {
+  const base = command => {
+    if (command === 'git status --short --untracked-files=all') return '';
+    if (command === 'git branch --show-current' || command === 'git ls-files') throw new Error('inspection failed');
+    return command === 'npm test' ? 'All files 100 100 100 100' : '';
+  };
+  const fs = { existsSync: jest.fn(() => false), readFileSync: jest.fn(() => '{bad') };
+  expect(() => runPreflight(jest.fn(base), fs, { info: jest.fn() }, { strictRepository: true })).toThrow(/branch validation[\s\S]*package metadata validation[\s\S]*tracked-file validation/);
+  const detached = jest.fn(command => command === 'git status --short --untracked-files=all' ? '' : command === 'git branch --show-current' ? '' : command === 'git ls-files' ? '' : command === 'npm test' ? 'All files 100 100 100 100' : '');
+  expect(() => runPreflight(detached, { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ name: 'x', version: '1', description: 'x', license: 'MIT', scripts: { test: 'test' } })) }, { info: jest.fn() }, { strictRepository: true })).toThrow('detached');
+});
+
 test('detects strict 100x4 coverage', () => {
   expect(hasStrict100x4('All files     100     100     100     100')).toBe(true);
   expect(hasStrict100x4('All files                |     100 |      100 |     100 |     100 |')).toBe(true);

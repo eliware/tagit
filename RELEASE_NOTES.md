@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2.2.3 (Unreleased)
+
+### Changed
+
+- Made release version updates transactional when a release step fails.
+- Expanded strict preflight validation for branch, metadata, required files, and tracked secret-looking files.
+- Clarified that project owners may use only notes, push, and preflight; DevOps owns release and release-wait.
+- Excluded tests and internal deployment guidance from the npm package.
+
 ## 2.2.2
 
 ### Changed

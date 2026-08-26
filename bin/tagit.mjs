@@ -27,6 +27,8 @@ const defaultDependencies = {
   exit: process.exit,
 };
 
+const operatorBoundary = 'Project owners may run only tagit notes, tagit push, and tagit preflight. Project owners must never run tagit release or tagit release-wait; DevOps runs those commands only after preflight passes.';
+
 export async function runTagit(overrides = {}, argv = []) {
   const {
     fs, execSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
@@ -34,7 +36,7 @@ export async function runTagit(overrides = {}, argv = []) {
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
   if (options.help || !options.command) {
-    (overrides.output ?? console.log)(helpText());
+    (overrides.output ?? console.log)(`${operatorBoundary}\n\n${helpText()}`);
     return;
   }
   registerHandlersFn({ log });
@@ -52,6 +54,7 @@ export async function runTagit(overrides = {}, argv = []) {
     } catch (error) { log.error(error); exit(1); }
     return;
   }
+  let versionSnapshots = [];
   try {
     if (options.command === 'release' && !options.version) {
       throw new Error('A specific release version is required. Use tagit release --version X.Y.Z.');
@@ -70,7 +73,7 @@ export async function runTagit(overrides = {}, argv = []) {
       log.info(`Release ${version} verified successfully.`);
       return;
     }
-    const preflight = runPreflight(execSync, fs, log, { verifyCi: true });
+    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true });
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
@@ -80,12 +83,17 @@ export async function runTagit(overrides = {}, argv = []) {
       log.info('.notag detected: template release validated; tagging and publishing skipped.');
       return;
     }
+    versionSnapshots = ['package.json', 'package-lock.json', 'composer.json']
+      .filter(file => fs.existsSync(file))
+      .map(file => [file, fs.readFileSync(file, 'utf8')]);
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
     const release = gitOperations(execSync, fs, log, newVersion);
     await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true });
     log.info('Run tagit release-wait to monitor CI and confirm publication.');
   } catch (error) {
+    // Versioning happens before Git operations; restore it if any release step fails.
+    for (const [file, contents] of versionSnapshots) fs.writeFileSync(file, contents, 'utf8');
     log.error(error);
     exit(1);
   }

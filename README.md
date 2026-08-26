@@ -36,6 +36,13 @@ and exits with instructions to run `tagit release-wait`.
 verifying npm/GHCR when applicable, waiting briefly before npm checks, and
 exiting non-zero with bounded failure details.
 
+## Command ownership
+
+Project owners may run only `tagit notes`, `tagit push`, and `tagit preflight`.
+Project owners must never run `tagit release` or `tagit release-wait`. The
+DevOps team runs those commands only after the owner handoff and exact-HEAD
+preflight has passed.
+
 There is no automatic version bump, release dry-run, release branch, coverage
 waiver, or lint-warning waiver.
 

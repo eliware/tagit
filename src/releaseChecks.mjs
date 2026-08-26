@@ -76,9 +76,31 @@ export function verifyLatestCi(execSync, log, {
   throw new Error(`Successful GitHub Actions run for ${headSha} lacks passing Ubuntu and Windows jobs. Jobs: ${jobSummary}`);
 }
 
-export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi = false } = {}) {
+function validateRepository(execSync, fs, failures) {
+  try {
+    const branch = command(execSync, 'git branch --show-current').trim();
+    if (branch !== 'main') failures.push(`BLOCKED: release validation must run on main (current branch: ${branch || 'detached'}). Action: check out main and rerun tagit preflight.`);
+  } catch (error) { failures.push(failureMessage('branch validation', error)); }
+  for (const file of ['package.json', 'README.md', 'RELEASE_NOTES.md', '.github/workflows/nodejs.yml']) {
+    if (!fs.existsSync(file)) failures.push(`BLOCKED: required repository file is missing: ${file}. Action: restore it and rerun tagit preflight.`);
+  }
+  try {
+    const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    for (const field of ['name', 'version', 'description', 'license']) {
+      if (!packageData[field]) failures.push(`BLOCKED: package.json is missing metadata: ${field}. Action: correct package metadata and rerun tagit preflight.`);
+    }
+  } catch (error) { failures.push(failureMessage('package metadata validation', error)); }
+  const secretPattern = /(^|[\\/])(?:\.env(?:\.|$)|id_rsa(?:\.|$)|credentials(?:\.|[\\/]|$)|secrets?(?:\.|[\\/]|$))/i;
+  try {
+    const secrets = command(execSync, 'git ls-files').split(/\r?\n/).filter(file => secretPattern.test(file));
+    if (secrets.length) failures.push(`BLOCKED: tracked secret-looking files were found:\n${secrets.join('\n')}\nAction: remove secrets from Git and rerun tagit preflight.`);
+  } catch (error) { failures.push(failureMessage('tracked-file validation', error)); }
+}
+
+export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi = false, strictRepository = false } = {}) {
   const status = command(execSync, 'git status --short --untracked-files=all').trim();
   const failures = [];
+  if (strictRepository) validateRepository(execSync, fs, failures);
   if (status) failures.push(`BLOCKED: uncommitted changes are present:\n${status}\nAction: commit and push these changes, wait for CI to pass on the new commit, then rerun tagit preflight.`);
 
   const checks = [
