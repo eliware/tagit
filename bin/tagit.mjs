@@ -10,6 +10,7 @@ import { suggestVersion as suggestVersionDefault } from '../src/versionSuggestio
 import { verifyRelease as verifyReleaseDefault } from '../src/releaseVerification.mjs';
 import { buildNotesReport as buildNotesReportDefault } from '../src/releaseNotesReport.mjs';
 import { reportCiLinks as reportCiLinksDefault } from '../src/releaseVerification.mjs';
+import packageData from '../package.json' with { type: 'json' };
 
 const defaultDependencies = {
   fs: fsDefault,
@@ -35,6 +36,10 @@ export async function runTagit(overrides = {}, argv = []) {
     registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
+  if (options.versionQuery) {
+    (overrides.output ?? console.log)(packageData.version);
+    return;
+  }
   if (options.help || !options.command) {
     (overrides.output ?? console.log)(`${operatorBoundary}\n\n${helpText()}`);
     return;
@@ -113,11 +118,12 @@ export function getReleaseVersion(argv) {
 }
 
 export function parseOptions(argv) {
-  const command = argv[0];
+  const command = argv[0] && !['--help', '-h', '--version', '-v'].includes(argv[0]) ? argv[0] : undefined;
   if (command && !['notes', 'preflight', 'push', 'release', 'release-wait'].includes(command)) throw new Error(`Unknown command: ${command}`);
   return {
     command,
     help: isHelp(argv),
+    versionQuery: !command && (argv.includes('--version') || argv.includes('-v')),
     version: command === 'release' || command === 'release-wait' ? getReleaseVersion(argv) : null,
   };
 }

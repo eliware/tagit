@@ -30,6 +30,18 @@ test('detects CLI', () => {
   expect(isHelp(['preflight', '--help'])).toBe(true);
 });
 
+test('supports top-level help and version flags', async () => {
+  const output = jest.fn();
+  await runTagit({ output }, ['--help']);
+  expect(output).toHaveBeenCalledWith(expect.stringContaining('Project owners may run only'));
+  await runTagit({ output }, ['--version']);
+  expect(output).toHaveBeenLastCalledWith('2.2.2');
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  await runTagit({}, ['-v']);
+  expect(consoleSpy).toHaveBeenCalledWith('2.2.2');
+  consoleSpy.mockRestore();
+});
+
 test('handles missing release version and default preflight output', async () => {
   expect(getReleaseVersion(['release', '--version', '-x'])).toBe(null);
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
