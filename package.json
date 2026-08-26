@@ -55,7 +55,7 @@
         ]
     },
     "dependencies": {
-        "@eliware/common": "^1.1.4"
+        "@eliware/common": "^2.0.0"
     },
     "bin": {
         "tagit": "bin/tagit-cli.mjs",
