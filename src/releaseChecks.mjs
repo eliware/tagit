@@ -118,7 +118,10 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi 
     let output;
     try {
       const options = { stdio: ['inherit', 'pipe', 'pipe'], timeout: CHECK_TIMEOUT_MS };
-      if (name === 'audit') options.env = { ...process.env, npm_config_ignore_scripts: 'true' };
+      if (name === 'audit') {
+        options.env = { ...process.env, npm_config_ignore_scripts: 'true' };
+        delete options.env.npm_config_allow_scripts;
+      }
       output = command(execSync, check, options);
     } catch (error) {
       output = `${error.stdout ?? ''}\n${error.stderr ?? ''}`;
