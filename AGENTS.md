@@ -45,7 +45,8 @@ release validation-only: no version update, commit, tag, push, or publishing.
 - Keep source ESM `.mjs` and preserve dependency injection.
 - Use `bin/*-cli.mjs` wrappers; do not execute library modules casually.
 - Add tests for every branch or command-order change and maintain 100x4.
-- Run `npm test`, `npm run lint`, and `npm run pack` after changes.
+- Run `npm test`, `npm run lint`, `npm run typecheck`, and `npm run pack` after changes.
+- Run `npm run typecheck` after changes; CI runs it on Ubuntu and Windows.
 - Project owners must never tag, publish, release, or run release-wait; DevOps
   owns release and post-release verification after preflight passes.
 - Update README and release notes when behavior changes.

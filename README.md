@@ -2,6 +2,9 @@
 
 Cross-platform, AI-oriented release automation for Eliware projects.
 
+Tagit is a repository-root CLI. It validates local release readiness, reports
+changes, pushes existing commits, and provides DevOps release verification.
+
 ## Commands
 
 Run from the target repository root:
@@ -55,6 +58,43 @@ release skips version changes, commits, tags, pushes, and registry checks.
 
 Windows or Linux; Node.js 26+; npm; Git; authenticated `gh` for CI checks; and
 Composer when releasing a project containing `composer.json`.
+
+## Installation and configuration
+
+Install globally with `npm install --global @eliware/tagit`, or invoke it with
+`npx @eliware/tagit`. Run commands from the target repository root. Tagit reads
+Git, npm, GitHub CLI, and repository files; it has no configuration file and
+does not require environment variables. Authenticate `gh` using its normal
+secure credential store. Never place tokens in `.env` files or command output.
+
+## Public API
+
+The package entrypoint is the `tagit` executable. Library modules under `src/`
+are implementation details; use the CLI wrappers (`tagit`, `push`, and
+`upstream`) so signal handling, output, and exit codes remain consistent.
+
+## Security and operations
+
+`notes` and `preflight` are read-only. `push` pushes existing commits and does
+not stage or commit files. Release and publication commands are DevOps-only.
+Preflight blocks dirty worktrees, secret-looking tracked files, missing project
+metadata, failed local checks, and missing exact-HEAD CI evidence. A failed
+release restores version files; inspect status before retrying an interrupted
+operation. Tagit never stores credentials or deploys application workloads.
+
+## Validation
+
+```bash
+npm ci
+npm test
+npm run lint
+npm run typecheck
+npm audit --omit=dev --audit-level=moderate
+npm run pack
+```
+
+Smoke test the public entrypoint with `tagit --help` and `tagit notes` from a
+repository root. Both commands are safe to run without release authorization.
 
 ## Development
 
