@@ -1,5 +1,25 @@
 import { jest } from '@jest/globals';
-import { hasStrict100x4, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
+import { hasStrict100x4, resolveExecutable, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
+
+test('uses shell-free GitHub CLI arguments for CI inspection', () => {
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((executable, args) => {
+    if (args[1] === 'list') return JSON.stringify([{ databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://ci' }]);
+    return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
+      { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] });
+  });
+  expect(verifyLatestCi(execSync, { info: jest.fn() }, { headSha: 'abc', repository: 'eliware/tagit', execFileSync }))
+    .toMatchObject({ ubuntu: true, windows: true });
+  expect(execFileSync).toHaveBeenCalledWith('gh', ['run', 'list', '--commit', 'abc', '--repo', 'eliware/tagit', '--limit', '20', '--json', 'databaseId,status,conclusion,headSha,url'], expect.any(Object));
+});
+
+test('resolves platform-specific npm executable names', () => {
+  expect(resolveExecutable('npm', 'win32')).toBe('npm.cmd');
+  expect(resolveExecutable('npm', 'linux')).toBe('npm');
+  expect(resolveExecutable('git', 'win32')).toBe('git');
+});
 
 test('strict preflight validates repository ownership gates', () => {
   const execSync = jest.fn(command => {
@@ -69,6 +89,15 @@ test('preflight runs clean-tree, test, lint, and audit gates', () => {
   expect(result.test.passed).toBe(true);
   expect(execSync).toHaveBeenCalledWith('npm run lint', expect.any(Object));
   expect(execSync).toHaveBeenCalledWith('npm audit --omit=dev --audit-level=moderate', expect.any(Object));
+});
+
+test('uses the injected shell-free runner for local checks', () => {
+  const execSync = jest.fn(command => command === 'git status --short --untracked-files=all' ? '' : '');
+  const execFileSync = jest.fn(() => 'All files | 100 | 100 | 100 | 100 |');
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  const result = runPreflight(execSync, fs, { info: jest.fn() }, { execFileSync });
+  expect(result.test.passed).toBe(true);
+  expect(execFileSync).toHaveBeenCalledWith('npm.cmd', ['test'], expect.any(Object));
 });
 
 test('preflight rejects dirty trees before running package commands', () => {

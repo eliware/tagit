@@ -79,7 +79,7 @@ export async function runTagit(overrides = {}, argv = []) {
       log.info(`Release ${version} verified successfully.`);
       return;
     }
-    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true, ignore100x4: options.ignore100x4 });
+    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true, ignore100x4: options.ignore100x4, execFileSync });
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
