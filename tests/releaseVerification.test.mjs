@@ -169,7 +169,7 @@ test('waits for pending CI and retries npm propagation', async () => {
         { name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'windows', status: 'completed', conclusion: 'success' },
       ] }), '');
     }
-    if (executable === 'npm.cmd' && args[0] === 'view') {
+    if ((executable === 'npm' || executable === 'npm.cmd') && args[0] === 'view') {
       npmReads += 1;
       if (npmReads === 1) return callback(new Error('404'), '', '');
       return callback(null, '1.0.0', '');
@@ -199,7 +199,7 @@ test('verifies GHCR tags and handles private or absent npm packages', async () =
       { name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'windows', status: 'completed', conclusion: 'success' },
     ] }), '');
     if (args[0] === 'api') return callback(null, JSON.stringify([{ name: includeDigest ? 'sha256:abc' : 'not-a-digest', metadata: { container: { tags: ['v1.0.0'] } } }]), '');
-    if (executable === 'npm.cmd') return callback(null, '1.0.0', '');
+    if (executable === 'npm' || executable === 'npm.cmd') return callback(null, '1.0.0', '');
     callback(null, '', '');
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json' || file === '.github/workflows'), readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ name: 'demo', private: false }) : 'image: ghcr.io/eliware/demo'), readdirSync: jest.fn(() => ['ci.yml']) };
