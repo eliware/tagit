@@ -8,18 +8,20 @@ function usesWebpack(packageData, fs) {
     return hasWebpackPackage || hasWebpackConfig;
 }
 
-function runWebpackBuild(execSync, packageData) {
+function runWebpackBuild(execSync, packageData, execFileSync = null) {
+    const npm = resolveExecutable('npm');
+    const npx = resolveExecutable('npx');
     if (packageData?.scripts && packageData.scripts.build) {
-        execSync('npm run build', { stdio: 'inherit' });
+        if (execFileSync) execFileSync(npm, ['run', 'build'], { stdio: 'inherit' }); else execSync('npm run build', { stdio: 'inherit' });
         return;
     }
 
     if (packageData?.scripts && packageData.scripts.webpack) {
-        execSync('npm run webpack', { stdio: 'inherit' });
+        if (execFileSync) execFileSync(npm, ['run', 'webpack'], { stdio: 'inherit' }); else execSync('npm run webpack', { stdio: 'inherit' });
         return;
     }
 
-    execSync('npx webpack', { stdio: 'inherit' });
+    if (execFileSync) execFileSync(npx, ['webpack'], { stdio: 'inherit' }); else execSync('npx webpack', { stdio: 'inherit' });
 }
 
 
@@ -113,9 +115,11 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
     try {
         if (fs.existsSync('composer.json')) {
             log.info('composer.json exists - running composer update');
-            execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
+            if (execFileSync) execFileSync(resolveExecutable('composer'), ['update'], { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } });
+            else execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
             log.info('Running composer bump');
-            execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
+            if (execFileSync) execFileSync(resolveExecutable('composer'), ['bump'], { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } });
+            else execSync('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
         }
 
         if (fs.existsSync('package.json')) {
@@ -135,12 +139,12 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
 
             if (packageData?.scripts && packageData.scripts.test) {
                 log.info('package.json has test script - running npm test');
-                execSync('npm test', { stdio: 'inherit' });
+                if (execFileSync) execFileSync(resolveExecutable('npm'), ['test'], { stdio: 'inherit' }); else execSync('npm test', { stdio: 'inherit' });
             }
 
             if (usesWebpack(packageData, fs)) {
                 log.info('webpack detected - running webpack build');
-                runWebpackBuild(execSync, packageData);
+                runWebpackBuild(execSync, packageData, execFileSync);
                 log.info('webpack build complete');
             }
         }

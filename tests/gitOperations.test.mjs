@@ -379,3 +379,35 @@ test('uses the injected platform-resolved npm runner for package refreshes', () 
   expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['install', 'lodash@latest'], expect.any(Object));
   expect(execSync).not.toHaveBeenCalled();
 });
+
+test('uses argument arrays for Composer and npm test execution', () => {
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((executable, args) => args[0] === 'rev-parse' ? 'abc\n' : '');
+  const fs = {
+    existsSync: jest.fn(file => file === 'composer.json' || file === 'package.json'),
+    readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ version: '1.0.0', scripts: { test: 'test' } }) : '{}'),
+    writeFileSync: jest.fn(),
+  };
+  gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+  expect(execFileSync).toHaveBeenCalledWith('composer.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
+  expect(execFileSync).toHaveBeenCalledWith('composer.cmd', ['bump'], expect.objectContaining({ stdio: 'inherit' }));
+  expect(execFileSync).toHaveBeenCalledWith('npm.cmd', ['test'], expect.objectContaining({ stdio: 'inherit' }));
+});
+
+test('uses argument arrays for each webpack execution mode', () => {
+  for (const packageData of [
+    { scripts: { build: 'build' }, dependencies: { webpack: '1' } },
+    { scripts: { webpack: 'webpack' }, dependencies: { webpack: '1' } },
+    { dependencies: { webpack: '1' } },
+  ]) {
+    const execSync = jest.fn();
+    const execFileSync = jest.fn((executable, args) => args[0] === 'rev-parse' ? 'abc\n' : '');
+    const fs = {
+      existsSync: jest.fn(file => file === 'package.json'),
+      readFileSync: jest.fn(() => JSON.stringify({ version: '1.0.0', ...packageData })),
+      writeFileSync: jest.fn(),
+    };
+    gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+    expect(execSync).not.toHaveBeenCalled();
+  }
+});
