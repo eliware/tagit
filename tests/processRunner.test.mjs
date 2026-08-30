@@ -1,5 +1,13 @@
 import { jest } from '@jest/globals';
-import { runProcess, runProcessAsync } from '../src/processRunner.mjs';
+import { resolveExecutable, runProcess, runProcessAsync } from '../src/processRunner.mjs';
+
+test('resolves command shims on Windows only', () => {
+  expect(resolveExecutable('npm', 'win32')).toBe('npm.cmd');
+  expect(resolveExecutable('npx', 'win32')).toBe('npx.cmd');
+  expect(resolveExecutable('composer', 'win32')).toBe('composer.cmd');
+  expect(resolveExecutable('git', 'win32')).toBe('git');
+  expect(resolveExecutable('npm', 'linux')).toBe('npm');
+});
 
 test('passes executable, argument array, and options to the injected runner', () => {
   const execFileSync = jest.fn(() => 'output');
