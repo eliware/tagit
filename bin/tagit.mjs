@@ -28,7 +28,7 @@ const defaultDependencies = {
   exit: process.exit,
 };
 
-const operatorBoundary = 'Project owners may run only tagit notes, tagit push, and tagit preflight. Project owners must never run tagit release or tagit release-wait; DevOps runs those commands only after preflight passes.';
+const operatorBoundary = 'Project owners may run only tagit notes, tagit push, and tagit preflight. Project owners must never run tagit release or tagit release-wait; DevOps runs those commands only after preflight passes. DevOps may use --ignore-100x4 only with an approved documented waiver; all other gates remain required.';
 
 export async function runTagit(overrides = {}, argv = []) {
   const {
@@ -78,7 +78,7 @@ export async function runTagit(overrides = {}, argv = []) {
       log.info(`Release ${version} verified successfully.`);
       return;
     }
-    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true });
+    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true, ignore100x4: options.ignore100x4 });
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
@@ -124,6 +124,7 @@ export function parseOptions(argv) {
     command,
     help: isHelp(argv),
     versionQuery: !command && (argv.includes('--version') || argv.includes('-v')),
+    ignore100x4: argv.includes('--ignore-100x4'),
     version: command === 'release' || command === 'release-wait' ? getReleaseVersion(argv) : null,
   };
 }

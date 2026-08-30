@@ -25,6 +25,10 @@ They must never run `tagit release` or `tagit release-wait`. Those commands are
 DevOps-only and may run only after the owner handoff and exact-HEAD preflight
 have passed.
 
+`--ignore-100x4` is a DevOps-only, explicitly documented waiver for
+`tagit preflight` or `tagit release`. It waives only the coverage threshold;
+all other gates remain mandatory. Project owners must not use it.
+
 Release requires an explicit version; automatic bumping is unsupported. After
 preflight it updates metadata, commits, creates `vX.Y.Z`, and pushes on `main`.
 It discovers the tag workflow and prints links, then `release-wait` monitors

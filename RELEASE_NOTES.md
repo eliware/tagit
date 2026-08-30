@@ -11,6 +11,7 @@
 - Added explicit package exports, package-file allowlisting, public publish
   metadata, and a cross-platform typecheck gate.
 - Expanded README setup, API, security, operations, and validation guidance.
+- Added a DevOps-only `--ignore-100x4` coverage waiver for preflight and release.
 
 ## 2.2.2
 

@@ -12,6 +12,7 @@ Run from the target repository root:
 ```text
 tagit notes
 tagit preflight
+tagit preflight --ignore-100x4
 tagit push
 tagit release --version X.Y.Z
 tagit release-wait
@@ -26,6 +27,10 @@ functions/lines (100x4), zero-warning lint, audit, package contents, required
 project checks, and successful Ubuntu and Windows CI for the exact HEAD.
 Pending CI is monitored until completion. Failures include bounded output and
 actionable remediation. Dirty changes block CI validation.
+
+DevOps may use `--ignore-100x4` with `tagit preflight` or `tagit release` only
+with an approved documented waiver. It waives only the coverage threshold;
+all other gates remain mandatory. Project owners may not use this flag.
 
 `tagit push` pushes existing commits only. It never stages or commits changes,
 ignores untracked files, prints CI workflow/job links for the pushed HEAD, and

@@ -7,6 +7,7 @@ const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
 test('supports release wait alongside preflight and release commands', () => {
   expect(parseOptions(['notes'])).toMatchObject({ command: 'notes', version: null });
   expect(parseOptions(['preflight'])).toMatchObject({ command: 'preflight', version: null });
+  expect(parseOptions(['preflight', '--ignore-100x4'])).toMatchObject({ command: 'preflight', ignore100x4: true });
   expect(parseOptions(['release', '--version', '2.4.0'])).toMatchObject({ command: 'release', version: '2.4.0' });
   expect(parseOptions(['release-wait'])).toMatchObject({ command: 'release-wait', version: null });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
@@ -60,6 +61,12 @@ test('preflight runs without release side effects', async () => {
   expect(output).toHaveBeenCalledWith(JSON.stringify({ ok: true, checks: { test: { passed: true } } }));
 });
 
+test('passes the explicit coverage waiver to preflight', async () => {
+  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+  await runTagit({ output: jest.fn(), runPreflight, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['preflight', '--ignore-100x4']);
+  expect(runPreflight).toHaveBeenCalledWith(expect.anything(), expect.anything(), log, expect.objectContaining({ ignore100x4: true }));
+});
+
 test('notes prints the generated report without release side effects', async () => {
   const output = jest.fn();
   await runTagit({ output, buildNotesReport: jest.fn(() => 'TAGIT NOTES REPORT'), suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
@@ -79,6 +86,14 @@ test('release runs the release operation for an explicit version', async () => {
   await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
   expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: '2.4.0' });
   expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0');
+});
+
+test('release passes the coverage waiver through preflight', async () => {
+  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+  const updateVersionFiles = jest.fn().mockResolvedValue('2.3.0');
+  const gitOperations = jest.fn(() => ({ commitSha: 'abc' }));
+  await runTagit({ updateVersionFiles, gitOperations, runPreflight, verifyRelease: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.3.0', '--ignore-100x4']);
+  expect(runPreflight).toHaveBeenCalledWith(expect.anything(), expect.anything(), log, expect.objectContaining({ ignore100x4: true }));
 });
 
 test('release-wait monitors the latest tag without release side effects', async () => {

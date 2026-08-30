@@ -95,6 +95,7 @@ test('preflight honors an explicit 100x4 waiver and audit fallback', () => {
   };
 
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty('test.passed', true);
+  expect(execSync).toHaveBeenCalledWith('eliware-test --ignore-100x4', expect.any(Object));
   expect(execSync).toHaveBeenCalledWith('npm audit --omit=dev --audit-level=moderate', expect.any(Object));
 });
 
