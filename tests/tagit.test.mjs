@@ -112,7 +112,7 @@ test('push pushes commits without staging and reports CI links', async () => {
   const reportCiLinks = jest.fn();
   await runTagit({ output, execSync, execFileSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
   expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
-  expect(reportCiLinks).toHaveBeenCalledWith(execSync, log, 'abc', { attempts: 10, delayMs: 2000 });
+  expect(reportCiLinks).toHaveBeenCalledWith(execSync, log, 'abc', { attempts: 10, delayMs: 2000, execFileSync });
 });
 
 test('push reports failures', async () => {

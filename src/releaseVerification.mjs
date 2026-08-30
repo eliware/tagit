@@ -33,20 +33,24 @@ function workflowFiles(fs) {
   return fs.readdirSync(directory).filter(file => /\.(yml|yaml)$/i.test(file));
 }
 
-export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 2000 } = {}) {
+export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 2000, execFileSync = null } = {}) {
   const remote = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
   const match = remote.match(/[/:]([^/:]+\/[^/]+?)(?:\.git)?$/);
   if (!match) throw new Error(`Cannot determine GitHub repository from origin: ${remote}`);
   let runs = [];
   for (let attempt = 0; attempt < attempts && !runs.length; attempt += 1) {
-    runs = json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
+    runs = execFileSync
+      ? JSON.parse(execFileSync('gh', ['run', 'list', '--repo', match[1], '--commit', headSha, '--limit', '20', '--json', 'databaseId,url,headSha'], { encoding: 'utf8' }))
+      : json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
       .filter(run => run.headSha === headSha);
     if (!runs.length && attempt + 1 < attempts) execSync(`node -e "setTimeout(() => {}, ${delayMs})"`);
   }
   if (!runs.length) { log.info(`No CI run exists yet for ${headSha}.`); return { repo: match[1], headSha, runs: [] }; }
   runs.forEach(run => {
     log.info(`Workflow: [${run.url}](${run.url})`);
-    const details = json(execSync, `gh run view ${run.databaseId} --repo ${match[1]} --json jobs`);
+    const details = execFileSync
+      ? JSON.parse(execFileSync('gh', ['run', 'view', String(run.databaseId), '--repo', match[1], '--json', 'jobs'], { encoding: 'utf8' }))
+      : json(execSync, `gh run view ${run.databaseId} --repo ${match[1]} --json jobs`);
     (details.jobs ?? []).forEach(job => { if (job.url) log.info(`${job.name}: [${job.url}](${job.url})`); });
   });
   return { repo: match[1], headSha, runs };

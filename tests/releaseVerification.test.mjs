@@ -23,6 +23,16 @@ test('release command adapter validates its inputs', async () => {
   await expect(releaseCommand(jest.fn(), 'gh', 'run')).rejects.toThrow();
 });
 
+test('reportCiLinks uses shell-free GitHub arguments', () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFileSync = jest.fn((executable, args) => args[1] === 'list'
+    ? JSON.stringify([{ databaseId: 3, headSha: 'abc', url: 'https://ci' }])
+    : JSON.stringify({ jobs: [{ name: 'test', url: 'https://job' }] }));
+  const log = { info: jest.fn() };
+  expect(reportCiLinks(execSync, log, 'abc', { execFileSync })).toMatchObject({ repo: 'eliware/demo', headSha: 'abc' });
+  expect(execFileSync).toHaveBeenCalledWith('gh', expect.arrayContaining(['run', 'view', '3']), expect.any(Object));
+});
+
 test('verifyRelease uses the injected async runner for GitHub inspection', async () => {
   const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
   const execFile = jest.fn((executable, args, options, callback) => {
