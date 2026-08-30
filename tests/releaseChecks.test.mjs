@@ -1,7 +1,10 @@
 import { jest } from '@jest/globals';
 import { hasStrict100x4, resolveExecutable, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
 
-const isNodeNpm = (executable, args) => executable === process.execPath && args.some(arg => arg.endsWith('npm-cli.js'));
+const isNodeNpm = (executable, args) => (executable === 'npm' || executable === 'npm.cmd' || executable === process.execPath && args.some(arg => arg.endsWith('npm-cli.js')));
+const expectNpmCall = (mock, expectedArgs) => {
+  expect(mock.mock.calls.some(([executable, args]) => isNodeNpm(executable, args) && expectedArgs.every(arg => args.includes(arg)))).toBe(true);
+};
 
 test('uses shell-free GitHub CLI arguments for CI inspection', () => {
   const execSync = jest.fn();
@@ -86,8 +89,8 @@ test('preflight runs clean-tree, test, lint, and audit gates', () => {
   const result = runPreflight(execSync, fs, log);
 
   expect(result.test.passed).toBe(true);
-  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'run', 'lint']), expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
+  expectNpmCall(execSync, ['run', 'lint']);
+  expectNpmCall(execSync, ['audit', '--omit=dev', '--audit-level=moderate']);
 });
 
 test('uses the injected shell-free runner for local checks', () => {
@@ -96,7 +99,7 @@ test('uses the injected shell-free runner for local checks', () => {
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
   const result = runPreflight(execFileSync, fs, { info: jest.fn() });
   expect(result.test.passed).toBe(true);
-  expect(execFileSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining(['test']), expect.any(Object));
+  expectNpmCall(execFileSync, ['test']);
 });
 
 test('preflight rejects dirty trees before running package commands', () => {
@@ -123,7 +126,7 @@ test('preflight honors an explicit 100x4 waiver and audit fallback', () => {
 
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty('test.passed', true);
   expect(execSync).toHaveBeenCalledWith('eliware-test', ['--ignore-100x4'], expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
+  expectNpmCall(execSync, ['audit', '--omit=dev', '--audit-level=moderate']);
 });
 
 test('preflight blocks missing strict 100x4 coverage', () => {
@@ -266,8 +269,8 @@ test('preflight aggregates CI failures after local checks', () => {
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
   expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow('GitHub CI verification failed');
-  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'run', 'lint']), expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
+  expectNpmCall(execSync, ['run', 'lint']);
+  expectNpmCall(execSync, ['audit', '--omit=dev', '--audit-level=moderate']);
 });
 
 test('preflight gives remediation for a failing test and missing coverage', () => {
