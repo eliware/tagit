@@ -33,6 +33,10 @@ test('maps Windows npm checks through the Node npm CLI', () => {
   ]);
 });
 
+test('keeps non-Windows process commands unchanged', () => {
+  expect(processCommand('npm', ['test'], 'linux', '/usr/bin/node')).toEqual([resolveExecutable('npm'), ['test']]);
+});
+
 test('strict preflight validates repository ownership gates', () => {
   const execSync = jest.fn((executable, args) => {
     if (executable === 'git' && args[0] === 'status') return '';
