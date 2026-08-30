@@ -1,5 +1,22 @@
 import { jest } from '@jest/globals';
-import { reportCiLinks, sleepDefault, verifyRelease } from '../src/releaseVerification.mjs';
+import { releaseCommand, reportCiLinks, sleepDefault, verifyRelease } from '../src/releaseVerification.mjs';
+
+test('release command adapter preserves executable and argument boundaries', async () => {
+  const execFile = jest.fn((executable, args, options, callback) => callback(null, 'ok', ''));
+  await expect(releaseCommand(execFile, 'gh', ['run', 'list', '--repo', 'eliware/tagit'])).resolves.toBe('ok');
+  expect(execFile).toHaveBeenCalledWith('gh', ['run', 'list', '--repo', 'eliware/tagit'], { encoding: 'utf8' }, expect.any(Function));
+});
+
+test('release command adapter propagates process errors and output', async () => {
+  const error = new Error('command failed');
+  const execFile = jest.fn((executable, args, options, callback) => callback(error, 'stdout', 'stderr'));
+  await expect(releaseCommand(execFile, 'npm', ['view', 'pkg', 'version'])).rejects.toMatchObject({ message: 'command failed', stdout: 'stdout', stderr: 'stderr' });
+});
+
+test('release command adapter validates its inputs', async () => {
+  await expect(releaseCommand(null, 'gh', [])).rejects.toThrow();
+  await expect(releaseCommand(jest.fn(), 'gh', 'run')).rejects.toThrow();
+});
 
 test('resolves the default delay helper', async () => {
   await expect(sleepDefault(0)).resolves.toBeUndefined();
