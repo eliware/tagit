@@ -1,4 +1,9 @@
 export const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+export function waitSync(milliseconds) {
+  if (milliseconds <= 0) return;
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
 export function npmExecutable(platform = process.platform) { return platform === 'win32' ? 'npm.cmd' : 'npm'; }
 
 export async function releaseCommand(execFile, executable, args, options = { encoding: 'utf8' }) {
@@ -43,7 +48,7 @@ export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 
       ? JSON.parse(execFileSync('gh', ['run', 'list', '--repo', match[1], '--commit', headSha, '--limit', '20', '--json', 'databaseId,url,headSha'], { encoding: 'utf8' }))
       : json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
       .filter(run => run.headSha === headSha);
-    if (!runs.length && attempt + 1 < attempts) execSync(`node -e "setTimeout(() => {}, ${delayMs})"`);
+    if (!runs.length && attempt + 1 < attempts) waitSync(delayMs);
   }
   if (!runs.length) { log.info(`No CI run exists yet for ${headSha}.`); return { repo: match[1], headSha, runs: [] }; }
   runs.forEach(run => {

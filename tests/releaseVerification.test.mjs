@@ -1,5 +1,10 @@
 import { jest } from '@jest/globals';
-import { npmExecutable, releaseCommand, reportCiLinks, sleepDefault, verifyRelease } from '../src/releaseVerification.mjs';
+import { npmExecutable, releaseCommand, reportCiLinks, sleepDefault, verifyRelease, waitSync } from '../src/releaseVerification.mjs';
+
+test('waitSync handles zero and positive bounded delays', () => {
+  expect(waitSync(0)).toBeUndefined();
+  expect(waitSync(1)).toBeUndefined();
+});
 
 test('selects the npm executable for each platform', () => {
   expect(npmExecutable('win32')).toBe('npm.cmd');
