@@ -37,7 +37,6 @@ export async function runTagit(overrides = {}, argv = []) {
     fs, execSync, execFileSync, execFile, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
     registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
-  const releaseExecFile = overrides.verifyRelease ? undefined : execFile;
   const options = parseOptions(argv);
   if (options.versionQuery) {
     (overrides.output ?? console.log)(packageData.version);
@@ -77,7 +76,7 @@ export async function runTagit(overrides = {}, argv = []) {
     if (options.command === 'release-wait') {
       const version = options.version ?? execSync('git describe --tags --abbrev=0').toString().trim().replace(/^v/, '');
       const commitSha = execSync(`git rev-list -n 1 v${version}`).toString().trim();
-      await verifyRelease(execSync, fs, log, { version, release: { commitSha }, ...(releaseExecFile ? { execFile: releaseExecFile } : {}) });
+      await verifyRelease(execSync, fs, log, { version, release: { commitSha } });
       log.info(`Release ${version} verified successfully.`);
       return;
     }
@@ -97,7 +96,7 @@ export async function runTagit(overrides = {}, argv = []) {
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
     const release = gitOperations(execSync, fs, log, newVersion);
-    await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true, ...(releaseExecFile ? { execFile: releaseExecFile } : {}) });
+    await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true });
     log.info('Run tagit release-wait to monitor CI and confirm publication.');
   } catch (error) {
     // Versioning happens before Git operations; restore it if any release step fails.
