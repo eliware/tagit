@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { log as defaultLog, registerHandlers, registerSignals } from '@eliware/common';
 import fsDefault from 'fs';
-import { execSync as execSyncDefault, execFileSync as execFileSyncDefault } from 'child_process';
+import { execSync as execSyncDefault, execFileSync as execFileSyncDefault, execFile as execFileDefault } from 'child_process';
 import path from 'path';
 import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVersionFiles.mjs';
 import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
@@ -16,6 +16,7 @@ const defaultDependencies = {
   fs: fsDefault,
   execSync: execSyncDefault,
   execFileSync: execFileSyncDefault,
+  execFile: execFileDefault,
   log: defaultLog,
   updateVersionFiles: updateVersionFilesDefault,
   gitOperations: gitOperationsDefault,
@@ -33,7 +34,7 @@ const operatorBoundary = 'Project owners may run only tagit notes, tagit push, a
 
 export async function runTagit(overrides = {}, argv = []) {
   const {
-    fs, execSync, execFileSync, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
+    fs, execSync, execFileSync, execFile, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
     registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
