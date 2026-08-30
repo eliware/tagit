@@ -1,5 +1,18 @@
 # Release Notes
 
+## 2.4.0
+
+### Added
+
+- Added safe `--dry-run` handling for push and DevOps release workflows.
+- Added explicit CLI guidance for project-owner and DevOps command boundaries.
+
+### Changed
+
+- Migrated process execution paths to shell-free, cross-platform runners.
+- Included `RELEASE_NOTES.md` in the published package contents.
+- Expanded regression coverage for dry-run behavior and Windows execution.
+
 ## 2.3.0
 
 ### Changed

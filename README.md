@@ -14,7 +14,9 @@ tagit notes
 tagit preflight
 tagit preflight --ignore-100x4
 tagit push
+tagit push --dry-run
 tagit release --version X.Y.Z
+tagit release --version X.Y.Z --dry-run
 tagit release-wait
 ```
 
@@ -49,6 +51,10 @@ and exits with instructions to run `tagit release-wait`.
 `tagit release-wait` resumes the release by monitoring CI to completion,
 verifying npm/GHCR when applicable, waiting briefly before npm checks, and
 exiting non-zero with bounded failure details.
+
+The `--dry-run` release form is for DevOps readiness checks only and requires
+an explicit version. It runs preflight and performs no version update, commit,
+tag, push, or publication. `--dry-run` on `push` performs no network action.
 
 ## Command ownership
 
@@ -86,11 +92,25 @@ are implementation details; use the CLI wrappers (`tagit`, `push`, and
 ## Security and operations
 
 `notes` and `preflight` are read-only. `push` pushes existing commits and does
-not stage or commit files. Release and publication commands are DevOps-only.
+not stage or commit files; `push --dry-run` performs no push or CI lookup.
+Release and publication commands are DevOps-only. Release dry-run is also
+DevOps-only and performs no release side effects.
 Preflight blocks dirty worktrees, secret-looking tracked files, missing project
 metadata, failed local checks, and missing exact-HEAD CI evidence. A failed
 release restores version files; inspect status before retrying an interrupted
 operation. Tagit never stores credentials or deploys application workloads.
+
+## CI and deployment
+
+GitHub Actions validates every push to `main`, pull request, and `v*` tag on
+Ubuntu and Windows using Node.js 26. Each validation job runs install, tests,
+lint, typecheck, production audit, and package validation. Publishing is a
+separate job restricted to `v*` tags and runs only after both validation jobs
+pass. The workflow keeps repository contents read-only and grants package
+provenance permissions only to the publishing job.
+
+The optional Knit deployment configuration targets `/opt/tagit` for the `dev`
+environment and repeats the local validation gates after a fast-forward pull.
 
 ## Validation
 

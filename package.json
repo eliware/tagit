@@ -1,8 +1,8 @@
 {
     "name": "@eliware/tagit",
     "type": "module",
-    "version": "2.3.0",
-    "description": "AI-oriented release notes, preflight validation, and cross-platform Git release automation.",
+    "version": "2.4.0",
+    "description": "AI-oriented release notes, safe preflight and dry-run validation, and cross-platform Git release automation.",
     "main": "bin/tagit-cli.mjs",
     "exports": {
         ".": "./bin/tagit-cli.mjs"
@@ -46,8 +46,7 @@
         "release",
         "publishing",
         "cli",
-        "version-bumping",
-        "webpack"
+        "version-bumping"
     ],
     "author": "Eli Sterling, eliware.org <eli@eliware.org>",
     "license": "MIT",
