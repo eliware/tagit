@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { hasStrict100x4, resolveExecutable, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
+import { hasStrict100x4, processCommand, resolveExecutable, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
 
 const isNodeNpm = (executable, args) => (executable === 'npm' || executable === 'npm.cmd' || executable === process.execPath && args.some(arg => arg.endsWith('npm-cli.js')));
 const expectNpmCall = (mock, expectedArgs) => {
@@ -24,6 +24,13 @@ test('resolves platform-specific npm executable names', () => {
   expect(resolveExecutable('npm', 'win32')).toBe('npm.cmd');
   expect(resolveExecutable('npm', 'linux')).toBe('npm');
   expect(resolveExecutable('git', 'win32')).toBe('git');
+});
+
+test('maps Windows npm checks through the Node npm CLI', () => {
+  expect(processCommand('npm', ['test'], 'win32', 'C:\\node\\node.exe')).toEqual([
+    'C:\\node\\node.exe',
+    ['C:\\node\\node_modules\\npm\\bin\\npm-cli.js', 'test'],
+  ]);
 });
 
 test('strict preflight validates repository ownership gates', () => {
