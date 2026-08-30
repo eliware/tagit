@@ -1,7 +1,7 @@
 export const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
-function json(execSync, command, execFileSync = null, executable = 'gh', args = []) {
-  return JSON.parse(execFileSync ? execFileSync(executable, args, { encoding: 'utf8' }) : execSync(command, { encoding: 'utf8' }));
+function json(execSync, command) {
+  return JSON.parse(execSync(command, { encoding: 'utf8' }));
 }
 
 function repositoryName(execSync) {
@@ -17,23 +17,20 @@ function workflowFiles(fs) {
   return fs.readdirSync(directory).filter(file => /\.(yml|yaml)$/i.test(file));
 }
 
-export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 2000, execFileSync = null } = {}) {
+export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 2000 } = {}) {
   const remote = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
   const match = remote.match(/[/:]([^/:]+\/[^/]+?)(?:\.git)?$/);
   if (!match) throw new Error(`Cannot determine GitHub repository from origin: ${remote}`);
   let runs = [];
   for (let attempt = 0; attempt < attempts && !runs.length; attempt += 1) {
-    runs = json(execSync, '', execFileSync, 'gh', ['run', 'list', '--repo', match[1], '--commit', headSha, '--limit', '20', '--json', 'databaseId,url,headSha'])
+    runs = json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
       .filter(run => run.headSha === headSha);
-    if (!runs.length && attempt + 1 < attempts) {
-      if (execFileSync) { /* Shell-free callers use their own retry cadence. */ }
-      else execSync(`node -e "setTimeout(() => {}, ${delayMs})"`);
-    }
+    if (!runs.length && attempt + 1 < attempts) execSync(`node -e "setTimeout(() => {}, ${delayMs})"`);
   }
   if (!runs.length) { log.info(`No CI run exists yet for ${headSha}.`); return { repo: match[1], headSha, runs: [] }; }
   runs.forEach(run => {
     log.info(`Workflow: [${run.url}](${run.url})`);
-    const details = json(execSync, '', execFileSync, 'gh', ['run', 'view', String(run.databaseId), '--repo', match[1], '--json', 'jobs']);
+    const details = json(execSync, `gh run view ${run.databaseId} --repo ${match[1]} --json jobs`);
     (details.jobs ?? []).forEach(job => { if (job.url) log.info(`${job.name}: [${job.url}](${job.url})`); });
   });
   return { repo: match[1], headSha, runs };
@@ -41,17 +38,17 @@ export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 
 
 export async function verifyRelease(execSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
-  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false, execFileSync = null,
+  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false,
 } = {}) {
   const repo = repositoryName(execSync);
   const tag = `v${version}`;
   const headSha = release.commitSha;
   let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
-    const runs = json(execSync, '', execFileSync, 'gh', ['run', 'list', '--repo', repo, '--limit', '50', '--json', 'databaseId,status,conclusion,headSha,headBranch,url']);
+    const runs = json(execSync, `gh run list --repo ${repo} --limit 50 --json databaseId,status,conclusion,headSha,headBranch,url`);
     const candidate = runs.find(item => item.headSha === headSha && item.headBranch === tag);
     if (candidate) {
-      const details = json(execSync, '', execFileSync, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url']);
+      const details = json(execSync, `gh run view ${candidate.databaseId} --repo ${repo} --json status,conclusion,headSha,jobs,url`);
       if (linksOnly || details.status === 'completed') { run = { ...candidate, ...details }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }
@@ -87,9 +84,7 @@ export async function verifyRelease(execSync, fs, log, {
     let published = false;
     for (let attempt = 0; attempt < npmRetries; attempt += 1) {
       try {
-        const visible = execFileSync
-          ? execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['view', `${packageData.name}@${version}`, 'version'], { encoding: 'utf8' }).trim()
-          : execSync(`npm view ${packageData.name}@${version} version`, { encoding: 'utf8' }).trim();
+        const visible = execSync(`npm view ${packageData.name}@${version} version`, { encoding: 'utf8' }).trim();
         if (visible === version) { published = true; break; }
       } catch { /* Registry propagation can temporarily return 404. */ }
       await sleep(npmRetryMs);
@@ -100,7 +95,7 @@ export async function verifyRelease(execSync, fs, log, {
 
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
-    const versions = json(execSync, '', execFileSync, 'gh', ['api', '--paginate', `/orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`]);
+    const versions = json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
     const image = versions.find(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
     if (!image) throw new Error(`GHCR does not expose ${repo}:${version}.`);
     const imageDigest = image.name?.startsWith('sha256:') ? image.name : null;
