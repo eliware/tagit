@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { getReleaseVersion, helpText, isCli, isHelp, parseOptions, preflightGuide, releaseGuide, runTagit } from '../bin/tagit.mjs';
+import packageData from '../package.json' with { type: 'json' };
 
 const noop = jest.fn();
 const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
@@ -9,7 +10,7 @@ test('supports release wait alongside preflight and release commands', () => {
   expect(parseOptions(['preflight'])).toMatchObject({ command: 'preflight', version: null });
   expect(parseOptions(['preflight', '--ignore-100x4'])).toMatchObject({ command: 'preflight', ignore100x4: true });
   expect(parseOptions(['push', '--dry-run'])).toMatchObject({ command: 'push', dryRun: true });
-  expect(parseOptions(['release', '--version', '2.4.0'])).toMatchObject({ command: 'release', version: '2.4.0' });
+  expect(parseOptions(['release', '--version', packageData.version])).toMatchObject({ command: 'release', version: packageData.version });
   expect(parseOptions(['release-wait'])).toMatchObject({ command: 'release-wait', version: null });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
   expect(() => parseOptions(['release', '--version', 'next'])).toThrow('Invalid release version');
@@ -37,10 +38,10 @@ test('supports top-level help and version flags', async () => {
   await runTagit({ output }, ['--help']);
   expect(output).toHaveBeenCalledWith(expect.stringContaining('Project owners may run only'));
   await runTagit({ output }, ['--version']);
-  expect(output).toHaveBeenLastCalledWith('2.4.0');
+  expect(output).toHaveBeenLastCalledWith(packageData.version);
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   await runTagit({}, ['-v']);
-  expect(consoleSpy).toHaveBeenCalledWith('2.4.0');
+  expect(consoleSpy).toHaveBeenCalledWith(packageData.version);
   consoleSpy.mockRestore();
 });
 
@@ -82,28 +83,28 @@ test('notes uses console output when no output override is supplied', async () =
 });
 
 test('release runs the release operation for an explicit version', async () => {
-  const updateVersionFiles = jest.fn().mockResolvedValue('2.4.0');
+  const updateVersionFiles = jest.fn().mockResolvedValue(packageData.version);
   const gitOperations = jest.fn();
-  await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
-  expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: '2.4.0' });
-  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0');
+  await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version]);
+  expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: packageData.version });
+  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, packageData.version);
 });
 
 test('release passes the coverage waiver through preflight', async () => {
   const runPreflight = jest.fn(() => ({ test: { passed: true } }));
-  const updateVersionFiles = jest.fn().mockResolvedValue('2.3.0');
+  const updateVersionFiles = jest.fn().mockResolvedValue(packageData.version);
   const gitOperations = jest.fn(() => ({ commitSha: 'abc' }));
-  await runTagit({ updateVersionFiles, gitOperations, runPreflight, verifyRelease: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.3.0', '--ignore-100x4']);
+  await runTagit({ updateVersionFiles, gitOperations, runPreflight, verifyRelease: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version, '--ignore-100x4']);
   expect(runPreflight).toHaveBeenCalledWith(expect.anything(), expect.anything(), log, expect.objectContaining({ ignore100x4: true }));
 });
 
 test('release-wait monitors the latest tag without release side effects', async () => {
   const execSync = jest.fn();
-  const execFileSync = jest.fn((command, args) => args[0] === 'describe' ? 'v2.4.0' : 'abc');
+  const execFileSync = jest.fn((command, args) => args[0] === 'describe' ? `v${packageData.version}` : 'abc');
   const verifyRelease = jest.fn().mockResolvedValue({});
   await runTagit({ execSync, execFileSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
-  expect(execFileSync).toHaveBeenCalledWith('git', ['rev-list', '-n', '1', 'v2.4.0']);
-  expect(verifyRelease).toHaveBeenCalledWith(execFileSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' }, execFile: expect.any(Function) });
+  expect(execFileSync).toHaveBeenCalledWith('git', ['rev-list', '-n', '1', `v${packageData.version}`]);
+  expect(verifyRelease).toHaveBeenCalledWith(execFileSync, expect.anything(), log, { version: packageData.version, release: { commitSha: 'abc' }, execFile: expect.any(Function) });
 });
 
 test('push pushes commits without staging and reports CI links', async () => {
@@ -128,7 +129,7 @@ test('release dry run preflights without changing or publishing anything', async
   const updateVersionFiles = jest.fn();
   const gitOperations = jest.fn();
   const verifyRelease = jest.fn();
-  await runTagit({ runPreflight, updateVersionFiles, gitOperations, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0', '--dry-run']);
+  await runTagit({ runPreflight, updateVersionFiles, gitOperations, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version, '--dry-run']);
   expect(runPreflight).toHaveBeenCalled();
   expect(updateVersionFiles).not.toHaveBeenCalled();
   expect(gitOperations).not.toHaveBeenCalled();
@@ -147,7 +148,7 @@ test('release rejects a missing version and handles release failures', async () 
   await runTagit({ exit, log: { ...log, error }, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release']);
   expect(exit).toHaveBeenCalledWith(1);
   const failed = jest.fn().mockRejectedValue(new Error('failed'));
-  await runTagit({ exit, log: { ...log, error }, updateVersionFiles: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
+  await runTagit({ exit, log: { ...log, error }, updateVersionFiles: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version]);
   expect(exit).toHaveBeenCalledWith(1);
 });
 
@@ -165,7 +166,7 @@ test('notag exits before release', async () => {
   const exit = jest.fn();
   const updateVersionFiles = jest.fn();
   const runPreflight = jest.fn(() => ({ test: { passed: true } }));
-  await runTagit({ fs: { existsSync: jest.fn(() => true) }, exit, updateVersionFiles, runPreflight, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
+  await runTagit({ fs: { existsSync: jest.fn(() => true) }, exit, updateVersionFiles, runPreflight, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version]);
   expect(runPreflight).toHaveBeenCalled();
   expect(exit).not.toHaveBeenCalled();
   expect(updateVersionFiles).not.toHaveBeenCalled();
