@@ -111,8 +111,11 @@ separate job restricted to `v*` tags and runs only after both validation jobs
 pass. The workflow keeps repository contents read-only and grants package
 provenance permissions only to the publishing job.
 
-The optional Knit deployment configuration targets `/opt/tagit` for the `dev`
-environment and repeats the local validation gates after a fast-forward pull.
+TagIt is a CLI package and has no application image or runtime deployment. Its
+`.knit/deploy.yaml` configuration is validation-only for the development
+checkout; it does not publish, deploy, or modify production state. Deployable
+consumer projects must use the GitOps staging pull-request workflow described
+in the organization release flow.
 
 ## Validation
 

@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2.4.2
+
+### Changed
+
+- Clarified that TagIt’s Knit configuration is validation-only and does not
+  deploy applications or modify production GitOps state.
+- Documented the required GitOps staging pull-request workflow for deployable
+  consumer projects.
+
 ## 2.4.1
 
 ### Fixed
