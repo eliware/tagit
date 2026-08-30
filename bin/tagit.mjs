@@ -95,7 +95,7 @@ export async function runTagit(overrides = {}, argv = []) {
       .map(file => [file, fs.readFileSync(file, 'utf8')]);
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
-    const release = gitOperations(execSync, fs, log, newVersion);
+    const release = gitOperations(execSync, fs, log, newVersion, { execFileSync });
     await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true, execFile });
     log.info('Run tagit release-wait to monitor CI and confirm publication.');
   } catch (error) {

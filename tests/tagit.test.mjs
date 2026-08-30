@@ -85,7 +85,7 @@ test('release runs the release operation for an explicit version', async () => {
   const gitOperations = jest.fn();
   await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
   expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: '2.4.0' });
-  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0');
+  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0', { execFileSync: expect.any(Function) });
 });
 
 test('release passes the coverage waiver through preflight', async () => {

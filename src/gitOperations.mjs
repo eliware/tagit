@@ -68,7 +68,13 @@ function ensureReleaseVersion(fs, file, newVersion) {
     if (changed) fs.writeFileSync(file, JSON.stringify(data, null, 4), 'utf-8');
 }
 
-export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, skipChecks = false } = {}) {
+export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, skipChecks = false, execFileSync = null } = {}) {
+    const runFile = (executable, args, options = {}) => {
+        if (execFileSync) return execFileSync(executable, args, options);
+        const command = executable === 'git' && args[0] === 'commit'
+            ? `git commit -m ${JSON.stringify(args[2])}` : `${executable} ${args.join(' ')}`;
+        return execSync(command, options);
+    };
     if (dryRun) {
         log.info(`Dry run: checking release ${newVersion} without changing Git or dependencies`);
         if (fs.existsSync('package.json')) {
@@ -136,23 +142,23 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
         }
 
         log.info('Adding all changes to git');
-        execSync('git add -A', { stdio: 'inherit' });
+        runFile('git', ['add', '-A'], { stdio: 'inherit' });
         log.info(`Committing with message: Version ${newVersion} - ${dateFormatted}`);
         // JSON string quoting produces a shell argument that works in both
         // POSIX shells and Windows cmd.exe/PowerShell. POSIX single quotes
         // are passed literally by Windows and make Git treat the message
         // fragments as pathspecs.
         const commitMessage = `Version ${newVersion} - ${dateFormatted}`;
-        execSync(`git commit -m ${JSON.stringify(commitMessage)}`, { stdio: 'inherit' });
+        runFile('git', ['commit', '-m', commitMessage], { stdio: 'inherit' });
         const releaseTag = `v${newVersion}`;
         log.info(`Tagging commit with tag: ${releaseTag}`);
-        execSync(`git tag ${releaseTag}`, { stdio: 'inherit' });
+        runFile('git', ['tag', releaseTag], { stdio: 'inherit' });
         log.info('Pushing commits to origin');
-        execSync('git push', { stdio: 'inherit' });
+        runFile('git', ['push'], { stdio: 'inherit' });
         log.info('Pushing tags to origin');
-        execSync('git push --tags', { stdio: 'inherit' });
+        runFile('git', ['push', '--tags'], { stdio: 'inherit' });
         log.info('Git operations complete');
-        const commitOutput = execSync('git rev-parse HEAD', { encoding: 'utf8' });
+        const commitOutput = runFile('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' });
         return { commitSha: commitOutput ? commitOutput.trim() : null, tag: releaseTag };
     } catch (err) {
         restoreFileVersion(fs, 'composer.json', composerSnapshot);

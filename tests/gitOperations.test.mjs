@@ -350,3 +350,13 @@ describe('gitOperations', () => {
     }), 'utf-8');
   });
 });
+
+test('uses argument arrays for release Git mutations when injected', () => {
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((executable, args) => args[0] === 'rev-parse' ? 'abc\n' : '');
+  const fs = { existsSync: jest.fn(() => false), readFileSync: jest.fn(), writeFileSync: jest.fn() };
+  const result = gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.0', { execFileSync });
+  expect(result).toEqual({ commitSha: 'abc', tag: 'v1.0.0' });
+  expect(execFileSync).toHaveBeenCalledWith('git', ['commit', '-m', expect.stringContaining('Version 1.0.0')], expect.any(Object));
+  expect(execSync).not.toHaveBeenCalled();
+});
