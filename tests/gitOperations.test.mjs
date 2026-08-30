@@ -1,9 +1,15 @@
 import { jest } from '@jest/globals';
-import { gitOperations } from '../src/gitOperations.mjs';
+import { commandOptions, gitOperations } from '../src/gitOperations.mjs';
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 const composerCommand = process.platform === 'win32' ? 'composer.cmd' : 'composer';
+const npmRunOptions = { stdio: 'inherit', ...(process.platform === 'win32' ? { shell: true } : {}) };
+
+test('adds shell mode only for Windows command shims', () => {
+  expect(commandOptions('git', { stdio: 'inherit' })).toEqual({ stdio: 'inherit' });
+  expect(commandOptions('npm.cmd', { stdio: 'inherit' })).toEqual({ stdio: 'inherit', shell: true });
+});
 
 describe('gitOperations', () => {
   let execSyncMock;
@@ -35,8 +41,8 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
 
-    expect(execSyncMock).toHaveBeenCalledWith(npmCommand, ['test'], { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith(npxCommand, ['webpack'], { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith(npmCommand, ['test'], expect.objectContaining(npmRunOptions));
+    expect(execSyncMock).toHaveBeenCalledWith(npxCommand, ['webpack'], expect.objectContaining(npmRunOptions));
     expect(execSyncMock).not.toHaveBeenCalledWith('git', ['add', '-A'], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Dry run complete: ${mockVersion} was not released`);
   });
@@ -94,7 +100,7 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith(npmCommand, ['install', 'lodash@latest'], { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith(npmCommand, ['install', 'lodash@latest'], expect.objectContaining(npmRunOptions));
   });
 
   test('ignores npm outdated failures without stdout', () => {

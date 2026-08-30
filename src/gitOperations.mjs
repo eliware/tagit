@@ -1,5 +1,9 @@
 import { resolveExecutable } from './processRunner.mjs';
 
+export function commandOptions(executable, options = {}) {
+    return executable.endsWith('.cmd') ? { ...options, shell: true } : options;
+}
+
 function usesWebpack(packageData, fs) {
     const sections = [packageData?.dependencies, packageData?.devDependencies, packageData?.peerDependencies, packageData?.optionalDependencies];
     const hasWebpackPackage = sections.some((section) => section && Object.prototype.hasOwnProperty.call(section, 'webpack'));
@@ -12,23 +16,24 @@ function runWebpackBuild(execFileSync, packageData) {
     const npm = resolveExecutable('npm');
     const npx = resolveExecutable('npx');
     if (packageData?.scripts && packageData.scripts.build) {
-        execFileSync(npm, ['run', 'build'], { stdio: 'inherit' });
+        execFileSync(npm, ['run', 'build'], commandOptions(npm, { stdio: 'inherit' }));
         return;
     }
 
     if (packageData?.scripts && packageData.scripts.webpack) {
-        execFileSync(npm, ['run', 'webpack'], { stdio: 'inherit' });
+        execFileSync(npm, ['run', 'webpack'], commandOptions(npm, { stdio: 'inherit' }));
         return;
     }
 
-    execFileSync(npx, ['webpack'], { stdio: 'inherit' });
+    execFileSync(npx, ['webpack'], commandOptions(npx, { stdio: 'inherit' }));
 }
 
 
 function updateOutdatedDependencies(execFileSync, log) {
     let output = '';
     try {
-        output = execFileSync(resolveExecutable('npm'), ['outdated', '--json'], { encoding: 'utf-8' });
+        const executable = resolveExecutable('npm');
+        output = execFileSync(executable, ['outdated', '--json'], commandOptions(executable, { encoding: 'utf-8' }));
     } catch (error) {
         // npm outdated exits with status 1 when outdated packages are found.
         output = error.stdout || '';
@@ -44,7 +49,8 @@ function updateOutdatedDependencies(execFileSync, log) {
     }
     for (const name of Object.keys(outdated)) {
         log.info(`Updating outdated dependency to latest: ${name}`);
-        execFileSync(resolveExecutable('npm'), ['install', `${name}@latest`], { stdio: 'inherit' });
+        const executable = resolveExecutable('npm');
+        execFileSync(executable, ['install', `${name}@latest`], commandOptions(executable, { stdio: 'inherit' }));
     }
 }
 
@@ -83,7 +89,7 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
             const packageData = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
             if (!skipChecks && packageData?.scripts?.test) {
                 log.info('Dry run: running npm test');
-                execFileSync(npm, ['test'], { stdio: 'inherit' });
+                execFileSync(npm, ['test'], commandOptions(npm, { stdio: 'inherit' }));
             }
             if (!skipChecks && usesWebpack(packageData, fs)) {
                 log.info('Dry run: running webpack build');
@@ -111,17 +117,18 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
     try {
         if (fs.existsSync('composer.json')) {
             log.info('composer.json exists - running composer update');
-            execFileSync(resolveExecutable('composer'), ['update'], { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } });
+            const composer = resolveExecutable('composer');
+            execFileSync(composer, ['update'], commandOptions(composer, { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } }));
             log.info('Running composer bump');
-            execFileSync(resolveExecutable('composer'), ['bump'], { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } });
+            execFileSync(composer, ['bump'], commandOptions(composer, { stdio: 'inherit', env: { ...process.env, COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' } }));
         }
 
         if (fs.existsSync('package.json')) {
             log.info('package.json exists - running npm install');
-            execFileSync(npm, ['install'], { stdio: 'inherit' });
+            execFileSync(npm, ['install'], commandOptions(npm, { stdio: 'inherit' }));
             updateOutdatedDependencies(execFileSync, log);
             log.info('Running npm update');
-            execFileSync(npm, ['update'], { stdio: 'inherit' });
+            execFileSync(npm, ['update'], commandOptions(npm, { stdio: 'inherit' }));
 
             // npm may rewrite root package metadata while refreshing dependencies.
             // Reassert the release version before reading, committing, and tagging.
@@ -133,7 +140,8 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
 
             if (packageData?.scripts && packageData.scripts.test) {
                 log.info('package.json has test script - running npm test');
-                execFileSync(resolveExecutable('npm'), ['test'], { stdio: 'inherit' });
+                const testExecutable = resolveExecutable('npm');
+                execFileSync(testExecutable, ['test'], commandOptions(testExecutable, { stdio: 'inherit' }));
             }
 
             if (usesWebpack(packageData, fs)) {
