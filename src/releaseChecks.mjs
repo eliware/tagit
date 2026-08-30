@@ -13,6 +13,13 @@ export function resolveExecutable(executable, platform = process.platform) {
   return platform === 'win32' && executable === 'npm' ? 'npm.cmd' : executable;
 }
 
+function processCommand(executable, args) {
+  if (process.platform === 'win32' && executable === 'npm') {
+    return [process.execPath, [path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js'), ...args]];
+  }
+  return [resolveExecutable(executable), args];
+}
+
 function failureMessage(name, error, output) {
   const timedOut = error?.code === 'ETIMEDOUT' || error?.signal === 'SIGTERM';
   if (timedOut) return `BLOCKED: ${name} exceeded the ${CHECK_TIMEOUT_MS / 1000}-second limit and may be hanging. Action: inspect for unset timers, open handles, or waiting network/process operations, then rerun tagit preflight.`;
@@ -119,12 +126,13 @@ export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, verif
   for (const [name, [executable, args]] of checks) {
     let output;
     try {
-      const options = { stdio: ['inherit', 'pipe', 'pipe'], timeout: CHECK_TIMEOUT_MS };
+      const options = { stdio: 'pipe', timeout: CHECK_TIMEOUT_MS };
       if (name === 'audit') {
         options.env = { ...process.env, npm_config_ignore_scripts: 'true' };
         delete options.env.npm_config_allow_scripts;
       }
-      output = execFileSync(resolveExecutable(executable), args, options);
+      const [command, commandArgs] = processCommand(executable, args);
+      output = execFileSync(command, commandArgs, options);
     } catch (error) {
       output = `${error.stdout ?? ''}\n${error.stderr ?? ''}`;
       results[name] = { passed: false };
@@ -151,3 +159,4 @@ export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, verif
   if (failures.length) throw new Error(`Preflight found ${failures.length} issue(s):\n\n${failures.join('\n\n')}`);
   return results;
 }
+import path from 'node:path';

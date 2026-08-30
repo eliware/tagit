@@ -1,6 +1,8 @@
 import { jest } from '@jest/globals';
 import { hasStrict100x4, resolveExecutable, runPreflight, verifyLatestCi } from '../src/releaseChecks.mjs';
 
+const isNodeNpm = (executable, args) => executable === process.execPath && args.some(arg => arg.endsWith('npm-cli.js'));
+
 test('uses shell-free GitHub CLI arguments for CI inspection', () => {
   const execSync = jest.fn();
   const execFileSync = jest.fn((executable, args) => {
@@ -26,7 +28,7 @@ test('strict preflight validates repository ownership gates', () => {
     if (executable === 'git' && args[0] === 'status') return '';
     if (executable === 'git' && args[0] === 'branch') return 'main';
     if (executable === 'git' && args[0] === 'ls-files') return 'package.json\nREADME.md\nRELEASE_NOTES.md';
-    if (executable === 'npm.cmd' && args[0] === 'test') return 'All files 100 100 100 100';
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'All files 100 100 100 100';
     return '';
   });
   const fs = { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ name: 'x', version: '1.0.0', description: 'x', license: 'MIT', scripts: { test: 'test' } })) };
@@ -38,7 +40,7 @@ test('strict preflight reports branch, required files, metadata, and tracked sec
     if (executable === 'git' && args[0] === 'status') return '';
     if (executable === 'git' && args[0] === 'branch') return 'feature/x';
     if (executable === 'git' && args[0] === 'ls-files') return '.env\ncredentials.json';
-    return executable === 'npm.cmd' && args[0] === 'test' ? 'All files 100 100 100 100' : '';
+    return isNodeNpm(executable, args) && args.at(-1) === 'test' ? 'All files 100 100 100 100' : '';
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
   expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { strictRepository: true })).toThrow(/main[\s\S]*required repository file[\s\S]*metadata[\s\S]*secret-looking/);
@@ -47,11 +49,11 @@ test('strict preflight reports branch, required files, metadata, and tracked sec
 test('strict preflight reports validation command and metadata failures', () => {
   const base = (executable, args) => {
     if (executable === 'git' && (args[0] === 'branch' || args[0] === 'ls-files')) throw new Error('inspection failed');
-    return executable === 'npm.cmd' && args[0] === 'test' ? 'All files 100 100 100 100' : '';
+    return isNodeNpm(executable, args) && args.at(-1) === 'test' ? 'All files 100 100 100 100' : '';
   };
   const fs = { existsSync: jest.fn(() => false), readFileSync: jest.fn(() => '{bad') };
   expect(() => runPreflight(jest.fn(base), fs, { info: jest.fn() }, { strictRepository: true })).toThrow(/branch validation[\s\S]*package metadata validation[\s\S]*tracked-file validation/);
-  const detached = jest.fn((executable, args) => executable === 'npm.cmd' && args[0] === 'test' ? 'All files 100 100 100 100' : '');
+  const detached = jest.fn((executable, args) => isNodeNpm(executable, args) && args.at(-1) === 'test' ? 'All files 100 100 100 100' : '');
   expect(() => runPreflight(detached, { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ name: 'x', version: '1', description: 'x', license: 'MIT', scripts: { test: 'test' } })) }, { info: jest.fn() }, { strictRepository: true })).toThrow('detached');
 });
 
@@ -63,7 +65,7 @@ test('detects strict 100x4 coverage', () => {
 
 test('reports bounded and empty command output', () => {
   const execSync = jest.fn((executable, args) => {
-    if (executable === 'npm.cmd' && args[0] === 'test') return 'x'.repeat(5000);
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'x'.repeat(5000);
     return '';
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
@@ -72,7 +74,7 @@ test('reports bounded and empty command output', () => {
 
 test('preflight runs clean-tree, test, lint, and audit gates', () => {
   const execSync = jest.fn((executable, args) => {
-    if (executable === 'npm.cmd' && args[0] === 'test') return 'All files     100     100     100     100';
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'All files     100     100     100     100';
     return '';
   });
   const fs = {
@@ -84,8 +86,8 @@ test('preflight runs clean-tree, test, lint, and audit gates', () => {
   const result = runPreflight(execSync, fs, log);
 
   expect(result.test.passed).toBe(true);
-  expect(execSync).toHaveBeenCalledWith('npm.cmd', ['run', 'lint'], expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith('npm.cmd', ['audit', '--omit=dev', '--audit-level=moderate'], expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'run', 'lint']), expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
 });
 
 test('uses the injected shell-free runner for local checks', () => {
@@ -94,7 +96,7 @@ test('uses the injected shell-free runner for local checks', () => {
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
   const result = runPreflight(execFileSync, fs, { info: jest.fn() });
   expect(result.test.passed).toBe(true);
-  expect(execFileSync).toHaveBeenCalledWith('npm.cmd', ['test'], expect.any(Object));
+  expect(execFileSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining(['test']), expect.any(Object));
 });
 
 test('preflight rejects dirty trees before running package commands', () => {
@@ -121,7 +123,7 @@ test('preflight honors an explicit 100x4 waiver and audit fallback', () => {
 
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty('test.passed', true);
   expect(execSync).toHaveBeenCalledWith('eliware-test', ['--ignore-100x4'], expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith('npm.cmd', ['audit', '--omit=dev', '--audit-level=moderate'], expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
 });
 
 test('preflight blocks missing strict 100x4 coverage', () => {
@@ -135,7 +137,7 @@ test('preflight blocks missing strict 100x4 coverage', () => {
 
 test('preflight reports command failures and allows template releases', () => {
   const fs = { existsSync: jest.fn(() => false) };
-  const failingExec = jest.fn((executable, args) => executable === 'npm.cmd' && args[0] === 'run' && args[1] === 'lint' ? (() => { throw { stdout: 'bad', stderr: 'lint' }; })() : '');
+  const failingExec = jest.fn((executable, args) => isNodeNpm(executable, args) && args.at(-2) === 'run' && args.at(-1) === 'lint' ? (() => { throw { stdout: 'bad', stderr: 'lint' }; })() : '');
   expect(() => runPreflight(failingExec, fs, { info: jest.fn() })).toThrow('lint failed');
   expect(() => runPreflight(jest.fn(() => ''), { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) }, { info: jest.fn() }))
     .toThrow('Preflight found 1 issue');
@@ -216,7 +218,7 @@ test('preflight verifies CI for the exact current HEAD', () => {
       { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
       { name: 'Windows', status: 'completed', conclusion: 'success' },
     ] });
-    if (executable === 'npm.cmd' && args[0] === 'test') return 'All files     100     100     100     100';
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'All files     100     100     100     100';
     return '';
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
@@ -264,13 +266,13 @@ test('preflight aggregates CI failures after local checks', () => {
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
   expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow('GitHub CI verification failed');
-  expect(execSync).toHaveBeenCalledWith('npm.cmd', ['run', 'lint'], expect.any(Object));
-  expect(execSync).toHaveBeenCalledWith('npm.cmd', ['audit', '--omit=dev', '--audit-level=moderate'], expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'run', 'lint']), expect.any(Object));
+  expect(execSync).toHaveBeenCalledWith(process.execPath, expect.arrayContaining([expect.stringContaining('npm-cli.js'), 'audit', '--omit=dev', '--audit-level=moderate']), expect.any(Object));
 });
 
 test('preflight gives remediation for a failing test and missing coverage', () => {
   const failingTest = jest.fn((executable, args) => {
-    if (executable === 'npm.cmd' && args[0] === 'test') throw new Error('intentional test failure');
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw new Error('intentional test failure');
     return '';
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
@@ -282,7 +284,7 @@ test('preflight gives remediation for a failing test and missing coverage', () =
 
 test('preflight reports hanging checks with timer guidance', () => {
   const execSync = jest.fn((executable, args) => {
-    if (executable === 'npm.cmd' && args[0] === 'test') throw Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' });
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' });
     return '';
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
@@ -292,7 +294,7 @@ test('preflight reports hanging checks with timer guidance', () => {
 test('preflight aggregates all blocking checks with next actions', () => {
   const execSync = jest.fn((executable, args) => {
     if (executable === 'git' && args[0] === 'status') return ' M package.json';
-    if (executable === 'npm.cmd' && args[0] === 'test') return 'Tests passed without coverage';
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'Tests passed without coverage';
     throw new Error(`${executable} failed`);
   });
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
