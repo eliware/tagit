@@ -52,6 +52,10 @@ export async function runTagit(overrides = {}, argv = []) {
     return;
   }
   if (options.command === 'push') {
+    if (options.dryRun) {
+      log.info('Dry run: no commits were pushed and no CI lookup was performed.');
+      return;
+    }
     try {
       execFileSync('git', ['push'], { stdio: 'inherit' });
       const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
@@ -83,6 +87,10 @@ export async function runTagit(overrides = {}, argv = []) {
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
+      return;
+    }
+    if (options.command === 'release' && options.dryRun) {
+      log.info('Dry run passed: release versioning, commit, tag, push, and publication were skipped.');
       return;
     }
     if (fs.existsSync('.notag')) {
@@ -126,12 +134,13 @@ export function parseOptions(argv) {
     help: isHelp(argv),
     versionQuery: !command && (argv.includes('--version') || argv.includes('-v')),
     ignore100x4: argv.includes('--ignore-100x4'),
+    dryRun: argv.includes('--dry-run'),
     version: command === 'release' || command === 'release-wait' ? getReleaseVersion(argv) : null,
   };
 }
 
 export function helpText() {
-  return `Usage: tagit <command>\n\nTAGIT RELEASE WORKFLOW\n\nResponsibility handoff:\n  Project owner  -> runs tagit notes, updates release notes/tests, and resolves all local issues.\n  Project owner  -> commits and pushes the finished work, then confirms CI is green.\n  DevOps admin   -> runs tagit preflight to independently verify the exact pushed HEAD.\n  DevOps admin   -> runs tagit release --version X.Y.Z, then shares the workflow links.\n  DevOps admin   -> runs tagit release-wait to monitor CI and confirm publication.\n\nCommands:\n  notes                     Report changes since the latest tag; read-only.\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI; read-only.\n  push                      Push existing commits only; ignore untracked files and print CI links.\n  release --version X.Y.Z  Preflight, version, commit, tag, push, and print CI links.\n  release-wait              Wait for release CI; verify npm/GHCR and report final links.\n\nRequired gates:\n  100x4 coverage, zero lint warnings, audit, package validation, required project tests,\n  and successful Ubuntu and Windows CI for the exact commit. Failures are blockers.\n\nTemplates:\n  A .notag repository still runs preflight but never versions, tags, pushes, or publishes.\n\nOptions:\n  -h, --help                Show this overview\n  -v, --version             Show the installed tagit version`;
+  return `Usage: tagit <command> [options]\n\nTAGIT RELEASE WORKFLOW\n\nCommands:\n  notes                     Report changes since the latest tag; read-only.\n  preflight                 Verify local gates and exact-HEAD Ubuntu/Windows CI; read-only.\n  push                      Push existing commits only; ignore untracked files and print CI links.\n  release --version X.Y.Z  DevOps-only release workflow.\n  release-wait              DevOps-only post-release verification.\n\nOwnership:\n  Project owners may run only notes, push, and preflight.\n  DevOps runs release and release-wait only after preflight passes.\n\nOptions:\n  -h, --help                Show this overview\n  -v, --version             Show the installed tagit version\n      --dry-run             Check readiness without side effects\n      --ignore-100x4        DevOps-only documented coverage waiver`;
 }
 
 export function preflightGuide() {

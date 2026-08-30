@@ -40,6 +40,11 @@ branches.
 files are ignored. It prints available exact-HEAD CI links and exits without
 waiting or tagging.
 
+`tagit push --dry-run` performs no push or CI lookup. DevOps may use
+`tagit release --version X.Y.Z --dry-run` to run preflight without changing
+versions or creating commits, tags, pushes, or publications. Dry-run mode must
+not be used to bypass the owner/DevOps command boundary.
+
 For template repositories, `.notag` retains all preflight checks but makes
 release validation-only: no version update, commit, tag, push, or publishing.
 

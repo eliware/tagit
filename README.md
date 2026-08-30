@@ -36,6 +36,11 @@ all other gates remain mandatory. Project owners may not use this flag.
 ignores untracked files, prints CI workflow/job links for the pushed HEAD, and
 exits without waiting.
 
+Append `--dry-run` to `tagit push` to verify the invocation without pushing or
+looking up CI. DevOps may append `--dry-run` to an explicit `tagit release` to
+run preflight while skipping version changes, commits, tags, pushes, and
+publication.
+
 `tagit release --version X.Y.Z` requires an explicit version. It runs
 preflight, updates version files, commits, creates `vX.Y.Z`, and pushes the
 commit and tag. It discovers the release workflow, prints workflow/job links,
@@ -52,8 +57,7 @@ Project owners must never run `tagit release` or `tagit release-wait`. The
 DevOps team runs those commands only after the owner handoff and exact-HEAD
 preflight has passed.
 
-There is no automatic version bump, release dry-run, release branch, coverage
-waiver, or lint-warning waiver.
+There is no automatic version bump, release branch, or lint-warning waiver.
 
 ## Template repositories
 

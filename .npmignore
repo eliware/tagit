@@ -3,5 +3,4 @@ coverage/
 .github/
 .knit/
 AGENTS.md
-RELEASE_NOTES.md
 .env.example

@@ -8,6 +8,7 @@ test('supports release wait alongside preflight and release commands', () => {
   expect(parseOptions(['notes'])).toMatchObject({ command: 'notes', version: null });
   expect(parseOptions(['preflight'])).toMatchObject({ command: 'preflight', version: null });
   expect(parseOptions(['preflight', '--ignore-100x4'])).toMatchObject({ command: 'preflight', ignore100x4: true });
+  expect(parseOptions(['push', '--dry-run'])).toMatchObject({ command: 'push', dryRun: true });
   expect(parseOptions(['release', '--version', '2.4.0'])).toMatchObject({ command: 'release', version: '2.4.0' });
   expect(parseOptions(['release-wait'])).toMatchObject({ command: 'release-wait', version: null });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
@@ -113,6 +114,25 @@ test('push pushes commits without staging and reports CI links', async () => {
   await runTagit({ output, execSync, execFileSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
   expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
   expect(reportCiLinks).toHaveBeenCalledWith(execFileSync, log, 'abc', { attempts: 10, delayMs: 2000 });
+});
+
+test('push dry run performs no push or CI lookup', async () => {
+  const execFileSync = jest.fn();
+  await runTagit({ execFileSync, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push', '--dry-run']);
+  expect(execFileSync).not.toHaveBeenCalled();
+  expect(log.info).toHaveBeenCalledWith(expect.stringContaining('Dry run'));
+});
+
+test('release dry run preflights without changing or publishing anything', async () => {
+  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+  const updateVersionFiles = jest.fn();
+  const gitOperations = jest.fn();
+  const verifyRelease = jest.fn();
+  await runTagit({ runPreflight, updateVersionFiles, gitOperations, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0', '--dry-run']);
+  expect(runPreflight).toHaveBeenCalled();
+  expect(updateVersionFiles).not.toHaveBeenCalled();
+  expect(gitOperations).not.toHaveBeenCalled();
+  expect(verifyRelease).not.toHaveBeenCalled();
 });
 
 test('push reports failures', async () => {

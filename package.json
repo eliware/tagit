@@ -12,7 +12,8 @@
         "src/",
         "scripts/typecheck.mjs",
         "README.md",
-        "LICENSE"
+        "LICENSE",
+        "RELEASE_NOTES.md"
     ],
     "publishConfig": {
         "access": "public"
