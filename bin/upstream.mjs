@@ -1,16 +1,16 @@
 #!/usr/bin/env node
-import { execSync as defaultExecSync } from 'node:child_process';
+import { execFileSync as defaultExecFileSync } from 'node:child_process';
 
-export function runUpstream(args = [], execSync, now = new Date(), log = console) {
+export function runUpstream(args = [], execFileSync, now = new Date(), log = console) {
   const message = args.length ? args.join(' ') : now.toISOString().replace('T', ' ').slice(0, 19);
-  execSync('git fetch upstream', { stdio: 'inherit' });
+  execFileSync('git', ['fetch', 'upstream'], { stdio: 'inherit' });
   try {
-    execSync(`git merge upstream/master -m ${JSON.stringify(message)}`, { stdio: 'inherit' });
-    execSync('git push', { stdio: 'inherit' });
+    execFileSync('git', ['merge', 'upstream/master', '-m', message], { stdio: 'inherit' });
+    execFileSync('git', ['push'], { stdio: 'inherit' });
     return true;
   } catch {
     log.log('Merge conflicts detected. Files needing attention:');
-    execSync('git diff --name-only --diff-filter=U', { stdio: 'inherit' });
+    execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { stdio: 'inherit' });
     return false;
   }
 }

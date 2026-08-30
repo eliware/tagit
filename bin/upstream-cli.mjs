@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { runUpstream } from './upstream.mjs';
 
-runUpstream(process.argv.slice(2), execSync);
+runUpstream(process.argv.slice(2), execFileSync);

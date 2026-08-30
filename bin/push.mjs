@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { execSync as defaultExecSync } from 'node:child_process';
+import { execFileSync as defaultExecFileSync } from 'node:child_process';
 
-export function runPush(args = [], execSync, now = new Date()) {
-  execSync('git push', { stdio: 'inherit' });
+export function runPush(args = [], execFileSync, now = new Date()) {
+  execFileSync('git', ['push'], { stdio: 'inherit' });
 }
 
 export function isCli(argv) {
