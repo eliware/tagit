@@ -7,15 +7,15 @@ function nextVersion(version, level) {
   return `${major}.${minor}.${patch + 1}`;
 }
 
-export function suggestVersion(execSync, fs, execFileSync = null) {
+export function suggestVersion(execSync, fs, execFileSync) {
   const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const current = packageData.version;
   if (!/^\d+\.\d+\.\d+$/.test(current)) throw new Error(`Cannot suggest a version from invalid current version: ${current}`);
-  const run = (args, fallback) => execFileSync ? execFileSync('git', args, { encoding: 'utf8' }) : execSync(fallback, { encoding: 'utf8' });
-  const latestTag = run(['describe', '--tags', '--abbrev=0'], 'git describe --tags --abbrev=0').trim();
-  const files = run(['diff', '--name-only', `${latestTag}..HEAD`], `git diff --name-only ${latestTag}..HEAD`)
+  const run = args => execFileSync('git', args, { encoding: 'utf8' });
+  const latestTag = run(['describe', '--tags', '--abbrev=0']).trim();
+  const files = run(['diff', '--name-only', `${latestTag}..HEAD`])
     .split(/\r?\n/).map(file => file.trim()).filter(Boolean).filter(file => !IGNORED.test(file));
-  const diff = run(['diff', '--unified=0', `${latestTag}..HEAD`, '--', '.', ':!package-lock.json', ':!coverage', ':!node_modules'], `git diff --unified=0 ${latestTag}..HEAD -- . ":!package-lock.json" ":!coverage" ":!node_modules"`);
+  const diff = run(['diff', '--unified=0', `${latestTag}..HEAD`, '--', '.', ':!package-lock.json', ':!coverage', ':!node_modules']);
   let level = 'patch';
   let reason = 'small or non-public changes';
   if (/(BREAKING CHANGE|\bBREAKING\b|^[+].*(export|exports)|^[+].*\"exports\"|^[+].*\"bin\")/mi.test(diff)) {
