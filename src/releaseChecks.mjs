@@ -15,7 +15,7 @@ export function resolveExecutable(executable, platform = process.platform) {
 
 export function processCommand(executable, args, platform = process.platform, nodePath = process.execPath) {
   if (platform === 'win32' && executable === 'npm') {
-    return [nodePath, [path.join(path.dirname(nodePath), 'node_modules', 'npm', 'bin', 'npm-cli.js'), ...args]];
+    return [nodePath, [path.win32.join(path.win32.dirname(nodePath), 'node_modules', 'npm', 'bin', 'npm-cli.js'), ...args]];
   }
   return [resolveExecutable(executable), args];
 }
