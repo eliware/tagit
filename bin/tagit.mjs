@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { log as defaultLog, registerHandlers, registerSignals } from '@eliware/common';
 import fsDefault from 'fs';
-import { execSync as execSyncDefault, execFileSync as execFileSyncDefault, execFile as execFileDefault } from 'child_process';
+import { execFileSync as execFileSyncDefault, execFile as execFileDefault } from 'child_process';
 import path from 'path';
 import { updateVersionFiles as updateVersionFilesDefault } from '../src/updateVersionFiles.mjs';
 import { gitOperations as gitOperationsDefault } from '../src/gitOperations.mjs';
@@ -14,7 +14,6 @@ import packageData from '../package.json' with { type: 'json' };
 
 const defaultDependencies = {
   fs: fsDefault,
-  execSync: execSyncDefault,
   execFileSync: execFileSyncDefault,
   execFile: execFileDefault,
   log: defaultLog,
@@ -34,7 +33,7 @@ const operatorBoundary = 'Project owners may run only tagit notes, tagit push, a
 
 export async function runTagit(overrides = {}, argv = []) {
   const {
-    fs, execSync, execFileSync, execFile, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
+    fs, execFileSync, execFile, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
     registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
   const options = parseOptions(argv);
@@ -49,14 +48,14 @@ export async function runTagit(overrides = {}, argv = []) {
   registerHandlersFn({ log });
   registerSignalsFn({ log });
   if (options.command === 'notes') {
-    (overrides.output ?? console.log)(buildNotesReport(execSync, fs, execFileSync));
+    (overrides.output ?? console.log)(buildNotesReport(fs, execFileSync));
     return;
   }
   if (options.command === 'push') {
     try {
       execFileSync('git', ['push'], { stdio: 'inherit' });
       const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-      reportCiLinks(execSync, log, headSha, { attempts: 10, delayMs: 2000, execFileSync });
+      reportCiLinks(execFileSync, log, headSha, { attempts: 10, delayMs: 2000 });
       log.info('Push completed; untracked files were not staged.');
     } catch (error) { log.error(error); exit(1); }
     return;
@@ -76,11 +75,11 @@ export async function runTagit(overrides = {}, argv = []) {
     if (options.command === 'release-wait') {
       const version = options.version ?? execFileSync('git', ['describe', '--tags', '--abbrev=0']).toString().trim().replace(/^v/, '');
       const commitSha = execFileSync('git', ['rev-list', '-n', '1', `v${version}`]).toString().trim();
-      await verifyRelease(execSync, fs, log, { version, release: { commitSha }, execFile });
+      await verifyRelease(execFileSync, fs, log, { version, release: { commitSha }, execFile });
       log.info(`Release ${version} verified successfully.`);
       return;
     }
-    const preflight = runPreflight(execSync, fs, log, { verifyCi: true, strictRepository: true, ignore100x4: options.ignore100x4, execFileSync });
+    const preflight = runPreflight(execFileSync, fs, log, { verifyCi: true, strictRepository: true, ignore100x4: options.ignore100x4 });
     if (options.command === 'preflight') {
       log.info('Preflight passed: local gates and exact-HEAD Ubuntu/Windows CI are green.');
       (overrides.output ?? console.log)(JSON.stringify({ ok: true, checks: preflight }));
@@ -95,8 +94,8 @@ export async function runTagit(overrides = {}, argv = []) {
       .map(file => [file, fs.readFileSync(file, 'utf8')]);
     const newVersion = await updateVersionFiles(fs, log, { targetVersion: options.version });
     log.info(`Updated version to ${newVersion}`);
-    const release = gitOperations(execSync, fs, log, newVersion, { execFileSync });
-    await verifyRelease(execSync, fs, log, { version: newVersion, release, linksOnly: true, execFile });
+    const release = gitOperations(execFileSync, fs, log, newVersion);
+    await verifyRelease(execFileSync, fs, log, { version: newVersion, release, linksOnly: true, execFile });
     log.info('Run tagit release-wait to monitor CI and confirm publication.');
   } catch (error) {
     // Versioning happens before Git operations; restore it if any release step fails.

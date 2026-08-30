@@ -11,22 +11,22 @@ function gitRunner(describe, files, diff) {
 
 test('uses shell-free Git arguments when injected', () => {
   const execFileSync = jest.fn((executable, args) => args[0] === 'describe' ? 'v1.2.3' : 'README.md\n');
-  expect(suggestVersion(jest.fn(), fakeFs('1.2.3'), execFileSync)).toMatchObject({ latestTag: 'v1.2.3', suggested: '1.2.4' });
+  expect(suggestVersion(fakeFs('1.2.3'), execFileSync)).toMatchObject({ latestTag: 'v1.2.3', suggested: '1.2.4' });
   expect(execFileSync).toHaveBeenCalledWith('git', ['describe', '--tags', '--abbrev=0'], expect.any(Object));
 });
 
 test('suggests a patch for small changes and ignores generated files', () => {
-  expect(suggestVersion(jest.fn(), fakeFs('1.2.3'), gitRunner('v1.2.3', 'package-lock.json\nREADME.md', ''))).toMatchObject({ level: 'patch', suggested: '1.2.4', filesConsidered: 1 });
+  expect(suggestVersion(fakeFs('1.2.3'), gitRunner('v1.2.3', 'package-lock.json\nREADME.md', ''))).toMatchObject({ level: 'patch', suggested: '1.2.4', filesConsidered: 1 });
 });
 
 test('suggests a minor version for substantial implementation changes', () => {
-  expect(suggestVersion(jest.fn(), fakeFs('1.2.3'), gitRunner('v1.2.3', 'src/a.mjs\nsrc/b.mjs\nsrc/c.mjs\nsrc/d.mjs\nsrc/e.mjs', '+'.repeat(250)))).toMatchObject({ level: 'minor', suggested: '1.3.0' });
+  expect(suggestVersion(fakeFs('1.2.3'), gitRunner('v1.2.3', 'src/a.mjs\nsrc/b.mjs\nsrc/c.mjs\nsrc/d.mjs\nsrc/e.mjs', '+'.repeat(250)))).toMatchObject({ level: 'minor', suggested: '1.3.0' });
 });
 
 test('suggests a major version for explicit breaking indicators', () => {
-  expect(suggestVersion(jest.fn(), fakeFs('1.2.3'), gitRunner('v1.2.3', 'src/index.mjs', '+ export function changed() {}'))).toMatchObject({ level: 'major', suggested: '2.0.0' });
+  expect(suggestVersion(fakeFs('1.2.3'), gitRunner('v1.2.3', 'src/index.mjs', '+ export function changed() {}'))).toMatchObject({ level: 'major', suggested: '2.0.0' });
 });
 
 test('rejects an invalid current version', () => {
-  expect(() => suggestVersion(jest.fn(), fakeFs('next'), jest.fn())).toThrow('invalid current version');
+  expect(() => suggestVersion(fakeFs('next'), jest.fn())).toThrow('invalid current version');
 });

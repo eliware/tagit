@@ -17,16 +17,12 @@ export async function releaseCommand(execFile, executable, args, options = { enc
   });
 }
 
-function json(execSync, command) {
-  return JSON.parse(execSync(command, { encoding: 'utf8' }));
-}
-
 async function jsonAsync(execFile, executable, args) {
   return JSON.parse(await releaseCommand(execFile, executable, args));
 }
 
-function repositoryName(execSync) {
-  const remote = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+function repositoryName(execFileSync) {
+  const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
   const match = remote.match(/[/:]([^/:]+\/[^/]+?)(?:\.git)?$/);
   if (!match) throw new Error(`Cannot determine GitHub repository from origin: ${remote}`);
   return match[1];
@@ -38,46 +34,38 @@ function workflowFiles(fs) {
   return fs.readdirSync(directory).filter(file => /\.(yml|yaml)$/i.test(file));
 }
 
-export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 2000, execFileSync = null } = {}) {
-  const remote = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+export function reportCiLinks(execFileSync, log, headSha, { attempts = 1, delayMs = 2000 } = {}) {
+  const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
   const match = remote.match(/[/:]([^/:]+\/[^/]+?)(?:\.git)?$/);
   if (!match) throw new Error(`Cannot determine GitHub repository from origin: ${remote}`);
   let runs = [];
   for (let attempt = 0; attempt < attempts && !runs.length; attempt += 1) {
-    runs = execFileSync
-      ? JSON.parse(execFileSync('gh', ['run', 'list', '--repo', match[1], '--commit', headSha, '--limit', '20', '--json', 'databaseId,url,headSha'], { encoding: 'utf8' }))
-      : json(execSync, `gh run list --repo ${match[1]} --commit ${headSha} --limit 20 --json databaseId,url,headSha`)
+    runs = JSON.parse(execFileSync('gh', ['run', 'list', '--repo', match[1], '--commit', headSha, '--limit', '20', '--json', 'databaseId,url,headSha'], { encoding: 'utf8' }))
       .filter(run => run.headSha === headSha);
     if (!runs.length && attempt + 1 < attempts) waitSync(delayMs);
   }
   if (!runs.length) { log.info(`No CI run exists yet for ${headSha}.`); return { repo: match[1], headSha, runs: [] }; }
   runs.forEach(run => {
     log.info(`Workflow: [${run.url}](${run.url})`);
-    const details = execFileSync
-      ? JSON.parse(execFileSync('gh', ['run', 'view', String(run.databaseId), '--repo', match[1], '--json', 'jobs'], { encoding: 'utf8' }))
-      : json(execSync, `gh run view ${run.databaseId} --repo ${match[1]} --json jobs`);
+    const details = JSON.parse(execFileSync('gh', ['run', 'view', String(run.databaseId), '--repo', match[1], '--json', 'jobs'], { encoding: 'utf8' }));
     (details.jobs ?? []).forEach(job => { if (job.url) log.info(`${job.name}: [${job.url}](${job.url})`); });
   });
   return { repo: match[1], headSha, runs };
 }
 
-export async function verifyRelease(execSync, fs, log, {
+export async function verifyRelease(execFileSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
   npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false, execFile = null,
 } = {}) {
-  const repo = repositoryName(execSync);
+  const repo = repositoryName(execFileSync);
   const tag = `v${version}`;
   const headSha = release.commitSha;
   let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
-    const runs = execFile
-      ? await jsonAsync(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '50', '--json', 'databaseId,status,conclusion,headSha,headBranch,url'])
-      : json(execSync, `gh run list --repo ${repo} --limit 50 --json databaseId,status,conclusion,headSha,headBranch,url`);
+    const runs = await jsonAsync(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '50', '--json', 'databaseId,status,conclusion,headSha,headBranch,url']);
     const candidate = runs.find(item => item.headSha === headSha && item.headBranch === tag);
     if (candidate) {
-      const details = execFile
-        ? await jsonAsync(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url'])
-        : json(execSync, `gh run view ${candidate.databaseId} --repo ${repo} --json status,conclusion,headSha,jobs,url`);
+      const details = await jsonAsync(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url']);
       if (linksOnly || details.status === 'completed') { run = { ...candidate, ...details }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }
@@ -113,9 +101,7 @@ export async function verifyRelease(execSync, fs, log, {
     let published = false;
     for (let attempt = 0; attempt < npmRetries; attempt += 1) {
       try {
-        const visible = execFile
-          ? (await releaseCommand(execFile, npmExecutable(), ['view', `${packageData.name}@${version}`, 'version'])).trim()
-          : execSync(`npm view ${packageData.name}@${version} version`, { encoding: 'utf8' }).trim();
+        const visible = (await releaseCommand(execFile, npmExecutable(), ['view', `${packageData.name}@${version}`, 'version'])).trim();
         if (visible === version) { published = true; break; }
       } catch { /* Registry propagation can temporarily return 404. */ }
       await sleep(npmRetryMs);
@@ -126,9 +112,7 @@ export async function verifyRelease(execSync, fs, log, {
 
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
-    const versions = execFile
-      ? await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`])
-      : json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
+    const versions = await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`]);
     const image = versions.find(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
     if (!image) throw new Error(`GHCR does not expose ${repo}:${version}.`);
     const imageDigest = image.name?.startsWith('sha256:') ? image.name : null;

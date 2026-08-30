@@ -7,7 +7,7 @@ function nextVersion(version, level) {
   return `${major}.${minor}.${patch + 1}`;
 }
 
-export function suggestVersion(execSync, fs, execFileSync) {
+export function suggestVersion(fs, execFileSync) {
   const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const current = packageData.version;
   if (!/^\d+\.\d+\.\d+$/.test(current)) throw new Error(`Cannot suggest a version from invalid current version: ${current}`);

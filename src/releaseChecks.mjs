@@ -2,10 +2,6 @@ const COVERAGE_RE = /All files\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+
 const CHECK_TIMEOUT_MS = 120000;
 const OUTPUT_LIMIT = 4000;
 
-function command(execSync, command, options = {}) {
-  return execSync(command, { encoding: 'utf8', ...options });
-}
-
 function outputText(output) {
   const text = String(output).trim();
   if (!text) return '\nOutput: (no output captured)';
@@ -28,24 +24,19 @@ export function hasStrict100x4(output) {
   return Boolean(match && match.slice(1).every(value => Number(value) === 100));
 }
 
-function readCiRun(execSync, runId, execFileSync = null) {
-  const output = execFileSync
-    ? execFileSync('gh', ['run', 'view', String(runId), '--json', 'status,conclusion,headSha,jobs'], { encoding: 'utf8' })
-    : command(execSync, `gh run view ${runId} --json status,conclusion,headSha,jobs`);
+function readCiRun(execFileSync, runId) {
+  const output = execFileSync('gh', ['run', 'view', String(runId), '--json', 'status,conclusion,headSha,jobs'], { encoding: 'utf8' });
   return JSON.parse(output);
 }
 
-export function verifyLatestCi(execSync, log, {
+export function verifyLatestCi(execFileSync, log, {
   headSha,
   repository = null,
   waitForCompletion = true,
-  execFileSync = null,
 } = {}) {
   if (!headSha) throw new Error('A commit SHA is required for CI verification.');
   const repoArg = repository ? ['--repo', repository] : [];
-  const gh = (args, options = {}) => execFileSync
-    ? execFileSync('gh', args, { encoding: 'utf8', ...options })
-    : command(execSync, `gh ${args.join(' ')}`, options);
+  const gh = (args, options = {}) => execFileSync('gh', args, { encoding: 'utf8', ...options });
   let runs;
   try {
     runs = JSON.parse(gh(['run', 'list', '--commit', headSha, ...repoArg, '--limit', '20', '--json', 'databaseId,status,conclusion,headSha,url']));
@@ -60,7 +51,7 @@ export function verifyLatestCi(execSync, log, {
     } catch {
       // Re-read the completed run below so the final error includes its conclusion.
     }
-    return verifyLatestCi(execSync, log, { headSha, repository, waitForCompletion: false, execFileSync });
+    return verifyLatestCi(execFileSync, log, { headSha, repository, waitForCompletion: false });
   }
   const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
   if (!candidates.length) {
@@ -69,7 +60,7 @@ export function verifyLatestCi(execSync, log, {
     throw new Error(`No successful GitHub Actions run exists for ${headSha}. Observed: ${details}`);
   }
   for (const run of candidates) {
-    const data = readCiRun(execSync, run.databaseId, execFileSync);
+    const data = readCiRun(execFileSync, run.databaseId);
     const jobs = data.jobs ?? [];
     const successful = job => job.status === 'completed' && job.conclusion === 'success';
     const ubuntu = jobs.some(job => successful(job) && /ubuntu/i.test(job.name));
@@ -80,16 +71,16 @@ export function verifyLatestCi(execSync, log, {
     }
   }
   const jobSummary = candidates.map(run => {
-    const data = readCiRun(execSync, run.databaseId, execFileSync);
+    const data = readCiRun(execFileSync, run.databaseId);
     const jobs = Array.isArray(data.jobs) ? data.jobs : [];
     return `${run.url ? `[run ${run.databaseId}](${run.url})` : `run ${run.databaseId}`}: ${jobs.map(job => `${job.url ? `[${job.name}](${job.url})` : job.name} [${job.status}/${job.conclusion}]`).join(', ')}`;
   }).join('; ');
   throw new Error(`Successful GitHub Actions run for ${headSha} lacks passing Ubuntu and Windows jobs. Jobs: ${jobSummary}`);
 }
 
-function validateRepository(execSync, fs, failures) {
+function validateRepository(execFileSync, fs, failures) {
   try {
-    const branch = command(execSync, 'git branch --show-current').trim();
+    const branch = execFileSync('git', ['branch', '--show-current'], { encoding: 'utf8' }).trim();
     if (branch !== 'main') failures.push(`BLOCKED: release validation must run on main (current branch: ${branch || 'detached'}). Action: check out main and rerun tagit preflight.`);
   } catch (error) { failures.push(failureMessage('branch validation', error)); }
   for (const file of ['package.json', 'README.md', 'RELEASE_NOTES.md', '.github/workflows/nodejs.yml']) {
@@ -103,15 +94,15 @@ function validateRepository(execSync, fs, failures) {
   } catch (error) { failures.push(failureMessage('package metadata validation', error)); }
   const secretPattern = /(^|[\\/])(?:\.env(?:$|\.(?!example$))|id_rsa(?:\.|$)|credentials(?:\.|[\\/]|$)|secrets?(?:\.|[\\/]|$))/i;
   try {
-    const secrets = command(execSync, 'git ls-files').split(/\r?\n/).filter(file => secretPattern.test(file));
+    const secrets = execFileSync('git', ['ls-files'], { encoding: 'utf8' }).split(/\r?\n/).filter(file => secretPattern.test(file));
     if (secrets.length) failures.push(`BLOCKED: tracked secret-looking files were found:\n${secrets.join('\n')}\nAction: remove secrets from Git and rerun tagit preflight.`);
   } catch (error) { failures.push(failureMessage('tracked-file validation', error)); }
 }
 
-export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi = false, strictRepository = false, execFileSync = null } = {}) {
-  const status = command(execSync, 'git status --short --untracked-files=all').trim();
+export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, verifyCi = false, strictRepository = false } = {}) {
+  const status = execFileSync('git', ['status', '--short', '--untracked-files=all'], { encoding: 'utf8' }).trim();
   const failures = [];
-  if (strictRepository) validateRepository(execSync, fs, failures);
+  if (strictRepository) validateRepository(execFileSync, fs, failures);
   if (status) failures.push(`BLOCKED: uncommitted changes are present:\n${status}\nAction: commit and push these changes, wait for CI to pass on the new commit, then rerun tagit preflight.`);
 
   const checks = [
@@ -133,9 +124,7 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi 
         options.env = { ...process.env, npm_config_ignore_scripts: 'true' };
         delete options.env.npm_config_allow_scripts;
       }
-      output = execFileSync
-        ? execFileSync(resolveExecutable(executable), args, options)
-        : command(execSync, `${executable} ${args.join(' ')}`, options);
+      output = execFileSync(resolveExecutable(executable), args, options);
     } catch (error) {
       output = `${error.stdout ?? ''}\n${error.stderr ?? ''}`;
       results[name] = { passed: false };
@@ -152,8 +141,8 @@ export function runPreflight(execSync, fs, log, { ignore100x4 = false, verifyCi 
     if (status) {
       results.ci = { passed: false, blocked: true };
     } else try {
-      const headSha = command(execSync, 'git rev-parse HEAD').trim();
-      results.ci = verifyLatestCi(execSync, log, { headSha, execFileSync });
+      const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      results.ci = verifyLatestCi(execFileSync, log, { headSha });
     } catch (error) {
       results.ci = { passed: false };
       failures.push(`BLOCKED: GitHub CI verification failed: ${error.message}\nAction: push the current commit, wait for successful Ubuntu and Windows CI, then rerun tagit preflight.`);

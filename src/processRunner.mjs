@@ -2,9 +2,15 @@ import { execFileSync as defaultExecFileSync } from 'node:child_process';
 import { execFile as defaultExecFile } from 'node:child_process';
 
 /**
- * Process-runner contract: callers provide an executable and an argument array
- * separately; options are passed directly to Node's child-process API. Shell
- * strings and shell options are intentionally outside this interface.
+ * The sole process boundary for tagit.
+ *
+ * Contract:
+ * - every caller supplies a callable runner explicitly;
+ * - executable and arguments are separate values;
+ * - arguments must be an array and are never shell-parsed;
+ * - Node child-process options are passed through unchanged;
+ * - shell command strings, shell fallback paths, and omitted runners are not
+ *   supported by the application API.
  */
 export function runProcess(execFileSync = defaultExecFileSync, executable, args = [], options = {}) {
   if (typeof executable !== 'string' || !executable) {

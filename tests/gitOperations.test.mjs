@@ -31,9 +31,9 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['test'], { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npx.cmd', ['webpack'], { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('git', ['add', '-A'], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Dry run complete: ${mockVersion} was not released`);
   });
 
@@ -52,13 +52,13 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion, { dryRun: true });
 
-    expect(execSyncMock).not.toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm.cmd', ['test'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('continues when npm outdated has no output', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
-    execSyncMock.mockImplementation((command) => command === 'npm outdated --json' ? '' : undefined);
+    execSyncMock.mockImplementation((executable, args) => executable === 'npm.cmd' && args.join(' ') === 'outdated --json' ? '' : undefined);
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
@@ -67,14 +67,14 @@ describe('gitOperations', () => {
 
   test('returns the pushed commit SHA', () => {
     fsMock.existsSync.mockReturnValue(false);
-    execSyncMock.mockImplementation((command) => command === 'git rev-parse HEAD' ? 'abc123\n' : undefined);
+    execSyncMock.mockImplementation((executable, args) => executable === 'git' && args.join(' ') === 'rev-parse HEAD' ? 'abc123\n' : undefined);
     expect(gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toEqual({ commitSha: 'abc123', tag: `v${mockVersion}` });
   });
 
   test('continues when npm outdated output is invalid', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
-    execSyncMock.mockImplementation((command) => command === 'npm outdated --json' ? '{bad json' : undefined);
+    execSyncMock.mockImplementation((executable, args) => executable === 'npm.cmd' && args.join(' ') === 'outdated --json' ? '{bad json' : undefined);
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
@@ -84,20 +84,20 @@ describe('gitOperations', () => {
   test('uses npm outdated error stdout and upgrades listed dependencies', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'npm outdated --json') throw { stdout: JSON.stringify({ lodash: {} }) };
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'npm.cmd' && args.join(' ') === 'outdated --json') throw { stdout: JSON.stringify({ lodash: {} }) };
     });
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm install lodash@latest', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install', 'lodash@latest'], { stdio: 'inherit' });
   });
 
   test('ignores npm outdated failures without stdout', () => {
     fsMock.existsSync.mockImplementation((file) => file === 'package.json');
     fsMock.readFileSync.mockReturnValue(JSON.stringify({ scripts: {}, dependencies: {} }));
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'npm outdated --json') throw new Error('outdated unavailable');
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'npm.cmd' && args.join(' ') === 'outdated --json') throw new Error('outdated unavailable');
     });
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
@@ -107,8 +107,8 @@ describe('gitOperations', () => {
 
   test('does not restore absent version snapshots on failure', () => {
     fsMock.existsSync.mockReturnValue(false);
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'git add -A') throw new Error('git failed');
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'git' && args.join(' ') === 'add -A') throw new Error('git failed');
     });
 
     expect(() => gitOperations(execSyncMock, fsMock, logMock, mockVersion)).toThrow('git failed');
@@ -126,33 +126,33 @@ describe('gitOperations', () => {
 
     expect(logMock.info).toHaveBeenCalledWith('Starting git operations');
     expect(logMock.info).toHaveBeenCalledWith('composer.json exists - running composer update');
-    expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer update', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('composer.cmd', ['update'], expect.objectContaining({ stdio: 'inherit', env: expect.objectContaining({ COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' }) }));
     expect(logMock.info).toHaveBeenCalledWith('Running composer bump');
-    expect(execSyncMock).toHaveBeenCalledWith('COMPOSER_HOME="." COMPOSER_ALLOW_SUPERUSER=1 composer bump', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('composer.cmd', ['bump'], expect.objectContaining({ stdio: 'inherit', env: expect.objectContaining({ COMPOSER_HOME: '.', COMPOSER_ALLOW_SUPERUSER: '1' }) }));
     expect(logMock.info).toHaveBeenCalledWith('package.json exists - running npm install');
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
     expect(logMock.info).toHaveBeenCalledWith('Running npm update');
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('package.json has test script - running npm test');
-    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['test'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
-    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['run', 'build'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
     expect(logMock.info).toHaveBeenCalledWith('Adding all changes to git');
-    expect(execSyncMock).toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['add', '-A'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith(`Committing with message: Version ${mockVersion} - ${dateFormatted}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git commit -m ${JSON.stringify(`Version ${mockVersion} - ${dateFormatted}`)}`, { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['commit', '-m', `Version ${mockVersion} - ${dateFormatted}`], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: v${mockVersion}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git tag v${mockVersion}`, { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['tag', `v${mockVersion}`], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing commits to origin');
-    expect(execSyncMock).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['push'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('Pushing tags to origin');
-    expect(execSyncMock).toHaveBeenCalledWith('git push --tags', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['push', '--tags'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('Git operations complete');
   });
 
@@ -190,15 +190,15 @@ describe('gitOperations', () => {
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
     expect(logMock.info).toHaveBeenCalledWith('Starting git operations');
-    expect(execSyncMock).toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['add', '-A'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith(`Committing with message: Version ${mockVersion} - ${dateFormatted}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git commit -m ${JSON.stringify(`Version ${mockVersion} - ${dateFormatted}`)}`, { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['commit', '-m', `Version ${mockVersion} - ${dateFormatted}`], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith(`Tagging commit with tag: v${mockVersion}`);
-    expect(execSyncMock).toHaveBeenCalledWith(`git tag v${mockVersion}`, { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['tag', `v${mockVersion}`], { stdio: 'inherit' });
     expect(logMock.info).toHaveBeenCalledWith('Pushing commits to origin');
-    expect(execSyncMock).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['push'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('Pushing tags to origin');
-    expect(execSyncMock).toHaveBeenCalledWith('git push --tags', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('git', ['push', '--tags'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('skips webpack build when package.json does not use webpack', () => {
@@ -210,13 +210,13 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm.cmd', ['run', 'webpack'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx.cmd', ['webpack'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('runs webpack build when webpack.config.js exists', () => {
@@ -229,7 +229,7 @@ describe('gitOperations', () => {
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
     expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
-    expect(execSyncMock).toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npx.cmd', ['webpack'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
   });
 
@@ -243,8 +243,8 @@ describe('gitOperations', () => {
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
     expect(logMock.info).toHaveBeenCalledWith('webpack detected - running webpack build');
-    expect(execSyncMock).toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['run', 'webpack'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx.cmd', ['webpack'], expect.objectContaining({ stdio: 'inherit' }));
     expect(logMock.info).toHaveBeenCalledWith('webpack build complete');
   });
 
@@ -257,9 +257,9 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('npm run webpack', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('npx webpack', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['run', 'build'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('npm.cmd', ['run', 'webpack'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('npx.cmd', ['webpack'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('restores version files if npm update fails', () => {
@@ -271,8 +271,8 @@ describe('gitOperations', () => {
 
       return JSON.stringify({ version: '1.0.41', scripts: {} });
     });
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'npm update') {
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'npm.cmd' && args.join(' ') === 'update') {
         throw new Error('npm failed');
       }
     });
@@ -281,12 +281,12 @@ describe('gitOperations', () => {
 
     expect(fsMock.writeFileSync).toHaveBeenCalledWith('composer.json', JSON.stringify({ version: '1.0.41' }), 'utf-8');
     expect(fsMock.writeFileSync).toHaveBeenCalledWith('package.json', JSON.stringify({ version: '1.0.41', scripts: {} }), 'utf-8');
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
-    expect(execSyncMock).not.toHaveBeenCalledWith('git add -A', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).not.toHaveBeenCalledWith('git', ['add', '-A'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('runs npm test before build when defined', () => {
@@ -298,13 +298,13 @@ describe('gitOperations', () => {
 
     gitOperations(execSyncMock, fsMock, logMock, mockVersion);
 
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm install', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm outdated --json', { encoding: 'utf-8' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm update', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm test', { stdio: 'inherit' });
-    expect(execSyncMock).toHaveBeenCalledWith('npm run build', { stdio: 'inherit' });
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['install'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['outdated', '--json'], expect.objectContaining({ encoding: 'utf-8' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['test'], expect.objectContaining({ stdio: 'inherit' }));
+    expect(execSyncMock).toHaveBeenCalledWith('npm.cmd', ['run', 'build'], expect.objectContaining({ stdio: 'inherit' }));
   });
 
   test('restores version files if npm test fails', () => {
@@ -314,8 +314,8 @@ describe('gitOperations', () => {
       scripts: { test: 'jest', build: 'webpack' },
       dependencies: { webpack: '^5.0.0' }
     }));
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'npm test') {
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'npm.cmd' && args.join(' ') === 'test') {
         throw new Error('tests failed');
       }
     });
@@ -336,8 +336,8 @@ describe('gitOperations', () => {
       scripts: { build: 'webpack' },
       dependencies: { webpack: '^5.0.0' }
     }));
-    execSyncMock.mockImplementation((command) => {
-      if (command === 'npm run build') {
+    execSyncMock.mockImplementation((executable, args) => {
+      if (executable === 'npm.cmd' && args.join(' ') === 'run build') {
         throw new Error('build failed');
       }
     });
@@ -355,7 +355,7 @@ test('uses argument arrays for release Git mutations when injected', () => {
   const execSync = jest.fn();
   const execFileSync = jest.fn((executable, args) => args[0] === 'rev-parse' ? 'abc\n' : '');
   const fs = { existsSync: jest.fn(() => false), readFileSync: jest.fn(), writeFileSync: jest.fn() };
-  const result = gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.0', { execFileSync });
+  const result = gitOperations(execFileSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.0');
   expect(result).toEqual({ commitSha: 'abc', tag: 'v1.0.0' });
   expect(execFileSync).toHaveBeenCalledWith('git', ['commit', '-m', expect.stringContaining('Version 1.0.0')], expect.any(Object));
   expect(execSync).not.toHaveBeenCalled();
@@ -373,7 +373,7 @@ test('uses the injected platform-resolved npm runner for package refreshes', () 
     readFileSync: jest.fn(() => JSON.stringify({ version: '1.0.0' })),
     writeFileSync: jest.fn(),
   };
-  gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+  gitOperations(execFileSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1');
   expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['install'], expect.any(Object));
   expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['update'], expect.any(Object));
   expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['install', 'lodash@latest'], expect.any(Object));
@@ -388,7 +388,7 @@ test('uses argument arrays for Composer and npm test execution', () => {
     readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ version: '1.0.0', scripts: { test: 'test' } }) : '{}'),
     writeFileSync: jest.fn(),
   };
-  gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+  gitOperations(execFileSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1');
   expect(execFileSync).toHaveBeenCalledWith('composer.cmd', ['update'], expect.objectContaining({ stdio: 'inherit' }));
   expect(execFileSync).toHaveBeenCalledWith('composer.cmd', ['bump'], expect.objectContaining({ stdio: 'inherit' }));
   expect(execFileSync).toHaveBeenCalledWith('npm.cmd', ['test'], expect.objectContaining({ stdio: 'inherit' }));
@@ -407,7 +407,7 @@ test('uses argument arrays for each webpack execution mode', () => {
       readFileSync: jest.fn(() => JSON.stringify({ version: '1.0.0', ...packageData })),
       writeFileSync: jest.fn(),
     };
-    gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+    gitOperations(execFileSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1');
     expect(execSync).not.toHaveBeenCalled();
   }
 });

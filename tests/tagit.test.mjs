@@ -85,7 +85,7 @@ test('release runs the release operation for an explicit version', async () => {
   const gitOperations = jest.fn();
   await runTagit({ updateVersionFiles, gitOperations, verifyRelease: noop, runPreflight: noop, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', '2.4.0']);
   expect(updateVersionFiles).toHaveBeenCalledWith(expect.anything(), log, { targetVersion: '2.4.0' });
-  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0', { execFileSync: expect.any(Function) });
+  expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, '2.4.0');
 });
 
 test('release passes the coverage waiver through preflight', async () => {
@@ -102,7 +102,7 @@ test('release-wait monitors the latest tag without release side effects', async 
   const verifyRelease = jest.fn().mockResolvedValue({});
   await runTagit({ execSync, execFileSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
   expect(execFileSync).toHaveBeenCalledWith('git', ['rev-list', '-n', '1', 'v2.4.0']);
-  expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' }, execFile: expect.any(Function) });
+  expect(verifyRelease).toHaveBeenCalledWith(execFileSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' }, execFile: expect.any(Function) });
 });
 
 test('push pushes commits without staging and reports CI links', async () => {
@@ -112,7 +112,7 @@ test('push pushes commits without staging and reports CI links', async () => {
   const reportCiLinks = jest.fn();
   await runTagit({ output, execSync, execFileSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
   expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
-  expect(reportCiLinks).toHaveBeenCalledWith(execSync, log, 'abc', { attempts: 10, delayMs: 2000, execFileSync });
+  expect(reportCiLinks).toHaveBeenCalledWith(execFileSync, log, 'abc', { attempts: 10, delayMs: 2000 });
 });
 
 test('push reports failures', async () => {

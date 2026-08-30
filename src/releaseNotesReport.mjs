@@ -2,8 +2,8 @@ import { suggestVersion } from './versionSuggestion.mjs';
 
 const OUTPUT_LIMIT = 12000;
 
-export function buildNotesReport(execSync, fs, execFileSync) {
-  const suggestion = suggestVersion(execSync, fs, execFileSync);
+export function buildNotesReport(fs, execFileSync) {
+  const suggestion = suggestVersion(fs, execFileSync);
   const tag = suggestion.latestTag;
   const command = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
   const commits = command(['log', '--oneline', '--decorate', `${tag}..HEAD`]);

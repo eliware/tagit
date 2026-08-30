@@ -33,10 +33,10 @@ test('updates only mapped image references and validates overlays', () => {
   expect(result.files).toEqual(['apps/ask/base/deployment.yaml']);
   expect(files['/gitops/apps/ask/base/deployment.yaml']).toContain(`ghcr.io/eliware/ask:v1.1.7@${digest}`);
   expect(files['/gitops/apps/ask/base/deployment.yaml']).toContain('busybox:1.36');
-  expect(execSync).toHaveBeenCalledWith('kubectl kustomize .', { cwd: path.resolve('/gitops/apps/ask/base'), stdio: 'inherit' });
+  expect(execSync).toHaveBeenCalledWith('kubectl', ['kustomize', '.'], { cwd: path.resolve('/gitops/apps/ask/base'), stdio: 'inherit' });
   const execFileSync = jest.fn();
-  updateGitOpsPins(fs, execSync, { info: jest.fn() }, {
-    gitopsRoot: '/gitops', sourceRepository: 'eliware/ask', version: '1.1.8', digest, execFileSync,
+  updateGitOpsPins(fs, execFileSync, { info: jest.fn() }, {
+    gitopsRoot: '/gitops', sourceRepository: 'eliware/ask', version: '1.1.8', digest,
   });
   expect(execFileSync).toHaveBeenCalledWith('kubectl', ['kustomize', '.'], { cwd: path.resolve('/gitops/apps/ask/base'), stdio: 'inherit' });
 });
