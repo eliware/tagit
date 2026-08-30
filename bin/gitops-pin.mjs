@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { updateGitOpsPins } from '../src/gitopsPins.mjs';
 
 function value(args, name) {
@@ -17,6 +17,7 @@ try {
     version: value(args, '--version'),
     digest: value(args, '--digest'),
     dryRun: args.includes('--dry-run'),
+    execFileSync,
   });
   console.log(JSON.stringify({ ok: true, ...result }));
 } catch (error) {

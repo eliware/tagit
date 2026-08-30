@@ -33,6 +33,7 @@ export function updateGitOpsPins(fs, execSync, log, {
   version,
   digest,
   dryRun = false,
+  execFileSync = null,
 } = {}) {
   if (!gitopsRoot || !sourceRepository) throw new Error('GitOps root and source repository are required.');
   if (!VERSION_RE.test(version ?? '')) throw new Error(`Invalid release version: ${version}`);
@@ -58,7 +59,8 @@ export function updateGitOpsPins(fs, execSync, log, {
     }
     if (!dryRun) {
       log.info(`Validating GitOps overlay ${pin.overlay}`);
-      execSync('kubectl kustomize .', { cwd: safeRelativePath(gitopsRoot, pin.overlay), stdio: 'inherit' });
+      if (execFileSync) execFileSync('kubectl', ['kustomize', '.'], { cwd: safeRelativePath(gitopsRoot, pin.overlay), stdio: 'inherit' });
+      else execSync('kubectl kustomize .', { cwd: safeRelativePath(gitopsRoot, pin.overlay), stdio: 'inherit' });
     }
   }
   return { pins: pins.length, files: [...new Set(changed)] };
