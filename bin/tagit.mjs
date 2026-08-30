@@ -49,7 +49,7 @@ export async function runTagit(overrides = {}, argv = []) {
   registerHandlersFn({ log });
   registerSignalsFn({ log });
   if (options.command === 'notes') {
-    (overrides.output ?? console.log)(buildNotesReport(execSync, fs));
+    (overrides.output ?? console.log)(buildNotesReport(execSync, fs, execFileSync));
     return;
   }
   if (options.command === 'push') {
