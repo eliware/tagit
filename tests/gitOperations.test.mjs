@@ -360,3 +360,22 @@ test('uses argument arrays for release Git mutations when injected', () => {
   expect(execFileSync).toHaveBeenCalledWith('git', ['commit', '-m', expect.stringContaining('Version 1.0.0')], expect.any(Object));
   expect(execSync).not.toHaveBeenCalled();
 });
+
+test('uses the injected platform-resolved npm runner for package refreshes', () => {
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((executable, args) => {
+    if (args[0] === 'outdated') return JSON.stringify({ lodash: { current: '1.0.0', latest: '2.0.0' } });
+    if (args[0] === 'rev-parse') return 'abc\n';
+    return '';
+  });
+  const fs = {
+    existsSync: jest.fn(file => file === 'package.json'),
+    readFileSync: jest.fn(() => JSON.stringify({ version: '1.0.0' })),
+    writeFileSync: jest.fn(),
+  };
+  gitOperations(execSync, fs, { info: jest.fn(), error: jest.fn() }, '1.0.1', { execFileSync });
+  expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['install'], expect.any(Object));
+  expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['update'], expect.any(Object));
+  expect(execFileSync).toHaveBeenCalledWith(expect.stringMatching(/^npm(?:\.cmd)?$/), ['install', 'lodash@latest'], expect.any(Object));
+  expect(execSync).not.toHaveBeenCalled();
+});

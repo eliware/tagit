@@ -1,3 +1,5 @@
+import { resolveExecutable } from './processRunner.mjs';
+
 function usesWebpack(packageData, fs) {
     const sections = [packageData?.dependencies, packageData?.devDependencies, packageData?.peerDependencies, packageData?.optionalDependencies];
     const hasWebpackPackage = sections.some((section) => section && Object.prototype.hasOwnProperty.call(section, 'webpack'));
@@ -21,10 +23,10 @@ function runWebpackBuild(execSync, packageData) {
 }
 
 
-function updateOutdatedDependencies(execSync, log) {
+function updateOutdatedDependencies(execSync, log, execFileSync = null) {
     let output = '';
     try {
-        output = execSync('npm outdated --json', { encoding: 'utf-8' }) || '';
+        output = execFileSync ? execFileSync(resolveExecutable('npm'), ['outdated', '--json'], { encoding: 'utf-8' }) : execSync('npm outdated --json', { encoding: 'utf-8' });
     } catch (error) {
         // npm outdated exits with status 1 when outdated packages are found.
         output = error.stdout || '';
@@ -40,7 +42,8 @@ function updateOutdatedDependencies(execSync, log) {
     }
     for (const name of Object.keys(outdated)) {
         log.info(`Updating outdated dependency to latest: ${name}`);
-        execSync(`npm install ${name}@latest`, { stdio: 'inherit' });
+        if (execFileSync) execFileSync(resolveExecutable('npm'), ['install', `${name}@latest`], { stdio: 'inherit' });
+        else execSync(`npm install ${name}@latest`, { stdio: 'inherit' });
     }
 }
 
@@ -69,6 +72,7 @@ function ensureReleaseVersion(fs, file, newVersion) {
 }
 
 export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, skipChecks = false, execFileSync = null } = {}) {
+    const npm = resolveExecutable('npm');
     const runFile = (executable, args, options = {}) => {
         if (execFileSync) return execFileSync(executable, args, options);
         const command = executable === 'git' && args[0] === 'commit'
@@ -116,10 +120,10 @@ export function gitOperations(execSync, fs, log, newVersion, { dryRun = false, s
 
         if (fs.existsSync('package.json')) {
             log.info('package.json exists - running npm install');
-            execSync('npm install', { stdio: 'inherit' });
-            updateOutdatedDependencies(execSync, log);
+            if (execFileSync) execFileSync(npm, ['install'], { stdio: 'inherit' }); else execSync('npm install', { stdio: 'inherit' });
+            updateOutdatedDependencies(execSync, log, execFileSync);
             log.info('Running npm update');
-            execSync('npm update', { stdio: 'inherit' });
+            if (execFileSync) execFileSync(npm, ['update'], { stdio: 'inherit' }); else execSync('npm update', { stdio: 'inherit' });
 
             // npm may rewrite root package metadata while refreshing dependencies.
             // Reassert the release version before reading, committing, and tagging.
