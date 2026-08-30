@@ -1,4 +1,5 @@
 export const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+export function npmExecutable(platform = process.platform) { return platform === 'win32' ? 'npm.cmd' : 'npm'; }
 
 export async function releaseCommand(execFile, executable, args, options = { encoding: 'utf8' }) {
   if (typeof execFile !== 'function') throw new TypeError('An execFile runner is required.');
@@ -13,6 +14,10 @@ export async function releaseCommand(execFile, executable, args, options = { enc
 
 function json(execSync, command) {
   return JSON.parse(execSync(command, { encoding: 'utf8' }));
+}
+
+async function jsonAsync(execFile, executable, args) {
+  return JSON.parse(await releaseCommand(execFile, executable, args));
 }
 
 function repositoryName(execSync) {
@@ -49,17 +54,21 @@ export function reportCiLinks(execSync, log, headSha, { attempts = 1, delayMs = 
 
 export async function verifyRelease(execSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
-  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false,
+  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false, execFile = null,
 } = {}) {
   const repo = repositoryName(execSync);
   const tag = `v${version}`;
   const headSha = release.commitSha;
   let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
-    const runs = json(execSync, `gh run list --repo ${repo} --limit 50 --json databaseId,status,conclusion,headSha,headBranch,url`);
+    const runs = execFile
+      ? await jsonAsync(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '50', '--json', 'databaseId,status,conclusion,headSha,headBranch,url'])
+      : json(execSync, `gh run list --repo ${repo} --limit 50 --json databaseId,status,conclusion,headSha,headBranch,url`);
     const candidate = runs.find(item => item.headSha === headSha && item.headBranch === tag);
     if (candidate) {
-      const details = json(execSync, `gh run view ${candidate.databaseId} --repo ${repo} --json status,conclusion,headSha,jobs,url`);
+      const details = execFile
+        ? await jsonAsync(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url'])
+        : json(execSync, `gh run view ${candidate.databaseId} --repo ${repo} --json status,conclusion,headSha,jobs,url`);
       if (linksOnly || details.status === 'completed') { run = { ...candidate, ...details }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }
@@ -95,7 +104,9 @@ export async function verifyRelease(execSync, fs, log, {
     let published = false;
     for (let attempt = 0; attempt < npmRetries; attempt += 1) {
       try {
-        const visible = execSync(`npm view ${packageData.name}@${version} version`, { encoding: 'utf8' }).trim();
+        const visible = execFile
+          ? (await releaseCommand(execFile, npmExecutable(), ['view', `${packageData.name}@${version}`, 'version'])).trim()
+          : execSync(`npm view ${packageData.name}@${version} version`, { encoding: 'utf8' }).trim();
         if (visible === version) { published = true; break; }
       } catch { /* Registry propagation can temporarily return 404. */ }
       await sleep(npmRetryMs);
@@ -106,7 +117,9 @@ export async function verifyRelease(execSync, fs, log, {
 
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
-    const versions = json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
+    const versions = execFile
+      ? await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`])
+      : json(execSync, `gh api --paginate /orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`);
     const image = versions.find(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
     if (!image) throw new Error(`GHCR does not expose ${repo}:${version}.`);
     const imageDigest = image.name?.startsWith('sha256:') ? image.name : null;

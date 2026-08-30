@@ -1,5 +1,10 @@
 import { jest } from '@jest/globals';
-import { releaseCommand, reportCiLinks, sleepDefault, verifyRelease } from '../src/releaseVerification.mjs';
+import { npmExecutable, releaseCommand, reportCiLinks, sleepDefault, verifyRelease } from '../src/releaseVerification.mjs';
+
+test('selects the npm executable for each platform', () => {
+  expect(npmExecutable('win32')).toBe('npm.cmd');
+  expect(npmExecutable('linux')).toBe('npm');
+});
 
 test('release command adapter preserves executable and argument boundaries', async () => {
   const execFile = jest.fn((executable, args, options, callback) => callback(null, 'ok', ''));
@@ -16,6 +21,44 @@ test('release command adapter propagates process errors and output', async () =>
 test('release command adapter validates its inputs', async () => {
   await expect(releaseCommand(null, 'gh', [])).rejects.toThrow();
   await expect(releaseCommand(jest.fn(), 'gh', 'run')).rejects.toThrow();
+});
+
+test('verifyRelease uses the injected async runner for GitHub inspection', async () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFile = jest.fn((executable, args, options, callback) => {
+    if (args[1] === 'list') callback(null, JSON.stringify([{ databaseId: 4, headSha: 'abc', headBranch: 'v1.0.0', url: 'https://ci' }]), '');
+    else callback(null, JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [] }), '');
+  });
+  await expect(verifyRelease(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, {
+    version: '1.0.0', release: { commitSha: 'abc' }, linksOnly: true, initialDelayMs: 0, execFile,
+  })).resolves.toMatchObject({ linksOnly: true, runId: 4 });
+  expect(execFile).toHaveBeenCalledWith('gh', expect.arrayContaining(['run', 'list']), expect.any(Object), expect.any(Function));
+});
+
+test('verifyRelease uses the async runner for GHCR verification', async () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFile = jest.fn((executable, args, options, callback) => {
+    if (args[1] === 'list') callback(null, JSON.stringify([{ databaseId: 4, headSha: 'abc', headBranch: 'v1.0.0', url: 'https://ci' }]), '');
+    else if (args[1] === 'view') callback(null, JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' }, { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] }), '');
+    else callback(null, JSON.stringify([{ name: 'sha256:abc', metadata: { container: { tags: ['1.0.0'] } } }]), '');
+  });
+  const fs = { existsSync: jest.fn(file => file === '.github/workflows' || file === 'ci.yml'), readdirSync: jest.fn(() => ['ci.yml']), readFileSync: jest.fn(() => 'ghcr.io/eliware/demo') };
+  await expect(verifyRelease(execSync, fs, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, initialDelayMs: 0, execFile })).resolves.toMatchObject({ ghcr: true, imageDigest: 'sha256:abc' });
+});
+
+test('verifyRelease uses the async runner for npm visibility', async () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFile = jest.fn((executable, args, options, callback) => {
+    if (args[1] === 'list') callback(null, JSON.stringify([{ databaseId: 4, headSha: 'abc', headBranch: 'v1.0.0', url: 'https://ci' }]), '');
+    else if (args[1] === 'view') callback(null, JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' }, { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] }), '');
+    else callback(null, '1.0.0\n', '');
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json' || file === '.github/workflows'), readdirSync: jest.fn(() => []), readFileSync: jest.fn(() => JSON.stringify({ name: 'demo', private: false })) };
+  await expect(verifyRelease(execSync, fs, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, initialDelayMs: 0, execFile })).resolves.toMatchObject({ npm: true, ghcr: false });
 });
 
 test('resolves the default delay helper', async () => {
