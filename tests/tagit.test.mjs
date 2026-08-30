@@ -97,9 +97,11 @@ test('release passes the coverage waiver through preflight', async () => {
 });
 
 test('release-wait monitors the latest tag without release side effects', async () => {
-  const execSync = jest.fn(command => command.includes('describe') ? 'v2.4.0' : 'abc');
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((command, args) => args[0] === 'describe' ? 'v2.4.0' : 'abc');
   const verifyRelease = jest.fn().mockResolvedValue({});
-  await runTagit({ execSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
+  await runTagit({ execSync, execFileSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
+  expect(execFileSync).toHaveBeenCalledWith('git', ['rev-list', '-n', '1', 'v2.4.0']);
   expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' }, execFile: expect.any(Function) });
 });
 

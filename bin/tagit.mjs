@@ -74,8 +74,8 @@ export async function runTagit(overrides = {}, argv = []) {
 
   try {
     if (options.command === 'release-wait') {
-      const version = options.version ?? execSync('git describe --tags --abbrev=0').toString().trim().replace(/^v/, '');
-      const commitSha = execSync(`git rev-list -n 1 v${version}`).toString().trim();
+      const version = options.version ?? execFileSync('git', ['describe', '--tags', '--abbrev=0']).toString().trim().replace(/^v/, '');
+      const commitSha = execFileSync('git', ['rev-list', '-n', '1', `v${version}`]).toString().trim();
       await verifyRelease(execSync, fs, log, { version, release: { commitSha }, execFile });
       log.info(`Release ${version} verified successfully.`);
       return;
