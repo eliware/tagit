@@ -27,7 +27,9 @@ have passed.
 
 `--ignore-100x4` is a DevOps-only, explicitly documented waiver for
 `tagit preflight` or `tagit release`. It waives only the coverage threshold;
-all other gates remain mandatory. Project owners must not use it.
+all other gates remain mandatory. Preflight still runs the target project's
+declared `npm test` script; a successful command is not a test failure merely
+because it reports ignored coverage. Project owners must not use it.
 
 Release requires an explicit version; automatic bumping is unsupported. After
 preflight it updates metadata, commits, creates `vX.Y.Z`, and pushes on `main`.

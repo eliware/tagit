@@ -32,7 +32,9 @@ actionable remediation. Dirty changes block CI validation.
 
 DevOps may use `--ignore-100x4` with `tagit preflight` or `tagit release` only
 with an approved documented waiver. It waives only the coverage threshold;
-all other gates remain mandatory. Project owners may not use this flag.
+all other gates remain mandatory. Preflight still runs the target project's
+declared `npm test` script and reports successful execution even when that
+script intentionally ignores coverage. Project owners may not use this flag.
 
 `tagit push` pushes existing commits only. It never stages or commits changes,
 ignores untracked files, prints CI workflow/job links for the pushed HEAD, and

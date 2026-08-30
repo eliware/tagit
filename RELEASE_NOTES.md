@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2.4.1
+
+### Fixed
+
+- Fixed waived preflight test reporting so projects using
+  `--ignore-100x4` run their declared `npm test` script and report successful
+  execution correctly, including when coverage is intentionally ignored.
+- Preserved captured failure output for genuinely unsuccessful test commands.
+
 ## 2.4.0
 
 ### Added
