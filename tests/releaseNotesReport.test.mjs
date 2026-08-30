@@ -1,6 +1,13 @@
 import { jest } from '@jest/globals';
 import { buildNotesReport } from '../src/releaseNotesReport.mjs';
 
+test('uses shell-free Git arguments for notes when injected', () => {
+  const execFileSync = jest.fn((executable, args) => args[0] === 'describe' ? 'v2.0.0' : '');
+  const report = buildNotesReport(jest.fn(), { readFileSync: () => JSON.stringify({ version: '2.0.0' }) }, execFileSync);
+  expect(report).toContain('Range: v2.0.0..HEAD');
+  expect(execFileSync).toHaveBeenCalledWith('git', expect.arrayContaining(['log']), expect.any(Object));
+});
+
 test('builds a bounded AI release-notes report from the latest tag', () => {
   const execSync = jest.fn(command => {
     if (command === 'git describe --tags --abbrev=0') return 'v2.0.0';
