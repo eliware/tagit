@@ -105,16 +105,17 @@ test('release-wait monitors the latest tag without release side effects', async 
 
 test('push pushes commits without staging and reports CI links', async () => {
   const output = jest.fn();
-  const execSync = jest.fn(command => command === 'git rev-parse HEAD' ? 'abc' : '');
+  const execSync = jest.fn();
+  const execFileSync = jest.fn((command, args) => args[0] === 'rev-parse' ? 'abc' : '');
   const reportCiLinks = jest.fn();
-  await runTagit({ output, execSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
-  expect(execSync).toHaveBeenCalledWith('git push', { stdio: 'inherit' });
+  await runTagit({ output, execSync, execFileSync, reportCiLinks, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
+  expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
   expect(reportCiLinks).toHaveBeenCalledWith(execSync, log, 'abc', { attempts: 10, delayMs: 2000 });
 });
 
 test('push reports failures', async () => {
   const exit = jest.fn();
-  await runTagit({ execSync: jest.fn(() => { throw new Error('push failed'); }), exit, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
+  await runTagit({ execFileSync: jest.fn(() => { throw new Error('push failed'); }), exit, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
   expect(exit).toHaveBeenCalledWith(1);
 });
 
