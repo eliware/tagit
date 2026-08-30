@@ -100,7 +100,7 @@ test('release-wait monitors the latest tag without release side effects', async 
   const execSync = jest.fn(command => command.includes('describe') ? 'v2.4.0' : 'abc');
   const verifyRelease = jest.fn().mockResolvedValue({});
   await runTagit({ execSync, verifyRelease, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release-wait']);
-  expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' } });
+  expect(verifyRelease).toHaveBeenCalledWith(execSync, expect.anything(), log, { version: '2.4.0', release: { commitSha: 'abc' }, execFile: expect.any(Function) });
 });
 
 test('push pushes commits without staging and reports CI links', async () => {
