@@ -119,7 +119,7 @@ export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, verif
   ];
   if (fs.existsSync('package.json')) {
     const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    if (packageData.scripts?.test) checks.unshift(['test', ignore100x4 ? ['eliware-test', ['--ignore-100x4']] : ['npm', ['test']]]);
+    if (packageData.scripts?.test) checks.unshift(['test', ['npm', ['test']]]);
   }
 
   const results = {};

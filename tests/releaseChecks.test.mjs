@@ -82,6 +82,15 @@ test('reports bounded and empty command output', () => {
   expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('output truncated');
 });
 
+test('reports an empty output excerpt when a command exits unsuccessfully', () => {
+  const execSync = jest.fn((executable, args) => {
+    if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw new Error('test failed');
+    return '';
+  });
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow('Output: (no output captured)');
+});
+
 test('preflight runs clean-tree, test, lint, and audit gates', () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'All files     100     100     100     100';
@@ -132,7 +141,7 @@ test('preflight honors an explicit 100x4 waiver and audit fallback', () => {
   };
 
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty('test.passed', true);
-  expect(execSync).toHaveBeenCalledWith('eliware-test', ['--ignore-100x4'], expect.any(Object));
+  expectNpmCall(execSync, ['test']);
   expectNpmCall(execSync, ['audit', '--omit=dev', '--audit-level=moderate']);
 });
 
