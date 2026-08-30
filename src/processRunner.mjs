@@ -2,11 +2,9 @@ import { execFileSync as defaultExecFileSync } from 'node:child_process';
 import { execFile as defaultExecFile } from 'node:child_process';
 
 /**
- * Execute a program without invoking a shell.
- *
- * Keeping the executable and arguments separate prevents command or argument
- * interpolation from becoming shell syntax, while the injected runner keeps
- * callers straightforward to test.
+ * Process-runner contract: callers provide an executable and an argument array
+ * separately; options are passed directly to Node's child-process API. Shell
+ * strings and shell options are intentionally outside this interface.
  */
 export function runProcess(execFileSync = defaultExecFileSync, executable, args = [], options = {}) {
   if (typeof executable !== 'string' || !executable) {

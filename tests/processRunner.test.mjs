@@ -9,6 +9,12 @@ test('resolves command shims on Windows only', () => {
   expect(resolveExecutable('npm', 'linux')).toBe('npm');
 });
 
+test('keeps process arguments separate from command text', () => {
+  const execFileSync = jest.fn();
+  runProcess(execFileSync, 'tool', ['argument with spaces', '$(not-shell-code)']);
+  expect(execFileSync).toHaveBeenCalledWith('tool', ['argument with spaces', '$(not-shell-code)'], {});
+});
+
 test('passes executable, argument array, and options to the injected runner', () => {
   const execFileSync = jest.fn(() => 'output');
   const options = { encoding: 'utf8', timeout: 1000 };
