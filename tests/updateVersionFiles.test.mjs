@@ -124,4 +124,9 @@ describe('updateVersionFiles', () => {
       .rejects.toThrow('Invalid target version');
   });
 
+  test('rejects projects without a version file', async () => {
+    fsMock.existsSync.mockReturnValue(false);
+    await expect(updateVersionFiles(fsMock, logMock)).rejects.toThrow('No package.json');
+  });
+
 });

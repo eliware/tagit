@@ -49,7 +49,9 @@ export function updateGitOpsPins(fs, execFileSync, log, {
     for (const relativeFile of pin.files) {
       const file = safeRelativePath(gitopsRoot, relativeFile);
       const original = fs.readFileSync(file, 'utf8');
-      const escapedImage = pin.image.replace(/[.*+?^${}()|[\[\]\\]/g, '\\$&');
+      // Supported input is the repository's simple `image: name[:tag]` YAML form;
+      // full YAML parsing and arbitrary templating belong to the GitOps repository.
+      const escapedImage = pin.image.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`image:\\s*(${escapedImage})(?=[:@\\s])(?::[^\\s]+)?`, 'g');
       const updated = original.replace(pattern, replacement);
       const matches = original.match(pattern) ?? [];

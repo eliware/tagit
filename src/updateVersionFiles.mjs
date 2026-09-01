@@ -42,6 +42,7 @@ export async function updateVersionFiles(fs, log, { dryRun = false, targetVersio
       newVersion = targetVersion ?? incrementVersion(packageData.version);
       log.info(`Incremented package.json version to ${newVersion}`);
     } else {
+      // Composer is authoritative for mixed PHP/Node packages; synchronization is intentional.
       log.info(`Syncing package.json version to ${newVersion}`);
     }
     packageData.version = newVersion;
@@ -54,5 +55,6 @@ export async function updateVersionFiles(fs, log, { dryRun = false, targetVersio
     }
   }
 
+  if (!newVersion) throw new Error('No package.json or composer.json version was found.');
   return newVersion;
 }

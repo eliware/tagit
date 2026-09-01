@@ -122,7 +122,8 @@ export async function verifyRelease(execFileSync, fs, log, {
 
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
-    // TagIt publishes the repository-named GHCR image; custom image names require workflow-specific verification.
+    // Intentional scope: TagIt supports organization-owned, repository-named GHCR
+    // images only; personal registries and custom image names require workflow-specific verification.
     const [owner, imageName] = repo.split('/');
     const versions = await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`]);
     const image = versions.find(item => {

@@ -1,5 +1,22 @@
 # Release Notes
 
+## 2.5.0
+
+### Added
+
+- Added stricter validation for release versions, GitOps pin arguments, image
+  references, and malformed CI/GHCR responses.
+- Added regression coverage for command parsing, CI selection, tag refs, and
+  invalid version inputs.
+
+### Changed
+
+- Improved exact-HEAD CI selection and release verification across GitHub tag
+  reference formats.
+- Added read-only GitOps overlay validation during dry runs.
+- Improved upstream merge/push error handling and release-file restoration.
+- Updated the shared test harness to `@eliware/test` `2.3.0`.
+
 ## 2.4.2
 
 ### Changed

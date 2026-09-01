@@ -20,6 +20,7 @@ try {
   for (const option of ['--gitops-root', '--registry', '--source', '--version', '--digest']) {
     if (args.filter(item => item === option).length > 1) throw new Error(`Duplicate option: ${option}`);
   }
+  if (args.some(item => !item.startsWith('--') && !allowed.has(item))) throw new Error('Unexpected positional argument.');
   const result = updateGitOpsPins(fs, execFileSync, console, {
     gitopsRoot: value(args, '--gitops-root'),
     registryPath: value(args, '--registry') ?? 'apps/image-pins.json',

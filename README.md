@@ -12,13 +12,13 @@ Run from the target repository root:
 ```text
 tagit notes
 tagit preflight
-tagit preflight --ignore-100x4
 tagit push
 tagit push --dry-run
-tagit release --version X.Y.Z
-tagit release --version X.Y.Z --dry-run
-tagit release-wait
 ```
+
+Project owners use `notes`, `preflight`, and `push`. DevOps may additionally
+use `tagit preflight --ignore-100x4`, `tagit release --version X.Y.Z`,
+`tagit release --version X.Y.Z --dry-run`, and `tagit release-wait`.
 
 `tagit notes` is read-only. It summarizes changes since the latest tag,
 suggests a SemVer level, and gives concise instructions for release notes.

@@ -136,6 +136,16 @@ export function getReleaseVersion(argv) {
 export function parseOptions(argv) {
   const command = argv[0] && !['--help', '-h', '--version', '-v'].includes(argv[0]) ? argv[0] : undefined;
   if (command && !['notes', 'preflight', 'push', 'release', 'release-wait'].includes(command)) throw new Error(`Unknown command: ${command}`);
+  const allowed = new Set(['--help', '-h', '--version', '-v', '--dry-run', '--ignore-100x4']);
+  for (const argument of argv.slice(1)) {
+    if (argument.startsWith('-') && !allowed.has(argument)) throw new Error(`Unknown option: ${argument}`);
+  }
+  for (const option of ['--dry-run', '--ignore-100x4']) {
+    if (argv.filter(argument => argument === option).length > 1) throw new Error(`Duplicate option: ${option}`);
+  }
+  if (command && argv.includes('--version') && !['release', 'release-wait'].includes(command)) {
+    throw new Error('--version requires release or release-wait; use --version alone to query TagIt.');
+  }
   return {
     command,
     help: isHelp(argv),

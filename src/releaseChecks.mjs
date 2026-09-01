@@ -52,6 +52,8 @@ export function verifyLatestCi(execFileSync, log, {
   } catch (error) {
     throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}.`, { cause: error });
   }
+  // Preflight requires one newest exact-HEAD validation run with both platform jobs;
+  // unrelated workflows are intentionally not treated as deployment evidence.
   const matchingRuns = runs.filter(run => run.headSha === headSha).sort((a, b) => Number(b.databaseId) - Number(a.databaseId));
   const pending = matchingRuns.find(run => run.status !== 'completed');
   if (pending && waitForCompletion) {

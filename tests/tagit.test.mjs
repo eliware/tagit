@@ -13,6 +13,9 @@ test('supports release wait alongside preflight and release commands', () => {
   expect(parseOptions(['release', '--version', packageData.version])).toMatchObject({ command: 'release', version: packageData.version });
   expect(parseOptions(['release-wait'])).toMatchObject({ command: 'release-wait', version: null });
   expect(() => parseOptions(['--check'])).toThrow('Unknown command');
+  expect(() => parseOptions(['preflight', '--unknown'])).toThrow('Unknown option');
+  expect(() => parseOptions(['preflight', '--dry-run', '--dry-run'])).toThrow('Duplicate option');
+  expect(() => parseOptions(['preflight', '--version', '2.0.0'])).toThrow('requires release');
   expect(() => parseOptions(['release', '--version', 'next'])).toThrow('Invalid release version');
   expect(getReleaseVersion(['release'])).toBe(null);
   expect(helpText()).toContain('TAGIT RELEASE WORKFLOW');
