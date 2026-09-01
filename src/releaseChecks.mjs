@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 const COVERAGE_RE = /All files\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)\s*\|?\s*([\d.]+)/i;
 const CHECK_TIMEOUT_MS = 120000;
 const OUTPUT_LIMIT = 4000;
@@ -50,7 +52,8 @@ export function verifyLatestCi(execFileSync, log, {
   } catch (error) {
     throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}.`, { cause: error });
   }
-  const pending = runs.find(run => run.headSha === headSha && run.status !== 'completed');
+  const matchingRuns = runs.filter(run => run.headSha === headSha).sort((a, b) => Number(b.databaseId) - Number(a.databaseId));
+  const pending = matchingRuns.find(run => run.status !== 'completed');
   if (pending && waitForCompletion) {
     if (pending.url) log.info(`CI in progress; waiting for completion: [workflow run ${pending.databaseId}](${pending.url})`);
     try {
@@ -60,7 +63,7 @@ export function verifyLatestCi(execFileSync, log, {
     }
     return verifyLatestCi(execFileSync, log, { headSha, repository, waitForCompletion: false });
   }
-  const candidates = runs.filter(run => run.headSha === headSha && run.status === 'completed' && run.conclusion === 'success');
+  const candidates = matchingRuns.filter(run => run.status === 'completed' && run.conclusion === 'success');
   if (!candidates.length) {
     const matching = runs.filter(run => run.headSha === headSha);
     const details = matching.map(run => `${run.url ? `[run ${run.databaseId}](${run.url})` : `run ${run.databaseId}`} [${run.status}/${run.conclusion}]`).join(', ');
@@ -159,4 +162,3 @@ export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, verif
   if (failures.length) throw new Error(`Preflight found ${failures.length} issue(s):\n\n${failures.join('\n\n')}`);
   return results;
 }
-import path from 'node:path';

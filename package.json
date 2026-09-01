@@ -58,7 +58,7 @@
     },
     "homepage": "https://github.com/eliware/tagit#readme",
     "devDependencies": {
-        "@eliware/test": "^2.1.4"
+        "@eliware/test": "^2.3.0"
     },
     "dependencies": {
         "@eliware/common": "^2.0.0"

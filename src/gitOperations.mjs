@@ -103,6 +103,7 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
     let packageData = null;
     let composerSnapshot = null;
     let packageSnapshot = null;
+    let lockfileSnapshot = null;
 
     log.info('Starting git operations');
 
@@ -112,6 +113,9 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
 
     if (fs.existsSync('package.json')) {
         packageSnapshot = fs.readFileSync('package.json', 'utf-8');
+    }
+    if (fs.existsSync('package-lock.json')) {
+        lockfileSnapshot = fs.readFileSync('package-lock.json', 'utf-8');
     }
 
     try {
@@ -152,6 +156,8 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
         }
 
         log.info('Adding all changes to git');
+        // DevOps release runs begin after strict preflight on a clean tree; staging all generated metadata is intentional.
+        // This function is not an owner command and must never be used as a substitute for preflight.
         runFile('git', ['add', '-A'], { stdio: 'inherit' });
         log.info(`Committing with message: Version ${newVersion} - ${dateFormatted}`);
         // JSON string quoting produces a shell argument that works in both
@@ -173,6 +179,7 @@ export function gitOperations(execFileSync, fs, log, newVersion, { dryRun = fals
     } catch (err) {
         restoreFileVersion(fs, 'composer.json', composerSnapshot);
         restoreFileVersion(fs, 'package.json', packageSnapshot);
+        restoreFileVersion(fs, 'package-lock.json', lockfileSnapshot);
         log.error('A command failed during git operations. Version files were restored.');
         throw err;
     }

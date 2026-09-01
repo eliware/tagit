@@ -1,3 +1,5 @@
+import { execFile as defaultExecFile } from 'node:child_process';
+
 export const sleepDefault = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 export function waitSync(milliseconds) {
@@ -55,21 +57,27 @@ export function reportCiLinks(execFileSync, log, headSha, { attempts = 1, delayM
 
 export async function verifyRelease(execFileSync, fs, log, {
   version, release, initialDelayMs = 15000, pollMs = 10000, maxPolls = 30,
-  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false, execFile = null,
+  npmRetries = 5, npmRetryMs = 10000, sleep = sleepDefault, linksOnly = false, execFile = defaultExecFile,
 } = {}) {
+  // Scope boundary: TagIt verifies the organization's repository-named GHCR artifact;
+  // custom registries, deployment mutation, and rollback after remote publication belong
+  // to DevOps/GitOps and are intentionally outside this library's release contract.
   const repo = repositoryName(execFileSync);
   const tag = `v${version}`;
   const headSha = release.commitSha;
   let run;
+  if (initialDelayMs > 0) await sleep(initialDelayMs);
   for (let poll = 0; poll < maxPolls; poll += 1) {
     const runs = await jsonAsync(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '50', '--json', 'databaseId,status,conclusion,headSha,headBranch,url']);
-    const candidate = runs.find(item => item.headSha === headSha && item.headBranch === tag);
+    const candidate = runs
+      .filter(item => item.headSha === headSha && [tag, `refs/tags/${tag}`, ''].includes(item.headBranch ?? ''))
+      .sort((a, b) => Number(b.databaseId) - Number(a.databaseId))[0];
     if (candidate) {
       const details = await jsonAsync(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url']);
       if (linksOnly || details.status === 'completed') { run = { ...candidate, ...details }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }
-    await sleep(pollMs);
+    if (!run && poll + 1 < maxPolls) await sleep(pollMs);
   }
   if (!run) throw new Error(`Release CI did not complete for ${repo}@${tag} (${headSha})`);
   if (linksOnly) {
@@ -79,13 +87,15 @@ export async function verifyRelease(execFileSync, fs, log, {
     return { repo, tag, headSha, runId: run.databaseId, linksOnly: true };
   }
   const successful = job => job.status === 'completed' && job.conclusion === 'success';
-  const failed = run.jobs.filter(job => job.conclusion && job.conclusion !== 'success');
+  const jobs = Array.isArray(run.jobs) ? run.jobs : [];
+  // Missing jobs are treated as missing required platform evidence below.
+  const failed = jobs.filter(job => job.conclusion && job.conclusion !== 'success');
   if (failed.length) throw new Error(`Release CI failed: ${failed.map(job => `${job.name}: ${job.conclusion}`).join('; ')}`);
-  if (!run.jobs.some(job => successful(job) && /ubuntu/i.test(job.name))) throw new Error('Release CI lacks a successful Ubuntu job.');
-  if (!run.jobs.some(job => successful(job) && /windows/i.test(job.name))) throw new Error('Release CI lacks a successful Windows job.');
-  const publishJobs = run.jobs.filter(job => /publish/i.test(job.name));
-  const ubuntuJob = run.jobs.find(job => /ubuntu/i.test(job.name));
-  const windowsJob = run.jobs.find(job => /windows/i.test(job.name));
+  if (!jobs.some(job => successful(job) && /ubuntu/i.test(job.name))) throw new Error('Release CI lacks a successful Ubuntu job.');
+  if (!jobs.some(job => successful(job) && /windows/i.test(job.name))) throw new Error('Release CI lacks a successful Windows job.');
+  const publishJobs = jobs.filter(job => /publish/i.test(job.name));
+  const ubuntuJob = jobs.find(job => /ubuntu/i.test(job.name));
+  const windowsJob = jobs.find(job => /windows/i.test(job.name));
   const links = [
     ['Workflow', run.url],
     ['Ubuntu', ubuntuJob?.url],
@@ -112,8 +122,13 @@ export async function verifyRelease(execFileSync, fs, log, {
 
   const publishesGhcr = workflowFiles(fs).some(file => fs.readFileSync(`.github/workflows/${file}`, 'utf8').includes('ghcr.io'));
   if (publishesGhcr) {
-    const versions = await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${repo.split('/')[0]}/packages/container/${repo.split('/')[1]}/versions`]);
-    const image = versions.find(item => item.metadata.container.tags.includes(version) || item.metadata.container.tags.includes(tag));
+    // TagIt publishes the repository-named GHCR image; custom image names require workflow-specific verification.
+    const [owner, imageName] = repo.split('/');
+    const versions = await jsonAsync(execFile, 'gh', ['api', '--paginate', `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`]);
+    const image = versions.find(item => {
+      const tags = item.metadata?.container?.tags;
+      return Array.isArray(tags) && (tags.includes(version) || tags.includes(tag));
+    });
     if (!image) throw new Error(`GHCR does not expose ${repo}:${version}.`);
     const imageDigest = image.name?.startsWith('sha256:') ? image.name : null;
     log.info(`GHCR verified: ${repo}:${version}.`);

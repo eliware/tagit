@@ -50,6 +50,22 @@ test('verifyRelease uses the injected async runner for GitHub inspection', async
   expect(execFile).toHaveBeenCalledWith('gh', expect.arrayContaining(['run', 'list']), expect.any(Object), expect.any(Function));
 });
 
+test('accepts refs/tags release workflow branches', async () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFile = jest.fn((executable, args, options, callback) => callback(null,
+    args[1] === 'list' ? JSON.stringify([
+      { databaseId: 5, headSha: 'abc', headBranch: 'refs/tags/v1.0.0' },
+      { databaseId: 4, headSha: 'abc' },
+    ])
+      : JSON.stringify({ status: 'completed', conclusion: 'success', jobs: [
+        { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
+        { name: 'Windows', status: 'completed', conclusion: 'success' },
+      ] }), ''));
+  await expect(verifyRelease(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, {
+    version: '1.0.0', release: { commitSha: 'abc' }, initialDelayMs: 0, execFile,
+  })).resolves.toMatchObject({ repo: 'eliware/demo', ci: true });
+});
+
 test('verifyRelease uses the async runner for GHCR verification', async () => {
   const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
   const execFile = jest.fn((executable, args, options, callback) => {
@@ -214,6 +230,16 @@ test('rejects missing platform jobs and npm propagation exhaustion', async () =>
     args[1] === 'list' ? JSON.stringify([{ databaseId: 1, headSha: 'abc', headBranch: 'v1.0.0' }])
       : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [] }), ''));
   await expect(verifyRelease(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, { version: '1.0.0', release: { commitSha: 'abc' }, sleep: async () => {}, execFile })).rejects.toThrow('Ubuntu');
+});
+
+test('treats malformed job data as missing platform evidence', async () => {
+  const execSync = jest.fn(() => 'git@github.com:eliware/demo.git');
+  const execFile = jest.fn((executable, args, options, callback) => callback(null,
+    args[1] === 'list' ? JSON.stringify([{ databaseId: 1, headSha: 'abc', headBranch: 'v1.0.0' }])
+      : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: {} }), ''));
+  await expect(verifyRelease(execSync, { existsSync: jest.fn(() => false) }, { info: jest.fn() }, {
+    version: '1.0.0', release: { commitSha: 'abc' }, sleep: async () => {}, execFile,
+  })).rejects.toThrow('Ubuntu');
 });
 
 test('uses the real delay implementation when no sleep override is provided', async () => {

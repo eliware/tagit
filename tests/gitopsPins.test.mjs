@@ -89,7 +89,7 @@ test('does not rewrite an already current pin', () => {
   expect(fs.writeFileSync).not.toHaveBeenCalled();
 });
 
-test('dry-run reports changes without writing or validating', () => {
+test('dry-run reports changes without writing while validating overlays', () => {
   const registry = { version: 1, pins: [{ sourceRepository: 'eliware/ask', image: 'ghcr.io/eliware/ask', overlay: 'apps/ask/base', files: ['apps/ask/base/deployment.yaml'] }] };
   const fs = {
     readFileSync: jest.fn(file => file.endsWith('image-pins.json')
@@ -101,5 +101,5 @@ test('dry-run reports changes without writing or validating', () => {
     gitopsRoot: '/gitops', sourceRepository: 'eliware/ask', version: '1.1.7', digest, dryRun: true,
   })).toEqual({ pins: 1, files: ['apps/ask/base/deployment.yaml'] });
   expect(fs.writeFileSync).not.toHaveBeenCalled();
-  expect(execSync).not.toHaveBeenCalled();
+  expect(execSync).toHaveBeenCalledWith('kubectl', ['kustomize', '.'], expect.objectContaining({ stdio: 'inherit' }));
 });

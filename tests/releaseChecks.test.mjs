@@ -20,6 +20,20 @@ test('uses shell-free GitHub CLI arguments for CI inspection', () => {
   expect(execFileSync).toHaveBeenCalledWith('gh', ['run', 'list', '--commit', 'abc', '--repo', 'eliware/tagit', '--limit', '20', '--json', 'databaseId,status,conclusion,headSha,url'], expect.any(Object));
 });
 
+test('selects the newest successful exact-HEAD run after pending runs settle', () => {
+  const execFileSync = jest.fn((executable, args) => {
+    if (args[1] === 'list') return JSON.stringify([
+      { databaseId: 8, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://new' },
+      { databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://old' },
+    ]);
+    return JSON.stringify({ headSha: 'abc', jobs: [
+      { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
+      { name: 'Windows', status: 'completed', conclusion: 'success' },
+    ] });
+  });
+  expect(verifyLatestCi(execFileSync, { info: jest.fn() }, { headSha: 'abc' })).toMatchObject({ runId: 8 });
+});
+
 test('resolves platform-specific npm executable names', () => {
   expect(resolveExecutable('npm', 'win32')).toBe('npm.cmd');
   expect(resolveExecutable('npm', 'linux')).toBe('npm');

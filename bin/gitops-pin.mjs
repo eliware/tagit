@@ -5,11 +5,21 @@ import { updateGitOpsPins } from '../src/gitopsPins.mjs';
 
 function value(args, name) {
   const index = args.indexOf(name);
-  return index === -1 ? null : args[index + 1];
+  if (index === -1) return null;
+  const result = args[index + 1];
+  if (!result || result.startsWith('--')) throw new Error(`${name} requires a value.`);
+  return result;
 }
 
 const args = process.argv.slice(2);
 try {
+  const allowed = new Set(['--gitops-root', '--registry', '--source', '--version', '--digest', '--dry-run']);
+  for (const arg of args.filter(item => item.startsWith('--'))) {
+    if (!allowed.has(arg)) throw new Error(`Unknown option: ${arg}`);
+  }
+  for (const option of ['--gitops-root', '--registry', '--source', '--version', '--digest']) {
+    if (args.filter(item => item === option).length > 1) throw new Error(`Duplicate option: ${option}`);
+  }
   const result = updateGitOpsPins(fs, execFileSync, console, {
     gitopsRoot: value(args, '--gitops-root'),
     registryPath: value(args, '--registry') ?? 'apps/image-pins.json',

@@ -119,4 +119,9 @@ describe('updateVersionFiles', () => {
     expect(JSON.parse(fsMock.writeFileSync.mock.calls[1][1]).version).toBe('7.8.9');
   });
 
+  test('rejects an invalid explicit target version', async () => {
+    await expect(updateVersionFiles(fsMock, logMock, { targetVersion: 'not-a-version' }))
+      .rejects.toThrow('Invalid target version');
+  });
+
 });

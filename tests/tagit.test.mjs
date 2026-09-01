@@ -45,6 +45,13 @@ test('supports top-level help and version flags', async () => {
   consoleSpy.mockRestore();
 });
 
+test('handles parse errors with a controlled exit', async () => {
+  const exit = jest.fn();
+  await runTagit({ exit, log }, ['unknown-command']);
+  expect(log.error).toHaveBeenCalledWith('Unknown command: unknown-command');
+  expect(exit).toHaveBeenCalledWith(1);
+});
+
 test('handles missing release version and default preflight output', async () => {
   expect(getReleaseVersion(['release', '--version', '-x'])).toBe(null);
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});

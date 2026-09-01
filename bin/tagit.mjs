@@ -36,7 +36,14 @@ export async function runTagit(overrides = {}, argv = []) {
     fs, execFileSync, execFile, log, updateVersionFiles, gitOperations, runPreflight, suggestVersion,
     registerHandlersFn, registerSignalsFn, verifyRelease, buildNotesReport, reportCiLinks, exit,
   } = { ...defaultDependencies, ...overrides };
-  const options = parseOptions(argv);
+  let options;
+  try {
+    options = parseOptions(argv);
+  } catch (error) {
+    log.error(error.message);
+    exit(1);
+    return;
+  }
   if (options.versionQuery) {
     (overrides.output ?? console.log)(packageData.version);
     return;

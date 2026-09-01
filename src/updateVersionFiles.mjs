@@ -4,6 +4,9 @@ export async function updateVersionFiles(fs, log, { dryRun = false, targetVersio
   const composerFile = 'composer.json';
   const packageFile = 'package.json';
   let newVersion = null;
+  if (targetVersion !== null && !/^\d+\.\d+\.\d+$/.test(targetVersion)) {
+    throw new Error(`Invalid target version: ${targetVersion}`);
+  }
 
   if (fs.existsSync(composerFile)) {
     log.info(`Reading ${composerFile}`);
@@ -18,7 +21,7 @@ export async function updateVersionFiles(fs, log, { dryRun = false, targetVersio
     log.info(`Incremented composer.json version from ${composerData.version} to ${newVersion}`);
     composerData.version = newVersion;
 
-    const newContent = JSON.stringify(composerData, null, 4);
+    const newContent = `${JSON.stringify(composerData, null, 4)}\n`;
     if (dryRun) log.info(`Dry run: would write updated version to ${composerFile}`);
     else {
       fs.writeFileSync(composerFile, newContent);
@@ -43,7 +46,7 @@ export async function updateVersionFiles(fs, log, { dryRun = false, targetVersio
     }
     packageData.version = newVersion;
 
-    const newPkgContent = JSON.stringify(packageData, null, 4);
+    const newPkgContent = `${JSON.stringify(packageData, null, 4)}\n`;
     if (dryRun) log.info(`Dry run: would write updated version to ${packageFile}`);
     else {
       fs.writeFileSync(packageFile, newPkgContent);
