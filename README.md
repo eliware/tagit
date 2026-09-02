@@ -1,9 +1,41 @@
-# @eliware/tagit
+# [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
+
+## @eliware/tagit [![npm version](https://img.shields.io/npm/v/@eliware/tagit.svg)](https://www.npmjs.com/package/@eliware/tagit)[![license](https://img.shields.io/github/license/eliware/tagit.svg)](LICENSE)[![build status](https://github.com/eliware/tagit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/tagit/actions)
 
 Cross-platform, AI-oriented release automation for Eliware projects.
 
 Tagit is a repository-root CLI. It validates local release readiness, reports
 changes, pushes existing commits, and provides DevOps release verification.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation and Configuration](#installation-and-configuration)
+- [Commands](#commands)
+- [Command Ownership](#command-ownership)
+- [Template Repositories](#template-repositories)
+- [Public API](#public-api)
+- [Security and Operations](#security-and-operations)
+- [CI and Deployment](#ci-and-deployment)
+- [Validation](#validation)
+- [Development](#development)
+- [Errors / Troubleshooting](#errors--troubleshooting)
+- [Support](#support)
+- [License](#license)
+- [Links](#links)
+
+## Features
+
+- AI-oriented release notes and SemVer guidance.
+- Read-only preflight validation with aggregated, actionable blockers.
+- Safe push and explicit dry-run workflows.
+- Cross-platform GitHub Actions, npm, GHCR, and package validation.
+- Exact-HEAD CI verification before release operations.
+- Explicit separation between project-owner and DevOps release commands.
+- Knit validation support for disposable Linux-side checks.
 
 ## Commands
 
@@ -26,7 +58,8 @@ suggests a SemVer level, and gives concise instructions for release notes.
 `tagit preflight` is read-only and aggregates blockers. It checks the clean
 `main` worktree, metadata, `.notag` policy, 100% statements/branches/
 functions/lines (100x4), zero-warning lint, audit, package contents, required
-project checks, and successful Ubuntu and Windows CI for the exact HEAD.
+project checks, and successful Ubuntu CI for the exact HEAD. Windows CI is
+optional and is reported when available.
 Pending CI is monitored until completion. Failures include bounded output and
 actionable remediation. Dirty changes block CI validation.
 
@@ -77,7 +110,7 @@ release skips version changes, commits, tags, pushes, and registry checks.
 Windows or Linux; Node.js 26+; npm; Git; authenticated `gh` for CI checks; and
 Composer when releasing a project containing `composer.json`.
 
-## Installation and configuration
+## Installation and Configuration
 
 Install globally with `npm install --global @eliware/tagit`, or invoke it with
 `npx @eliware/tagit`. Run commands from the target repository root. Tagit reads
@@ -91,7 +124,7 @@ The package entrypoint is the `tagit` executable. Library modules under `src/`
 are implementation details; use the CLI wrappers (`tagit`, `push`, and
 `upstream`) so signal handling, output, and exit codes remain consistent.
 
-## Security and operations
+## Security and Operations
 
 `notes` and `preflight` are read-only. `push` pushes existing commits and does
 not stage or commit files; `push --dry-run` performs no push or CI lookup.
@@ -105,10 +138,10 @@ operation. Tagit never stores credentials or deploys application workloads.
 ## CI and deployment
 
 GitHub Actions validates every push to `main`, pull request, and `v*` tag on
-Ubuntu and Windows using Node.js 26. Each validation job runs install, tests,
+ Ubuntu and Windows using Node.js 26. Each validation job runs install, tests,
 lint, typecheck, production audit, and package validation. Publishing is a
-separate job restricted to `v*` tags and runs only after both validation jobs
-pass. The workflow keeps repository contents read-only and grants package
+separate job restricted to `v*` tags and runs only after Ubuntu and any
+configured Windows validation pass. The workflow keeps repository contents read-only and grants package
 provenance permissions only to the publishing job.
 
 TagIt is a CLI package and has no application image or runtime deployment. Its
@@ -144,6 +177,29 @@ npm run pack
 Keep source as ESM, preserve injectable command execution, test every branch,
 maintain 100x4, and do not use Istanbul or c8 ignore directives.
 
+## Errors / Troubleshooting
+
+Run `tagit --help` for the current command and option list. If a release is
+interrupted, inspect the worktree and version files before retrying. Use
+`tagit preflight` to identify local, metadata, package, and CI blockers without
+performing release actions.
+
 ## License
 
 [MIT © Eli Sterling, eliware.org](LICENSE)
+
+## Support
+
+For help, questions, or to chat with the author and community, visit:
+
+[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)[![eliware.org](https://eliware.org/logos/eliware_96.png)](https://discord.gg/M6aTR9eTwN)
+
+**[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
+
+## Links
+
+- [Home Page](https://eliware.org)
+- [GitHub Repo](https://github.com/eliware/tagit)
+- [GitHub Org](https://github.com/eliware)
+- [npm](https://www.npmjs.com/package/@eliware/tagit)
+- [Discord](https://discord.gg/M6aTR9eTwN)
