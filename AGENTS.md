@@ -7,10 +7,11 @@ repository root on Windows or Linux.
 ## Preflight
 
 Preflight aggregates blockers and reports concise, bounded evidence. It must
-confirm a clean `main` worktree, no secrets or unexplained files, correct
-metadata/docs/workflows, no `.notag` conflict, 100x4 coverage, zero lint
-errors/warnings, production audit, package dry-run, applicable project checks,
-and successful Ubuntu and Windows CI for the exact local HEAD.
+confirm a clean `main` worktree, repository metadata and `.notag` policy, the
+target repository's declared `npm test` harness, and successful Ubuntu CI for
+the exact local HEAD; the shared harness owns coverage, lint, audit, package,
+and project checks. Windows CI is optional, but any Windows workflow that is
+present must pass.
 
 Pending CI is monitored until completion. Missing, stale, mismatched, failed,
 or cancelled CI blocks. Dirty changes block CI validation because CI cannot
@@ -32,9 +33,11 @@ declared `npm test` script; a successful command is not a test failure merely
 because it reports ignored coverage. Project owners must not use it.
 
 Release requires an explicit version; automatic bumping is unsupported. After
-preflight it updates metadata, commits, creates `vX.Y.Z`, and pushes on `main`.
+preflight it confirms `package.json` already matches the version, creates
+`vX.Y.Z`, and pushes only that tag on `main`; it never rewrites or commits
+files.
 It discovers the tag workflow and prints links, then `release-wait` monitors
-CI, verifies required Ubuntu/Windows and publish jobs, checks npm/GHCR when
+CI, verifies required Ubuntu and publish jobs (Windows is optional), checks npm/GHCR when
 applicable, and exits non-zero for post-release failure. Never create release
 branches.
 
@@ -55,8 +58,9 @@ release validation-only: no version update, commit, tag, push, or publishing.
 - Keep source ESM `.mjs` and preserve dependency injection.
 - Use `bin/*-cli.mjs` wrappers; do not execute library modules casually.
 - Add tests for every branch or command-order change and maintain 100x4.
-- Run `npm test`, `npm run lint`, `npm run typecheck`,
-  `npm audit --omit=dev --audit-level=moderate`, and `npm run pack` after changes.
+- Run `npm test` after changes. The shared `@eliware/test` harness invoked by
+  `npm test` owns lint, typecheck, audit, package validation, coverage, and
+  other applicable project checks; do not duplicate those checks in Tagit.
 - Project owners must never tag, publish, release, or run release-wait; DevOps
   owns release and post-release verification after preflight passes.
 - Update README and release notes when behavior changes.

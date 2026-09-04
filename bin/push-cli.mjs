@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { runPush } from './push.mjs';
+import { pushExistingCommits } from '../src/commands/push/push-existing-commits.mjs';
 
-runPush(process.argv.slice(2), execFileSync);
+pushExistingCommits(execFileSync);

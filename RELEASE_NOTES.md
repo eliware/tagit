@@ -13,9 +13,11 @@
 
 - Improved exact-HEAD CI selection and release verification across GitHub tag
   reference formats.
+- Changed release-wait polling to use up to 30 ten-second intervals for CI,
+  npm, and GHCR visibility, without an initial delay.
 - Added read-only GitOps overlay validation during dry runs.
 - Improved upstream merge/push error handling and release-file restoration.
-- Updated the shared test harness to `@eliware/test` `2.3.0`.
+ - Updated the shared test harness to `@eliware/test` `3.0.0`.
 
 ## 2.4.2
 

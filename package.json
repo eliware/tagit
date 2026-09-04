@@ -10,6 +10,7 @@
     "files": [
         "bin/",
         "src/",
+        "specs/",
         "scripts/typecheck.mjs",
         "README.md",
         "LICENSE",
@@ -23,7 +24,6 @@
         "test": "eliware-test",
         "lint": "eliware-test --lint",
         "typecheck": "node scripts/typecheck.mjs",
-        "gitops:pin": "node bin/gitops-pin.mjs",
         "pack": "npm pack --dry-run"
     },
     "repository": {
@@ -61,7 +61,7 @@
     },
     "homepage": "https://github.com/eliware/tagit#readme",
     "devDependencies": {
-        "@eliware/test": "^2.3.1"
+        "@eliware/test": "^3.0.0"
     },
     "dependencies": {
         "@eliware/common": "^2.0.0"

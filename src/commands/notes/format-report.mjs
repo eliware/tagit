@@ -1,0 +1,5 @@
+export function formatNotesReport(suggestion, changes) {
+  const { latestTag: tag, suggested, level, reason } = suggestion;
+  const { commits, files, excerpt } = changes;
+  return `TAGIT NOTES REPORT\nRange: ${tag}..HEAD\nSuggested release: ${suggested} (${level})\nReason: ${reason}\n\nCOMMITS\n${commits || '(none)'}\n\nCHANGED FILES\n${files || '(none)'}\n\nDIFF\n${excerpt || '(no source diff)'}\n\nAI ACTIONS\n1. Read the complete diff and inspect affected code, tests, workflows, and documentation.\n2. Determine the user-visible, breaking, security, compatibility, and operational impact.\n3. Verify the suggested version bump; change it only when the diff justifies another SemVer level.\n4. Update RELEASE_NOTES.md with concise categorized entries and the exact release version.\n5. Add or update regression, integration, smoke, or E2E tests where the change requires them.\n6. Run tagit preflight after the notes and tests are complete.\nThis command is read-only: it does not edit files, change versions, commit, tag, or publish.`;
+}
