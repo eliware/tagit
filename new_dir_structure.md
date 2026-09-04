@@ -154,6 +154,8 @@ been decomposed.
   from registry verification with mirrored tests.
 - [x] Split output secret redaction/truncation and GitHub-link repository-name
   parsing into focused leaves with mirrored tests.
+- [x] Extract Windows command-shim process options from preflight execution
+  with mirrored tests.
 - [x] Split upstream argument parsing, CLI detection, and merge execution from
   the upstream command coordinator with mirrored tests.
 - [x] Remove the uncovered upstream CLI compatibility wrapper; callers use the

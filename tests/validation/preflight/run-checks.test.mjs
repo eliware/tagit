@@ -78,6 +78,14 @@ test('uses the injected shell-free runner for local checks', () => {
   expectNpmCall(execFileSync, ['test']);
 });
 
+test('uses shell mode for Windows command shims', () => {
+  const execFileSync = jest.fn((executable, args) => args[0] === 'status' ? '' : 'passed');
+  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
+  runPreflight(execFileSync, fs, { info: jest.fn() });
+  const npmCall = execFileSync.mock.calls.find(([executable, args]) => executable === 'npm.cmd' && args.at(-1) === 'test');
+  expect(npmCall?.[2]).toMatchObject({ shell: true });
+});
+
 test('preflight rejects dirty trees before running package commands', () => {
   const execSync = jest.fn(() => ' M package.json\n');
   const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'test' } })) };
