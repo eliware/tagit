@@ -1,7 +1,7 @@
 import { processOptions } from '../../../src/validation/local/process-options.mjs';
 
-test('enables shell mode for Windows command shims', () => {
-  expect(processOptions('npm.cmd', 120000)).toMatchObject({ stdio: 'pipe', timeout: 120000, shell: true });
+test('keeps Windows command execution shell-free', () => {
+  expect(processOptions('cmd.exe', 120000)).toEqual({ stdio: 'pipe', timeout: 120000 });
 });
 
 test('keeps normal executables shell-free', () => {

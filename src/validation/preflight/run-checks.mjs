@@ -10,12 +10,14 @@ import { processCommand } from '../local/process-command.mjs';
 import { processOptions } from '../local/process-options.mjs';
 
 const CHECK_TIMEOUT_MS = 120000;
-export function runPreflight(execFileSync, fs, log, { ignore100x4: _ignore100x4 = false, verifyCi = false, strictRepository = false } = {}) {
+export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, ignoreMonolithLimits = false, verifyCi = false, strictRepository = false } = {}) {
   const status = readWorktreeStatus(execFileSync); const failures = [];
   if (strictRepository) validateRepository(execFileSync, fs, failures);
   const dirtyFailure = requireCleanWorktree(status); if (dirtyFailure) failures.push(dirtyFailure);
-  const checks = []; const testCheck = buildTestCheck(fs, coverageWaiverPolicy(_ignore100x4).ignored);
-  if (testCheck.missing) failures.push('BLOCKED: package.json does not declare scripts.test.\nAction: add the shared npm test harness before running preflight.'); else if (testCheck.check) checks.unshift(testCheck.check);
+  const checks = []; const testCheck = buildTestCheck(fs, { ignore100x4: coverageWaiverPolicy(ignore100x4).ignored, ignoreMonolithLimits });
+  if (testCheck.missing) failures.push('BLOCKED: package.json does not declare scripts.test.\nAction: add the shared npm test harness before running preflight.');
+  else if (testCheck.invalid) failures.push('BLOCKED: package.json must use an installed, non-linked @eliware/test dev dependency and scripts.test must invoke eliware-test.\nAction: install @eliware/test as a dev dependency, remove any local link, set scripts.test to eliware-test, then rerun preflight.');
+  else if (testCheck.check) checks.unshift(testCheck.check);
   const results = {};
   for (const [name, [executable, args]] of checks) {
     try {

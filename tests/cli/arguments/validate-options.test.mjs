@@ -12,6 +12,7 @@ test.each([
   [['release', '--version', '1.0.0', '--version', '1.0.0'], 'Duplicate'],
   [['release', '--help', '-h'], 'Duplicate'],
   [['notes', '--ignore-100x4'], 'requires preflight'],
+  [['notes', '--ignore-monolith-limits'], 'requires preflight'],
   [['notes', '--dry-run'], 'requires push'],
   [['notes', '--version', '1.0.0'], 'requires release'],
   [['release-wait', '--version', '1.0.0'], 'latest tag'],

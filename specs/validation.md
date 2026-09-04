@@ -3,7 +3,9 @@
 ## Local validation ownership
 
 The target repository's `scripts.test` command must invoke the approved shared
-Eliware test harness, normally `eliware-test`. That harness owns:
+Eliware test harness, normally `eliware-test`. The target must declare
+`@eliware/test` as a dev dependency, and its installed package must not be a
+local symlink or junction. That harness owns:
 
 - tests and 100×4 coverage;
 - lint and warning reporting;
@@ -15,6 +17,12 @@ Eliware test harness, normally `eliware-test`. That harness owns:
 Tagit invokes `npm test` as the single authoritative local validation command.
 It intentionally does not rerun those checks individually or parse test output
 to duplicate the harness's policy.
+
+Diagnostic waivers are explicit and paired: `tagit preflight --ignore-100x4`
+or `tagit release --version X.Y.Z --ignore-100x4` forwards
+`--ignore-100x4` to `eliware-test`; the analogous
+`--ignore-monolith-limits` flag forwards only the monolith waiver. Without the
+matching TagIt flag, neither waiver is passed through.
 
 ## Repository checks
 

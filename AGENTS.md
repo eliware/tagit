@@ -8,7 +8,8 @@ repository root on Windows or Linux.
 
 Preflight aggregates blockers and reports concise, bounded evidence. It must
 confirm a clean `main` worktree, repository metadata and `.notag` policy, the
-target repository's declared `npm test` harness, and successful Ubuntu CI for
+target repository's declared `npm test` harness, which must invoke an installed
+non-linked `@eliware/test` dev dependency, and successful Ubuntu CI for
 the exact local HEAD; the shared harness owns coverage, lint, audit, package,
 and project checks. Windows CI is optional, but any Windows workflow that is
 present must pass.
@@ -26,11 +27,11 @@ They must never run `tagit release` or `tagit release-wait`. Those commands are
 DevOps-only and may run only after the owner handoff and exact-HEAD preflight
 have passed.
 
-`--ignore-100x4` is a DevOps-only, explicitly documented waiver for
-`tagit preflight` or `tagit release`. It waives only the coverage threshold;
-all other gates remain mandatory. Preflight still runs the target project's
-declared `npm test` script; a successful command is not a test failure merely
-because it reports ignored coverage. Project owners must not use it.
+`--ignore-100x4` and `--ignore-monolith-limits` are DevOps-only, explicitly
+documented waivers for `tagit preflight` or `tagit release`. Each waiver is
+forwarded to the shared `eliware-test` command only when the matching TagIt
+flag is present; all other gates remain mandatory. Project owners must not use
+them.
 
 Release requires an explicit version; automatic bumping is unsupported. After
 preflight it confirms `package.json` already matches the version, creates
