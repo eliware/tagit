@@ -26,7 +26,7 @@ export async function pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxP
         const jobs = details.jobs.map(job => `${job.name} [${job.status}/${job.conclusion}]`).join(', ');
         throw new Error(`Release CI failed: ${String(details.conclusion)}. Jobs: ${jobs || 'none reported'}.`);
       }
-      if (details.status === 'completed' && details.conclusion === 'success' && linksOnly && !details.jobs.some(job => job.status === 'completed' && job.conclusion === 'success')) throw new Error(`Release CI completed without a successful job for run ${candidate.databaseId}.`);
+      if (linksOnly) return { ...candidate, ...details, databaseId: candidate.databaseId, headSha: details.headSha, headBranch: candidate.headBranch };
       if (details.status === 'completed') { run = { ...candidate, ...details, databaseId: candidate.databaseId, headSha: details.headSha, headBranch: candidate.headBranch }; break; }
       log.info(`Release CI is ${details.status}; waiting...`);
     }

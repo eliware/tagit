@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import { verifyNpmPublication } from '../../../src/registries/npm/verify-publication.mjs';
 
 test('waits for npm visibility and succeeds at the expected version', async () => {
-  let attempts = 0; const exec = jest.fn((_command, _args, _options, callback) => callback(null, attempts++ === 0 ? '2.0.0' : '2.1.0', ''));
+  let attempts = 0; const exec = jest.fn((_command, _args, _options, callback) => callback(null, attempts++ === 0 ? '{"version":"2.0.0","dist-tags":{"latest":"2.0.0"}}' : '[{"version":"2.1.0","dist-tags":{"latest":"2.1.0"}}]', ''));
   const sleep = jest.fn(async () => {});
   await expect(verifyNpmPublication(exec, { debug: jest.fn() }, { packageName: '@eliware/demo', version: '2.1.0', retries: 2, retryMs: 10, sleep })).resolves.toBeUndefined();
   expect(sleep).toHaveBeenCalledWith(10);
@@ -22,6 +22,6 @@ test('includes bounded command diagnostics in retry logging', async () => {
   }
 });
 test('uses the default retry interval when publication is immediately visible', async () => {
-  const exec = jest.fn((_command, _args, _options, callback) => callback(null, '1.0.0', ''));
+  const exec = jest.fn((_command, _args, _options, callback) => callback(null, '{"version":"1.0.0","dist-tags":{"latest":"1.0.0"}}', ''));
   await expect(verifyNpmPublication(exec, { debug: jest.fn() }, { packageName: 'demo', version: '1.0.0', retries: 1, sleep: jest.fn() })).resolves.toBeUndefined();
 });
