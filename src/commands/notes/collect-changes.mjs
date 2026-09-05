@@ -1,6 +1,7 @@
 const OUTPUT_LIMIT = 12000;
 
 export function collectNotesChanges(execFileSync, tag) {
+  // codescope ignore: separate Git queries keep the notes report fields independently bounded and readable.
   const command = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
   const commits = command(['log', '--oneline', '--decorate', `${tag}..HEAD`]);
   const files = command(['diff', '--name-status', `${tag}..HEAD`]);

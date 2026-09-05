@@ -7,3 +7,10 @@ test('handles version, help, and notes at the command boundary', async () => {
   const help = deps(); await dispatchCommand({ help: true }, help); expect(help.output).toHaveBeenCalledWith(expect.stringContaining('Project owners may run only'));
   const notes = deps(); await dispatchCommand({ command: 'notes' }, notes); expect(notes.output).toHaveBeenCalledWith('notes');
 });
+
+test('uses console output when no output override is supplied', async () => {
+  const original = console.log;
+  console.log = jest.fn();
+  try { await dispatchCommand({ help: true }, { ...deps(), output: undefined }); expect(console.log).toHaveBeenCalled(); }
+  finally { console.log = original; }
+});

@@ -7,3 +7,4 @@ test('resolves Windows command shims only where required', () => {
   expect(resolveExecutable('git', 'win32')).toBe('git');
   expect(resolveExecutable('npm', 'linux')).toBe('npm');
 });
+test('uses the host platform by default', () => expect(resolveExecutable('git')).toBe('git'));

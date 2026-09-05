@@ -4,3 +4,6 @@ test('redacts authorization and token-like values', () => {
   expect(redactSecrets('Authorization: Bearer abc token=secret ghp_value')).toContain('[REDACTED]');
   expect(redactSecrets('Authorization: Bearer abc token=secret ghp_value')).not.toContain('abc');
 });
+test('redacts complete quoted values containing whitespace', () => {
+  expect(redactSecrets('token="a b c"')).toBe('token=[REDACTED]');
+});

@@ -6,4 +6,5 @@ test('reads repository owner and name from Git remotes', () => {
 
 test('rejects an unusable remote', () => {
   expect(() => readRepositoryName(() => 'not-a-repository')).toThrow('Cannot determine GitHub repository');
+  expect(() => readRepositoryName(() => 'https://gitlab.com/eliware/tagit.git')).toThrow('Cannot determine GitHub repository');
 });

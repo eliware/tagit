@@ -5,30 +5,37 @@
     "description": "AI-oriented release notes, safe preflight and dry-run validation, and cross-platform Git release automation.",
     "main": "bin/tagit-cli.mjs",
     "exports": {
-        ".": "./bin/tagit-cli.mjs"
+        ".": "./bin/tagit-cli.mjs",
+        "./tagit": "./bin/tagit.mjs",
+        "./push": "./bin/push.mjs",
+        "./upstream": "./bin/upstream.mjs"
     },
     "files": [
         "bin/",
         "src/",
+        "docs/",
         "specs/",
+        "examples/",
         "scripts/typecheck.mjs",
+        "scripts/run-global-test.mjs",
         "README.md",
         "LICENSE",
         "RELEASE_NOTES.md"
     ],
     "publishConfig": {
-        "access": "public"
+        "access": "public",
+        "provenance": true
     },
     "scripts": {
         "start": "node bin/tagit-cli.mjs",
-        "test": "eliware-test",
+        "test": "node scripts/run-global-test.mjs",
         "lint": "eliware-test --lint",
         "typecheck": "node scripts/typecheck.mjs",
         "pack": "npm pack --dry-run"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/eliware/tagit.git"
+        "url": "https://github.com/eliware/tagit.git"
     },
     "keywords": [
         "tagit",
@@ -61,7 +68,7 @@
     },
     "homepage": "https://github.com/eliware/tagit#readme",
     "devDependencies": {
-        "@eliware/test": "^3.0.0"
+        "@eliware/test": "^4.0.0"
     },
     "dependencies": {
         "@eliware/common": "^2.0.0"

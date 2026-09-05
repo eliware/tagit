@@ -20,6 +20,6 @@ test('does not mutate or inspect CI during a dry run', () => {
 test('reports push failures and exits nonzero', () => {
   const exit = jest.fn();
   const log = { info: jest.fn(), error: jest.fn() };
-  runPushCommand({ execFileSync: jest.fn(() => { throw new Error('push failed'); }), reportCiLinks: jest.fn(), log, exit, dryRun: false });
+  expect(() => runPushCommand({ execFileSync: jest.fn(() => { throw new Error('push failed'); }), reportCiLinks: jest.fn(), log, exit, dryRun: false })).toThrow('push failed');
   expect(exit).toHaveBeenCalledWith(1);
 });

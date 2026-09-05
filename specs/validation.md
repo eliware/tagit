@@ -33,6 +33,14 @@ HEAD. Windows is optional, but present Windows jobs must pass. Malformed
 GitHub run or job records are reported with their location and remediation
 guidance; they are never silently ignored.
 
+Standard repositories must provide `package.json`, `README.md`, `AGENTS.md`,
+`RELEASE_NOTES.md`, `docs/`, `specs/`, `examples/`, `.env.example`, and the
+required CI workflow. A genuinely inapplicable path must be listed with a
+non-empty reason in the root `.tagit-exceptions.json` `inapplicable` object;
+missing paths are never silently skipped. Package metadata, package-file
+allowlists, release-note version headings, Git origin, and tag-only publication
+workflow safeguards are also checked structurally.
+
 ## Evidence rules
 
 Successful local validation does not replace CI evidence. CI must refer to the

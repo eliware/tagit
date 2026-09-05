@@ -19,3 +19,6 @@ test.each([
 ])('rejects invalid options: %s', (argv, message) => {
   expect(() => validateOptions(argv, argv[0])).toThrow(message);
 });
+test('rejects a value after commandless version query', () => {
+  expect(() => validateOptions(['--version', '1.2.3'], null)).toThrow('version query does not accept');
+});

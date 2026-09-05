@@ -1,10 +1,10 @@
-# Tagit behavior specifications
+# Overview: Tagit behavior specifications
 
 Tagit is a repository-root release coordination tool. These specifications
 describe intended user-visible behavior and the boundaries that maintainers,
 project owners, DevOps, and automation should rely on.
 
-## Contents
+## Table of contents
 
 1. [Commands](commands.md)
 2. [Release workflow](release-workflow.md)

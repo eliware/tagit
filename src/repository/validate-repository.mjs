@@ -4,7 +4,7 @@ import { validateTrackedFiles } from './validate-tracked-files.mjs';
 
 export function validateRepository(execFileSync, fs, failures) {
   validateBranch(execFileSync, failures);
-  validateMetadata(fs, failures);
+  validateMetadata(fs, failures, execFileSync);
   validateTrackedFiles(execFileSync, failures);
   return failures;
 }

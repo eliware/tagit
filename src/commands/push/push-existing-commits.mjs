@@ -1,5 +1,3 @@
-import { execFileSync as defaultExecFileSync } from 'node:child_process';
-
-export function pushExistingCommits(execFileSync = defaultExecFileSync) {
+export function pushExistingCommits(execFileSync) {
   execFileSync('git', ['push'], { stdio: 'inherit' });
 }

@@ -1,5 +1,17 @@
 export function missingPackageMetadata(packageData) {
-  return ['name', 'version', 'description', 'license'].filter(field => !packageData[field]);
+  const missing = ['name', 'version', 'description', 'author', 'repository', 'homepage', 'license']
+    .filter(field => !packageData[field]);
+  if (!Array.isArray(packageData.keywords) || packageData.keywords.length === 0) missing.push('keywords');
+  if (!packageData.repository?.url) missing.push('repository.url');
+  if (!packageData.engines?.node) missing.push('engines.node');
+  if (!packageData.scripts?.test) missing.push('scripts.test');
+  if (!packageData.scripts?.lint) missing.push('scripts.lint');
+  if (!packageData.exports) missing.push('exports');
+  if (packageData.private !== true && (!Array.isArray(packageData.files) || packageData.files.length === 0)) missing.push('files');
+  if (packageData.private !== true && packageData.publishConfig?.access !== 'public') missing.push('publishConfig.access=public');
+  if (packageData.private !== true && packageData.publishConfig?.provenance !== true) missing.push('publishConfig.provenance=true');
+  if (packageData.bugs !== undefined && !packageData.bugs.url) missing.push('bugs.url');
+  return missing;
 }
 
 export function missingMetadataMessage(field) {

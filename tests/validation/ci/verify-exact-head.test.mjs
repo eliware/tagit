@@ -82,6 +82,7 @@ test('waits for pending exact-head CI and then rechecks it', () => {
         : { databaseId: 3, status: 'completed', conclusion: 'success', headSha: 'abc' }]);
     }
     if (args[1] === 'watch') return '';
+    if (args[1] === 'view') return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] });
     return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] });
   });
   expect(verifyLatestCi(exec, log, { headSha: 'abc' })).toMatchObject({ runId: 3 });
@@ -108,15 +109,26 @@ test('waits for pending runs and reports run details', () => {
         : JSON.stringify([{ databaseId: 6, status: 'completed', conclusion: 'failure', headSha: 'abc' }]);
     }
     if (args[1] === 'watch') throw new Error('watch failed');
+    if (args[1] === 'view') return JSON.stringify({ status: 'completed', conclusion: 'failure', headSha: 'abc' });
     return '';
   });
-  expect(() => verifyLatestCi(exec, log, { headSha: 'abc' })).toThrow('No successful');
+  expect(() => verifyLatestCi(exec, log, { headSha: 'abc' })).toThrow('Latest GitHub Actions run');
 });
 
 test('reports missing or mismatched platform jobs', () => {
   const exec = jest.fn((command, args) => args[1] === 'list'
     ? JSON.stringify([{ databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc' }])
     : JSON.stringify({ headSha: 'other', jobs: [{ name: 'windows', status: 'completed', conclusion: 'success' }] }));
+  expect(() => verifyLatestCi(exec, log, { headSha: 'abc' })).toThrow('lacks a passing Ubuntu');
+});
+
+test('rejects a newest successful run when its required jobs fail', () => {
+  const exec = jest.fn((command, args) => args[1] === 'list'
+    ? JSON.stringify([
+      { databaseId: 8, status: 'completed', conclusion: 'success', headSha: 'abc' },
+      { databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc', url: 'https://ci/7' },
+    ])
+    : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: args[2] === '8' ? [{ name: 'ubuntu', status: 'completed', conclusion: 'failure' }] : [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] }));
   expect(() => verifyLatestCi(exec, log, { headSha: 'abc' })).toThrow('lacks a passing Ubuntu');
 });
 
@@ -132,6 +144,7 @@ test('sorts multiple runs and handles a pending run without a URL', () => {
         ])
         : JSON.stringify([{ databaseId: 2, status: 'completed', conclusion: 'success', headSha: 'abc' }]);
     }
+    if (args[1] === 'view') return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] });
     return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] });
   });
   expect(verifyLatestCi(exec, log, { headSha: 'abc' })).toMatchObject({ runId: 2 });
@@ -147,8 +160,8 @@ test('reports failed runs without URLs and malformed job payloads', () => {
   expect(() => verifyLatestCi(failed, log, { headSha: 'abc', waitForCompletion: false })).toThrow('run 10');
   const failedWithUrl = jest.fn(() => JSON.stringify([{ databaseId: 12, status: 'completed', conclusion: 'failure', headSha: 'abc', url: 'https://ci/12' }]));
   expect(() => verifyLatestCi(failedWithUrl, log, { headSha: 'abc' })).toThrow('run 12');
-  const pending = jest.fn(() => JSON.stringify([{ databaseId: 13, status: 'in_progress', conclusion: '', headSha: 'abc' }]));
-  expect(() => verifyLatestCi(pending, log, { headSha: 'abc' }, 30)).toThrow('No successful');
+  const pending = jest.fn(() => JSON.stringify([{ databaseId: 13, status: 'in_progress', conclusion: '', headSha: 'abc', url: 'https://ci/13' }]));
+  expect(() => verifyLatestCi(pending, log, { headSha: 'abc', waitForCompletion: false }, 30)).toThrow('No successful');
 });
 
 test('uses the completed-candidate branch when a successful run is present', () => {

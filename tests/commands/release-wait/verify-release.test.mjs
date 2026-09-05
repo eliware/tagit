@@ -23,9 +23,17 @@ test('rejects invalid release identity and polling bounds', async () => {
   await expect(verifyRelease(jest.fn(), {}, log, { ...validInput, pollMs: Number.NaN })).rejects.toThrow('polling bounds');
 });
 
+test('uses default polling dependencies on a completed links-only run', async () => {
+  const runner = runners({ details: { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] } });
+  await expect(verifyRelease(runner.execSync, {}, log, { version: '1.0.0', release: { commitSha: 'abc' }, maxPolls: 1, pollMs: 0, linksOnly: true, execFile: runner.execFile })).resolves.toMatchObject({ linksOnly: true });
+});
+test('rejects when the release options object is omitted', async () => {
+  await expect(verifyRelease(jest.fn(), {}, log)).rejects.toThrow('must be valid');
+});
+
 test('reports ambiguous metadata, invalid remotes, and exhausted inspection', async () => {
   const ambiguous = runners({ list: [{ databaseId: 1, headSha: 'abc', headBranch: 'v1.0.0' }, { databaseId: 'bad', createdAt: 'bad', headSha: 'abc', headBranch: 'v1.0.0' }] });
-  await expect(verifyRelease(ambiguous.execSync, {}, log, { ...validInput, execFile: ambiguous.execFile })).rejects.toThrow('ambiguous');
+  await expect(verifyRelease(ambiguous.execSync, {}, log, { ...validInput, execFile: ambiguous.execFile })).rejects.toThrow('malformed');
   const invalidRemote = runners({ remote: 'not-a-github-remote' });
   await expect(verifyRelease(invalidRemote.execSync, {}, log, validInput)).rejects.toThrow('Cannot determine');
   const unavailable = { execSync: jest.fn(() => 'git@github.com:eliware/demo.git'), execFile: jest.fn((_a, _b, _c, callback) => callback(new Error('offline'), '', '')) };
@@ -42,16 +50,16 @@ test('retries transient CI inspection and reports a non-successful candidate', a
   });
   await expect(verifyRelease(transient.execSync, { existsSync: jest.fn(() => false) }, log, { ...validInput, maxPolls: 2, pollMs: 0, sleep: async () => {}, execFile: transient.execFile })).resolves.toMatchObject({ ci: true });
   const failed = runners({ list: [{ databaseId: 5, status: 'completed', conclusion: 'cancelled', headSha: 'abc', headBranch: 'v1.0.0' }] });
-  await expect(verifyRelease(failed.execSync, {}, log, { ...validInput, execFile: failed.execFile })).rejects.toThrow('cancelled');
+  await expect(verifyRelease(failed.execSync, { existsSync: () => false }, log, { ...validInput, execFile: failed.execFile })).rejects.toThrow('cancelled');
   const absent = runners({ list: [] });
   await expect(verifyRelease(absent.execSync, {}, log, { ...validInput, execFile: absent.execFile })).rejects.toThrow('did not complete');
 });
 
 test('returns links-only evidence without registry checks', async () => {
-  const { execSync, execFile } = runners({ details: { status: 'in_progress', headSha: 'abc', jobs: [{ name: 'build', url: 'https://ci/job' }, { name: 'metadata-only' }] } });
-  await expect(verifyRelease(execSync, {}, log, { ...validInput, linksOnly: true, execFile })).resolves.toMatchObject({ linksOnly: true });
-  const empty = runners({ details: { status: 'in_progress', headSha: 'abc' } });
-  await expect(verifyRelease(empty.execSync, {}, log, { ...validInput, linksOnly: true, execFile: empty.execFile })).resolves.toMatchObject({ linksOnly: true });
+  const { execSync, execFile } = runners({ details: { status: 'in_progress', conclusion: '', headSha: 'abc', jobs: [{ name: 'build', status: 'in_progress', conclusion: '' }, { name: 'metadata-only', status: 'in_progress', conclusion: '' }] } });
+  await expect(verifyRelease(execSync, {}, log, { ...validInput, linksOnly: true, maxPolls: 1, execFile })).rejects.toThrow('did not complete');
+  const empty = runners({ details: { status: 'in_progress', conclusion: '', headSha: 'abc', jobs: [] } });
+  await expect(verifyRelease(empty.execSync, {}, log, { ...validInput, linksOnly: true, maxPolls: 1, execFile: empty.execFile })).rejects.toThrow('did not complete');
 });
 
 test('waits for pending CI, then verifies public npm publication', async () => {
@@ -59,19 +67,19 @@ test('waits for pending CI, then verifies public npm publication', async () => {
   const execSync = jest.fn(() => 'https://github.com/eliware/demo.git');
   const execFile = jest.fn((executable, args, options, callback) => {
     if (args[1] === 'list') return callback(null, JSON.stringify([{ databaseId: 2, headSha: 'abc', headBranch: 'v1.0.0' }]), '');
-    if (args[1] === 'view') return callback(null, JSON.stringify(views++ === 0 ? { status: 'in_progress', headSha: 'abc' } : { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'publish', status: 'completed', conclusion: 'success' }] }), '');
+    if (args[1] === 'view') return callback(null, JSON.stringify(views++ === 0 ? { status: 'in_progress', conclusion: '', headSha: 'abc', jobs: [] } : { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'publish', status: 'completed', conclusion: 'success' }] }), '');
     return callback(null, '1.0.0', '');
   });
   await expect(verifyRelease(execSync, publicFs, log, { ...validInput, maxPolls: 2, pollMs: 0, npmRetryMs: 0, sleep: async () => {}, execFile })).resolves.toMatchObject({ ci: true, npm: true });
 });
 
 test('reports mismatched details and completed workflow failure', async () => {
-  const mismatch = runners({ details: { status: 'completed', headSha: 'other', jobs: [] } });
+  const mismatch = runners({ details: { status: 'completed', conclusion: 'success', headSha: 'other', jobs: [] } });
   await expect(verifyRelease(mismatch.execSync, {}, log, { ...validInput, execFile: mismatch.execFile })).rejects.toThrow('expected abc');
   const failed = runners({ details: { status: 'completed', conclusion: 'cancelled', headSha: 'abc', jobs: [] } });
   await expect(verifyRelease(failed.execSync, {}, log, { ...validInput, execFile: failed.execFile })).rejects.toThrow('Release CI failed');
-  const unknown = runners({ details: { status: 'completed', conclusion: 'success', jobs: [] } });
-  await expect(verifyRelease(unknown.execSync, {}, log, { ...validInput, execFile: unknown.execFile })).rejects.toThrow('unknown');
+  const unknown = runners({ details: { status: 'completed', conclusion: 'success', headSha: undefined, jobs: [] } });
+  await expect(verifyRelease(unknown.execSync, {}, log, { ...validInput, execFile: unknown.execFile })).rejects.toThrow('malformed details');
 });
 
 test('requires Ubuntu, publish, and passing Windows when applicable', async () => {
@@ -82,7 +90,7 @@ test('requires Ubuntu, publish, and passing Windows when applicable', async () =
   const failedWindows = runners({ details: { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'windows', status: 'completed', conclusion: 'failure' }] } });
   await expect(verifyRelease(failedWindows.execSync, {}, log, { ...validInput, execFile: failedWindows.execFile })).rejects.toThrow('failing Windows');
   const malformedJobs = runners({ details: { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: {} } });
-  await expect(verifyRelease(malformedJobs.execSync, {}, log, { ...validInput, execFile: malformedJobs.execFile })).rejects.toThrow('Ubuntu');
+  await expect(verifyRelease(malformedJobs.execSync, {}, log, { ...validInput, execFile: malformedJobs.execFile })).rejects.toThrow('malformed details');
 });
 
 test('supports refs/tags, skipped optional jobs, private packages, and GHCR', async () => {

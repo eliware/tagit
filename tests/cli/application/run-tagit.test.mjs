@@ -2,34 +2,27 @@ import { jest } from '@jest/globals';
 import { execFileSync } from 'node:child_process';
 import { isCli, runTagit } from '../../../src/cli/application/run-tagit.mjs';
 import packageData from '../../../package.json' with { type: 'json' };
-
 const noop = jest.fn();
 const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
 const testArgv = process.argv;
 beforeAll(() => { process.argv = ['node', 'tagit']; });
 afterAll(() => { process.argv = testArgv; });
-
 test('runs the public CLI help entry point from the repository root', () => {
   const output = execFileSync(process.execPath, ['bin/tagit-cli.mjs', '--help'], { encoding: 'utf8' });
   expect(output).toContain('Usage: tagit');
-});
-
-test('runs the public notes entry point from the repository root', () => {
+}); test('runs the public notes entry point from the repository root', () => {
   const output = execFileSync(process.execPath, ['bin/tagit-cli.mjs', 'notes'], { encoding: 'utf8' });
   expect(output).toContain('TAGIT NOTES REPORT');
-});
-
-test('handles CLI help, version, and parse-error boundaries', async () => {
+}); test('handles CLI help, version, and parse-error boundaries', async () => {
   const output = jest.fn();
   const exit = jest.fn();
   await runTagit({ output }, ['--help']);
   expect(output).toHaveBeenCalledWith(expect.stringContaining('Project owners may run only'));
   await runTagit({ output }, ['--version']);
   expect(output).toHaveBeenLastCalledWith(packageData.version);
-  await runTagit({ exit, log }, ['unknown-command']);
+  await expect(runTagit({ exit, log }, ['unknown-command'])).rejects.toThrow('Unknown command');
   expect(exit).toHaveBeenCalledWith(1);
 });
-
 test('uses console output for default version and preflight responses', async () => {
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   await runTagit({}, ['-v']);
@@ -38,13 +31,11 @@ test('uses console output for default version and preflight responses', async ()
   expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"ok":true'));
   consoleSpy.mockRestore();
 });
-
 test('detects the supported CLI entrypoint names', () => {
   expect(isCli(['node', '/opt/tagit/bin/tagit.mjs'])).toBe(true);
   expect(isCli(['node', '/opt/test.mjs'])).toBe(false);
   expect(isCli(['node'])).toBe(false);
 });
-
 test('preflight runs without release side effects', async () => {
   const output = jest.fn();
   const runPreflight = jest.fn(() => ({ test: { passed: true } }));
@@ -54,17 +45,18 @@ test('preflight runs without release side effects', async () => {
   expect(updateVersionFiles).not.toHaveBeenCalled();
   expect(output).toHaveBeenCalledWith(JSON.stringify({ ok: true, checks: { test: { passed: true } } }));
 });
-
 test('passes the explicit coverage waiver to preflight', async () => {
   const runPreflight = jest.fn(() => ({ test: { passed: true } }));
   await runTagit({ output: jest.fn(), runPreflight, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['preflight', '--ignore-100x4']);
   expect(runPreflight).toHaveBeenCalledWith(expect.anything(), expect.anything(), log, expect.objectContaining({ ignore100x4: true }));
 });
-
-
 test('notes prints the generated report without release side effects', async () => {
   const output = jest.fn();
-  await runTagit({ output, buildNotesReport: jest.fn(() => 'TAGIT NOTES REPORT'), suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
+  const buildNotesReport = jest.fn(() => 'TAGIT NOTES REPORT');
+  const gitOperations = jest.fn();
+  await runTagit({ output, buildNotesReport, gitOperations, suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
+  expect(buildNotesReport).toHaveBeenCalledWith(expect.anything(), expect.anything());
+  expect(gitOperations).not.toHaveBeenCalled();
   expect(output).toHaveBeenCalledWith('TAGIT NOTES REPORT');
 });
 
@@ -74,13 +66,17 @@ test('notes uses console output when no output override is supplied', async () =
   expect(consoleSpy).toHaveBeenCalledWith('report');
   consoleSpy.mockRestore();
 });
-
 test('release runs the release operation for an explicit version', async () => {
   const gitOperations = jest.fn();
   await runTagit({ gitOperations, verifyRelease: noop, runPreflight: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version]);
   expect(gitOperations).toHaveBeenCalledWith(expect.any(Function), expect.anything(), log, packageData.version, { dryRun: false });
 });
-
+test('release does not invoke git operations when preflight fails', async () => {
+  const gitOperations = jest.fn();
+  const exit = jest.fn();
+  await expect(runTagit({ gitOperations, exit, runPreflight: jest.fn(() => { throw new Error('preflight failed'); }), log, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version])).rejects.toThrow('preflight failed');
+  expect(gitOperations).not.toHaveBeenCalled();
+});
 test('release blocks when package metadata does not match the explicit version', async () => {
   const gitOperations = jest.fn();
   const exit = jest.fn(() => { throw new Error('exit'); });
@@ -89,7 +85,6 @@ test('release blocks when package metadata does not match the explicit version',
   expect(log.error).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('package.json version') }));
   expect(gitOperations).not.toHaveBeenCalled();
 });
-
 test('release permits a repository without package metadata to reach tag operations', async () => {
   const gitOperations = jest.fn();
   await runTagit({
@@ -161,17 +156,17 @@ test('release dry run preflights without changing or publishing anything', async
 
 test('push reports failures', async () => {
   const exit = jest.fn();
-  await runTagit({ execFileSync: jest.fn(() => { throw new Error('push failed'); }), exit, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push']);
+  await expect(runTagit({ execFileSync: jest.fn(() => { throw new Error('push failed'); }), exit, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['push'])).rejects.toThrow('push failed');
   expect(exit).toHaveBeenCalledWith(1);
 });
 
 test('release rejects a missing version and handles release failures', async () => {
   const exit = jest.fn();
   const error = jest.fn();
-  await runTagit({ exit, log: { ...log, error }, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release']);
+  await expect(runTagit({ exit, log: { ...log, error }, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release'])).rejects.toThrow();
   expect(exit).toHaveBeenCalledWith(1);
   const failed = jest.fn().mockRejectedValue(new Error('failed'));
-  await runTagit({ exit, log: { ...log, error }, updateVersionFiles: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version]);
+  await expect(runTagit({ exit, log: { ...log, error }, updateVersionFiles: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version])).rejects.toThrow('already points');
   expect(exit).toHaveBeenCalledWith(1);
 });
 
@@ -184,7 +179,6 @@ test('bare invocation displays help', async () => {
   expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('TAGIT RELEASE WORKFLOW'));
   consoleSpy.mockRestore();
 });
-
 test('notag exits before release', async () => {
   const exit = jest.fn();
   const updateVersionFiles = jest.fn();
@@ -193,4 +187,14 @@ test('notag exits before release', async () => {
   expect(runPreflight).toHaveBeenCalled();
   expect(exit).not.toHaveBeenCalled();
   expect(updateVersionFiles).not.toHaveBeenCalled();
+});
+// codescope ignore: the default invocation is an intentional production-boundary smoke test.
+test('uses default arguments when runTagit is called without arguments', async () => {
+  await runTagit();
+});
+test('preserves failure after the exit boundary is stubbed', async () => {
+  const realExit = process.exit;
+  process.exit = jest.fn();
+  try { await expect(runTagit({ log }, ['unknown-command'])).rejects.toThrow(); }
+  finally { process.exit = realExit; }
 });

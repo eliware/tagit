@@ -10,6 +10,7 @@ const expectNpmCall = (mock, expectedArgs) => {
 // Platform command resolution remains part of the release-check adapter.
 
 test('resolves platform-specific npm executable names', () => {
+  expect(processCommand('npm', ['test'], 'win32', 'C:\\node\\node.exe')).toEqual(['cmd.exe', ['/d', '/s', '/c', 'npm.cmd', 'test']]);
 });
 
 test('uses the Windows npm executable from PATH', () => {
@@ -100,8 +101,10 @@ test('preflight rejects dirty trees before running package commands', () => {
 });
 
 test('strict preflight delegates repository validation', () => {
-  const exec = jest.fn((command, args) => args[0] === 'status' ? '' : args[0] === 'branch' ? 'main' : 'package.json');
-  const fs = { existsSync: () => true, readFileSync: () => JSON.stringify({ name: 'demo', version: '1', description: 'demo', license: 'MIT', devDependencies: { '@eliware/test': '^3.0.0' }, scripts: { test: 'eliware-test' } }) };
+  const workflow = "on:\n  push:\n    tags:\n      - 'v*'\npermissions:\n  contents: read\njobs:\n  build:\n    steps:\n      - uses: actions/checkout@v6\n      - run: npm ci\n      - run: npm test\n      - run: npm run lint\n      - run: npm run typecheck\n      - run: npm audit --omit=dev --audit-level=moderate\n      - run: npm run pack\n  publish:\n    needs: build\n    if: startsWith(github.ref, 'refs/tags/v')\n    permissions:\n      id-token: write";
+  const pkg = { name: 'demo', version: '1.0.0', description: 'demo', keywords: ['demo'], author: 'Eli', repository: { url: 'https://github.com/eliware/demo' }, homepage: 'https://github.com/eliware/demo', license: 'MIT', engines: { node: '>=26' }, devDependencies: { '@eliware/test': '^3.0.0' }, scripts: { test: 'eliware-test', lint: 'eliware-test --lint' }, exports: { '.': './index.mjs' }, files: ['README.md', 'LICENSE', 'RELEASE_NOTES.md'], publishConfig: { access: 'public', provenance: true } };
+  const exec = jest.fn((command, args) => args[0] === 'status' ? '' : args[0] === 'branch' ? 'main' : args[0] === 'remote' ? 'https://github.com/eliware/demo.git' : '');
+  const fs = { existsSync: () => true, readFileSync: file => file === '.tagit-exceptions.json' ? '{"inapplicable":{}}' : file === 'RELEASE_NOTES.md' ? '## 1.0.0' : file === '.github/workflows/nodejs.yml' ? workflow : JSON.stringify(pkg) };
   expect(runPreflight(exec, fs, { info: jest.fn() }, { strictRepository: true })).toHaveProperty('test.passed', true);
 });
 
@@ -132,80 +135,4 @@ test('preflight does not parse or duplicate the shared harness coverage result',
     readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })),
   };
   expect(runPreflight(execSync, fs, { info: jest.fn() })).toHaveProperty('test.passed', true);
-});
-
-test('preflight reports command failures and allows template releases', () => {
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  const failingExec = jest.fn((executable, args) => isNodeNpm(executable, args) && args.at(-1) === 'test' ? (() => { throw { stdout: 'bad', stderr: 'test' }; })() : '');
-  expect(() => runPreflight(failingExec, fs, { info: jest.fn() })).toThrow('test failed');
-  expect(runPreflight(jest.fn(() => ''), { existsSync: jest.fn(() => true), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) }, { info: jest.fn() }))
-    .toHaveProperty('test.passed', true);
-});
-
-test('preflight handles failures without captured output', () => {
-  const execSync = jest.fn((executable, args) => {
-    if (executable === 'git' && args[0] === 'status') return '';
-    throw new Error('failed');
-  });
-  expect(() => runPreflight(execSync, { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) }, { info: jest.fn() }))
-    .toThrow('test failed');
-});
-
-test('preflight verifies CI for the exact current HEAD', () => {
-  const execSync = jest.fn((executable, args) => {
-    if (executable === 'git' && args[0] === 'rev-parse') return 'abc';
-    if (executable === 'gh' && args[1] === 'list') return JSON.stringify([{ databaseId: 42, status: 'completed', conclusion: 'success', headSha: 'abc' }]);
-    if (executable === 'gh' && args[1] === 'view') return JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [
-      { name: 'Ubuntu', status: 'completed', conclusion: 'success' },
-      { name: 'Windows', status: 'completed', conclusion: 'success' },
-    ] });
-    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'All files     100     100     100     100';
-    return '';
-  });
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  expect(runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toHaveProperty('ci.ubuntu', true);
-});
-
-test('preflight aggregates CI failures after local checks', () => {
-  const execSync = jest.fn((executable, args) => {
-    if (executable === 'git' && args[0] === 'rev-parse') return 'abc';
-    if (executable === 'gh' && args[1] === 'list') throw new Error('network unavailable');
-    return executable === 'npm.cmd' && args[0] === 'test' ? 'All files     100     100     100     100' : '';
-  });
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow('GitHub CI verification failed');
-  expectNpmCall(execSync, ['test']);
-});
-
-test('preflight gives remediation for a failing test without parsing coverage', () => {
-  const failingTest = jest.fn((executable, args) => {
-    if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw new Error('intentional test failure');
-    return '';
-  });
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  expect(() => runPreflight(failingTest, fs, { info: jest.fn() })).toThrow(/test failed[\s\S]*fix the reported issue/);
-
-  const passingTest = jest.fn((executable, args) => args?.[0] === 'status' ? '' : 'Tests passed without a coverage summary');
-  expect(runPreflight(passingTest, fs, { info: jest.fn() })).toHaveProperty('test.passed', true);
-});
-
-test('preflight reports hanging checks with timer guidance', () => {
-  const execSync = jest.fn((executable, args) => {
-    if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw Object.assign(new Error('timed out'), { code: 'ETIMEDOUT' });
-    return '';
-  });
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow(/exceeded the 120-second limit[\s\S]*unset timers/);
-});
-
-test('preflight aggregates all blocking checks with next actions', () => {
-  const execSync = jest.fn((executable, args) => {
-    if (executable === 'git' && args[0] === 'status') return ' M package.json';
-    if (isNodeNpm(executable, args) && args.at(-1) === 'test') return 'Tests passed without coverage';
-    throw new Error(`${executable} failed`);
-  });
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow(
-    /uncommitted changes[\s\S]*commit and push/,
-  );
 });

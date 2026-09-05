@@ -13,3 +13,7 @@ test('reports merge conflicts without pushing', () => {
   expect(runUpstream(['merge'], exec, new Date(), log)).toBe(false);
   expect(exec).not.toHaveBeenCalledWith('git', ['push'], expect.anything());
 });
+test('runs with explicit time and logger dependencies', () => {
+  const exec = jest.fn((command, args) => args[0] === 'symbolic-ref' ? 'refs/remotes/upstream/main\n' : '');
+  expect(runUpstream([], exec, new Date('2026-07-29T18:07:59Z'), console)).toBe(true);
+});
