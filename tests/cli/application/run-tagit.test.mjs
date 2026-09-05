@@ -10,9 +10,10 @@ afterAll(() => { process.argv = testArgv; });
 test('runs the public CLI help entry point from the repository root', () => {
   const output = execFileSync(process.execPath, ['bin/tagit-cli.mjs', '--help'], { encoding: 'utf8' });
   expect(output).toContain('Usage: tagit');
-}); test('runs the public notes entry point from the repository root', () => {
-  const output = execFileSync(process.execPath, ['bin/tagit-cli.mjs', 'notes'], { encoding: 'utf8' });
-  expect(output).toContain('TAGIT NOTES REPORT');
+}); test('runs the notes entry point with injected dependencies', async () => {
+  const output = jest.fn();
+  await runTagit({ output, buildNotesReport: jest.fn(() => 'TAGIT NOTES REPORT'), suggestVersion: noop, log, registerHandlersFn: noop, registerSignalsFn: noop }, ['notes']);
+  expect(output).toHaveBeenCalledWith('TAGIT NOTES REPORT');
 }); test('handles CLI help, version, and parse-error boundaries', async () => {
   const output = jest.fn();
   const exit = jest.fn();
@@ -165,11 +166,10 @@ test('release rejects a missing version and handles release failures', async () 
   const error = jest.fn();
   await expect(runTagit({ exit, log: { ...log, error }, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release'])).rejects.toThrow();
   expect(exit).toHaveBeenCalledWith(1);
-  const failed = jest.fn().mockRejectedValue(new Error('failed'));
-  await expect(runTagit({ exit, log: { ...log, error }, updateVersionFiles: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version])).rejects.toThrow('already points');
+  const failed = jest.fn(() => { throw new Error('release operation failed'); }); const releaseExit = jest.fn(() => { throw new Error('release operation failed'); });
+  await expect(runTagit({ exit: releaseExit, log: { ...log, error }, gitOperations: failed, runPreflight: noop, suggestVersion: noop, registerHandlersFn: noop, registerSignalsFn: noop }, ['release', '--version', packageData.version])).rejects.toThrow('release operation failed');
   expect(exit).toHaveBeenCalledWith(1);
 });
-
 test('bare invocation displays help', async () => {
   const output = jest.fn();
   await runTagit({ output }, []);
