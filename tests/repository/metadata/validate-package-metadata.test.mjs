@@ -1,7 +1,7 @@
 import { missingMetadataMessage, missingPackageMetadata } from '../../../src/repository/metadata/validate-package-metadata.mjs';
 
 test('finds missing package metadata', () => {
-  expect(missingPackageMetadata({ name: 'demo', license: 'MIT' })).toEqual(expect.arrayContaining(['version', 'description', 'keywords', 'author', 'repository', 'homepage', 'engines.node', 'scripts.test', 'scripts.lint', 'exports', 'files', 'publishConfig.access=public', 'publishConfig.provenance=true']));
+  expect(missingPackageMetadata({ name: 'demo', license: 'MIT' })).toEqual(expect.arrayContaining(['version', 'description', 'keywords', 'author', 'repository', 'homepage', 'engines.node', 'scripts.test', 'scripts.lint', 'files', 'publishConfig.access=public', 'publishConfig.provenance=true']));
   expect(missingMetadataMessage('version')).toContain('version');
 });
 

@@ -6,7 +6,6 @@ export function missingPackageMetadata(packageData) {
   if (!packageData.engines?.node) missing.push('engines.node');
   if (!packageData.scripts?.test) missing.push('scripts.test');
   if (!packageData.scripts?.lint) missing.push('scripts.lint');
-  if (!packageData.exports) missing.push('exports');
   if (packageData.private !== true && (!Array.isArray(packageData.files) || packageData.files.length === 0)) missing.push('files');
   if (packageData.private !== true && packageData.publishConfig?.access !== 'public') missing.push('publishConfig.access=public');
   if (packageData.private !== true && packageData.publishConfig?.provenance !== true) missing.push('publishConfig.provenance=true');

@@ -28,7 +28,7 @@
     },
     "scripts": {
         "start": "node bin/tagit-cli.mjs",
-        "test": "node scripts/run-global-test.mjs",
+        "test": "eliware-test",
         "lint": "eliware-test --lint",
         "typecheck": "node scripts/typecheck.mjs",
         "pack": "npm pack --dry-run"
@@ -58,7 +58,7 @@
         "ci",
         "github-actions"
     ],
-    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+    "author": "Eliware <eli@eliware.org>",
     "license": "MIT",
     "engines": {
         "node": ">=26"

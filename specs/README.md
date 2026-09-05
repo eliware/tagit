@@ -1,5 +1,9 @@
 # Tagit specifications
 
+Scope and status: this directory is the normative developer-facing
+specification for TagIt. Requirements stated as rules describe intended
+supported behavior; examples and explanatory notes are non-normative.
+
 This directory is the index for Tagit's intended behavior. Start with the
 [overview](overview.md), then read the command, validation, release, GitOps,
 and [out-of-scope](out-of-scope.md) specifications relevant to the change.

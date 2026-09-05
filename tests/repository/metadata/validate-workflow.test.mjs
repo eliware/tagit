@@ -14,6 +14,6 @@ test('reports missing validation and publication safeguards', () => {
 
 test('does not confuse a workflow push trigger with publication on branches', () => {
   expect(validateReleaseWorkflow({ existsSync: () => true, readFileSync: () => valid.replace('refs/tags/v', 'refs/heads/main') })).toEqual([
-    'BLOCKED: publish job must depend on validation and run only for v* tags.',
+    'BLOCKED: publication must depend on validation and run only for v* tags.',
   ]);
 });
