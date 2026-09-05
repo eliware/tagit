@@ -85,11 +85,7 @@ test('uses the injected shell-free runner for local checks', () => {
 });
 
 test('uses a shell-free Windows command wrapper for npm shims', () => {
-  const execFileSync = jest.fn((executable, args) => args[0] === 'status' ? '' : 'passed');
-  const fs = { existsSync: jest.fn(file => file === 'package.json'), readFileSync: jest.fn(() => JSON.stringify({ scripts: { test: 'eliware-test' } })) };
-  runPreflight(execFileSync, fs, { info: jest.fn() });
-  const npmCall = execFileSync.mock.calls.find(([executable, args]) => executable === 'cmd.exe' && args.includes('npm.cmd'));
-  expect(npmCall?.[1]).toEqual(['/d', '/s', '/c', 'npm.cmd', 'test']);
+  expect(processCommand('npm', ['test'], 'win32')).toEqual(['cmd.exe', ['/d', '/s', '/c', 'npm.cmd', 'test']]);
 });
 
 test('preflight rejects dirty trees before running package commands', () => {
@@ -125,7 +121,7 @@ test('preflight accepts the shared harness result with the explicit waiver', () 
   expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty('test.passed', true);
   const npmCalls = execSync.mock.calls.filter(([executable, args]) => isNodeNpm(executable, args));
   expect(npmCalls).toHaveLength(1);
-  expect(npmCalls[0][1]).toEqual(['/d', '/s', '/c', 'npm.cmd', 'test', '--', '--ignore-100x4']);
+  expect(npmCalls[0][1]).toEqual(processCommand('npm', ['test', '--', '--ignore-100x4'])[1]);
 });
 
 test('preflight does not parse or duplicate the shared harness coverage result', () => {
