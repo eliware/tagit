@@ -13,6 +13,6 @@ export function runPreflight(execFileSync, fs, log, { ignore100x4 = false, ignor
   const local = runLocalChecks(execFileSync, fs, { ignore100x4, ignoreMonolithLimits, timeoutMs: CHECK_TIMEOUT_MS });
   failures.push(...local.failures); const results = local.results;
   // A blocked result is produced only for the already-reported dirty worktree; CI errors are independent blockers.
-  if (verifyCi) { results.ci = verifyPreflightCi(execFileSync, log, status); if (results.ci.error) failures.push(`BLOCKED: GitHub CI verification failed or was not completed. ${results.ci.error.message}\nAction: push the current commit, wait for successful Ubuntu and Windows CI, then rerun tagit preflight.`); }
+  if (verifyCi) { results.ci = verifyPreflightCi(execFileSync, log, status); if (results.ci.error) failures.push(`BLOCKED: GitHub CI verification failed or was not completed. ${results.ci.error.message}\nAction: provide a successful Ubuntu run for the exact HEAD; Windows is optional but must pass when present.`); }
   throwPreflightFailures(failures); return results;
 }
