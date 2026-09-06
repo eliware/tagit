@@ -8,6 +8,7 @@ placeholders only and contain no credentials or private machine paths.
 - [Owner workflow](owner-workflow/README.md) — safe notes, preflight, and push sequence.
 - [Owner workflow directory](owner-workflow/) — the runnable example directory.
 - [Plain-text workflow](owner-workflow.md) — the same sequence in a compact form.
+- [Runnable workflow](owner-workflow.mjs) — the executable example.
 
 Prerequisites: Node.js 26 or newer, Git, and a target repository with its
 shared test harness. From a clean checkout, install TagIt globally or use

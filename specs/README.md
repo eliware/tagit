@@ -8,6 +8,8 @@ This directory is the index for Tagit's intended behavior. Start with the
 [overview](overview.md), then read the command, validation, release, GitOps,
 and [out-of-scope](out-of-scope.md) specifications relevant to the change.
 
+[Back to the README](../README.md)
+
 ## Documents
 
 - [Specification index](README.md)
