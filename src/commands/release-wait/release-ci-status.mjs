@@ -15,7 +15,7 @@ export async function pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxP
     const candidate = selectReleaseRun(runs, headSha, tag);
     if (candidate) {
       const details = await readGithubJson(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'databaseId,status,conclusion,headSha,jobs,url']);
-      if (!details || (details.databaseId !== undefined && typeof details.databaseId !== 'number') || typeof details.status !== 'string' || typeof details.conclusion !== 'string' || typeof details.headSha !== 'string' || !Array.isArray(details.jobs)) throw new Error(`Release CI returned malformed details for run ${candidate.databaseId}.`);
+      if (!details || (details.databaseId !== undefined && typeof details.databaseId !== 'number') || typeof details.status !== 'string' || (details.conclusion !== null && details.conclusion !== undefined && typeof details.conclusion !== 'string') || typeof details.headSha !== 'string' || !Array.isArray(details.jobs)) throw new Error(`Release CI returned malformed details for run ${candidate.databaseId}.`);
       if (details.databaseId !== undefined && details.databaseId !== candidate.databaseId) throw new Error(`Release CI details identify run ${details.databaseId}, expected ${candidate.databaseId}.`);
       validateJobRecords(details.jobs, candidate.databaseId);
       if (details.headSha !== headSha) throw new Error(`Release CI details have commit ${details.headSha}, expected ${headSha}.`);

@@ -1,7 +1,7 @@
 import { releaseLinks } from '../../../src/commands/release-wait/release-links.mjs';
 
 test('formats workflow, platform, and publication links', () => {
-  expect(releaseLinks({ url: 'workflow', jobs: [{ name: 'ubuntu', url: 'ubuntu' }] }, [], [{ name: 'publish', url: 'publish' }]))
+  expect(releaseLinks({ url: 'workflow', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success', url: 'ubuntu' }] }, [], [{ name: 'publish', url: 'publish' }]))
     .toEqual([['Workflow', 'workflow'], ['Ubuntu', 'ubuntu'], ['Publish', 'publish']]);
 });
 

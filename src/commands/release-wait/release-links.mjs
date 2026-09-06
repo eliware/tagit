@@ -1,5 +1,5 @@
 export function releaseLinks(run, windowsJobs, publishJobs) {
-  const ubuntuJob = run.jobs.find(job => /ubuntu/i.test(job.name));
+  const ubuntuJob = run.jobs.find(job => /ubuntu/i.test(job.name) && job.status === 'completed' && job.conclusion === 'success');
   const windowsJob = windowsJobs[0];
   return [
     ['Workflow', run.url],

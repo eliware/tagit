@@ -42,3 +42,11 @@ test('rejects details from a different run', async () => {
   const execFile = jest.fn((_command, args, _options, callback) => callback(null, args[1] === 'list' ? JSON.stringify([{ databaseId: 9, createdAt: '2026-01-01', status: 'completed', conclusion: 'success', headSha: 'abc', headBranch: 'v1.0.0' }]) : JSON.stringify({ databaseId: 10, status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [] }), ''));
   await expect(pollReleaseCi({ execFile, repo: 'eliware/demo', headSha: 'abc', tag: 'v1.0.0', pollMs: 0, maxPolls: 1, sleep: jest.fn(), linksOnly: false, log: { info: jest.fn() } })).rejects.toThrow('identify run 10, expected 9');
 });
+
+test('continues polling when a pending detail has no conclusion', async () => {
+  let views = 0;
+  const execFile = jest.fn((_command, args, _options, callback) => callback(null, args[1] === 'list'
+    ? JSON.stringify([{ databaseId: 11, createdAt: '2026-01-01', headSha: 'abc', headBranch: 'v1.0.0' }])
+    : JSON.stringify(views++ === 0 ? { databaseId: 11, status: 'in_progress', conclusion: null, headSha: 'abc', jobs: [] } : { databaseId: 11, status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [] }), ''));
+  await expect(pollReleaseCi({ execFile, repo: 'eliware/demo', headSha: 'abc', tag: 'v1.0.0', pollMs: 0, maxPolls: 2, sleep: jest.fn(), linksOnly: false, log: { info: jest.fn() } })).resolves.toMatchObject({ databaseId: 11, status: 'completed' });
+});
