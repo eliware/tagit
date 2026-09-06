@@ -7,6 +7,10 @@ Eliware packages. It reports changes, validates repository readiness, pushes alr
 committed work, creates release tags for DevOps, and verifies CI and registry
 publication.
 
+Release verification treats a repository without `package.json` as an
+explicit non-package target: npm visibility and package publish-job checks are
+not applicable. A package repository must declare valid publication metadata.
+
 TagIt does not authenticate operator roles, deploy applications, modify GitOps,
 rewrite package metadata, or publish without the authorized release flow.
 

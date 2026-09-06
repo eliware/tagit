@@ -6,7 +6,7 @@ export async function pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxP
   let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
     let runs;
-    try { runs = await readGithubJson(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '20', '--json', 'databaseId,createdAt,status,conclusion,headSha,headBranch,url']); }
+    try { runs = await readGithubJson(execFile, 'gh', ['run', 'list', '--repo', repo, '--limit', '20', '--json', 'databaseId,createdAt,headSha,headBranch']); }
     catch (error) {
       if (error instanceof SyntaxError) throw new Error(`Release CI returned malformed list JSON: ${error.message}`);
       if (poll + 1 >= maxPolls) throw new Error(`Release CI inspection failed after ${maxPolls} attempts: ${error.message}`);

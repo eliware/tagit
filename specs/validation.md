@@ -43,6 +43,11 @@ workflow safeguards are also checked structurally.
 
 ## Evidence rules
 
+Post-release verification explicitly marks repositories without `package.json`
+as non-package targets. npm visibility and package publish-job checks are not
+applicable to those targets; package repositories must declare a valid
+publication name.
+
 Successful local validation does not replace CI evidence. CI must refer to the
 exact commit being handed off. Missing, stale, mismatched, pending beyond the
 polling budget, cancelled, or failed required evidence blocks preflight.
