@@ -9,3 +9,9 @@ test('numbers multiple publication links', () => {
   expect(releaseLinks({ url: 'workflow', jobs: [] }, [], [{ name: 'publish', url: 'one' }, { name: 'publish ghcr', url: 'two' }]))
     .toEqual([['Workflow', 'workflow'], ['Publish 1', 'one'], ['Publish 2', 'two']]);
 });
+test('reports the validated successful Windows job', () => {
+  expect(releaseLinks({ url: 'workflow', jobs: [] }, [
+    { name: 'windows-old', status: 'completed', conclusion: 'failure', url: 'bad' },
+    { name: 'windows', status: 'completed', conclusion: 'success', url: 'good' },
+  ], [])).toEqual([['Workflow', 'workflow'], ['Windows', 'good']]);
+});

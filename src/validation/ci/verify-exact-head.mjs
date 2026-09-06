@@ -18,6 +18,7 @@ export function verifyLatestCi(execFileSync, log, { headSha, repository = null, 
   }
   catch (error) { throw new Error(`Unable to inspect GitHub Actions runs for ${headSha}: ${error.message}`, { cause: error }); }
   const latest = selectLatestRun(runs, headSha);
+  if (latest?.status === 'completed' && !['success', 'failure', 'cancelled', 'skipped', 'neutral', 'timed_out', 'action_required'].includes(latest.conclusion)) throw new Error(`Latest GitHub Actions run ${latest.databaseId} has malformed completed conclusion: ${latest.conclusion}.`);
   if (latest?.status === 'completed' && latest.conclusion !== 'success') throw new Error(`Latest GitHub Actions run ${latest.databaseId} failed with ${latest.conclusion}.`);
   const candidates = latest && successfulRun(latest) ? [latest] : []; const pending = latest?.status !== 'completed' ? latest : null;
   if (waitForCompletion && pollPendingRun(execFileSync, log, pending, repoArg, pollAttempt)) return verifyLatestCi(execFileSync, log, { headSha, repository, waitForCompletion: true }, pollAttempt + 1, pending);

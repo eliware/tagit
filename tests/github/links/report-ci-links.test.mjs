@@ -16,7 +16,7 @@ test('reports absent CI, retries, and rejects invalid remotes', () => {
 test('handles missing job links and job arrays', () => {
   const exec = jest.fn((command, args) => command === 'git' ? 'git@github.com:eliware/tagit.git' : args[1] === 'list' ? JSON.stringify([{ databaseId: 8, url: 'https://ci/8', headSha: 'abc' }]) : JSON.stringify({ jobs: null }));
   expect(() => reportCiLinks(exec, log(), 'abc')).toThrow('malformed job records');
-  const noLink = jest.fn((command, args) => command === 'git' ? 'git@github.com:eliware/tagit.git' : args[1] === 'list' ? JSON.stringify([{ databaseId: 9, url: 'https://ci/9', headSha: 'abc' }]) : JSON.stringify({ jobs: [{}] }));
+  const noLink = jest.fn((command, args) => command === 'git' ? 'git@github.com:eliware/tagit.git' : args[1] === 'list' ? JSON.stringify([{ databaseId: 9, url: 'https://ci/9', headSha: 'abc' }]) : JSON.stringify({ jobs: [{ name: 'metadata-only' }] }));
   expect(reportCiLinks(noLink, log(), 'abc')).toMatchObject({ runs: [{ databaseId: 9 }] });
 });
 test('rejects invalid bounds and malformed responses', () => {
@@ -28,4 +28,8 @@ test('rejects invalid bounds and malformed responses', () => {
 test('rejects malformed individual run records', () => {
   const malformed = jest.fn((command) => command === 'git' ? 'https://github.com/eliware/tagit.git' : JSON.stringify([{ databaseId: 'bad', url: 'https://ci', headSha: 'abc' }]));
   expect(() => reportCiLinks(malformed, log(), 'abc')).toThrow('malformed run records');
+});
+test('rejects malformed individual job records', () => {
+  const malformed = jest.fn((command, args) => command === 'git' ? 'https://github.com/eliware/tagit.git' : args[1] === 'list' ? JSON.stringify([{ databaseId: 10, url: 'https://ci/10', headSha: 'abc' }]) : JSON.stringify({ jobs: [null, 42, { url: 'https://ci/job' }] }));
+  expect(() => reportCiLinks(malformed, log(), 'abc')).toThrow('malformed job records');
 });
