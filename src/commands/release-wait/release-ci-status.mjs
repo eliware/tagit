@@ -14,14 +14,11 @@ export async function pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxP
     }
     const candidate = selectReleaseRun(runs, headSha, tag);
     if (candidate) {
-      const details = await readGithubJson(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'status,conclusion,headSha,jobs,url']);
-      if (!details || typeof details.status !== 'string' || typeof details.conclusion !== 'string' || typeof details.headSha !== 'string' || !Array.isArray(details.jobs)) throw new Error(`Release CI returned malformed details for run ${candidate.databaseId}.`);
+      const details = await readGithubJson(execFile, 'gh', ['run', 'view', String(candidate.databaseId), '--repo', repo, '--json', 'databaseId,status,conclusion,headSha,jobs,url']);
+      if (!details || (details.databaseId !== undefined && typeof details.databaseId !== 'number') || typeof details.status !== 'string' || typeof details.conclusion !== 'string' || typeof details.headSha !== 'string' || !Array.isArray(details.jobs)) throw new Error(`Release CI returned malformed details for run ${candidate.databaseId}.`);
+      if (details.databaseId !== undefined && details.databaseId !== candidate.databaseId) throw new Error(`Release CI details identify run ${details.databaseId}, expected ${candidate.databaseId}.`);
       validateJobRecords(details.jobs, candidate.databaseId);
       if (details.headSha !== headSha) throw new Error(`Release CI details have commit ${details.headSha}, expected ${headSha}.`);
-      if (candidate.status === 'completed' && candidate.conclusion !== 'success') {
-        const jobs = details.jobs.map(job => `${job.name} [${job.status}/${job.conclusion}]`).join(', ');
-        throw new Error(`Release CI failed: ${String(candidate.conclusion)}. Jobs: ${jobs || 'none reported'}.`);
-      }
       if (details.status === 'completed' && details.conclusion !== 'success') {
         const jobs = details.jobs.map(job => `${job.name} [${job.status}/${job.conclusion}]`).join(', ');
         throw new Error(`Release CI failed: ${String(details.conclusion)}. Jobs: ${jobs || 'none reported'}.`);

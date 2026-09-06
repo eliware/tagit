@@ -49,7 +49,7 @@ test('retries transient CI inspection and reports a non-successful candidate', a
     return callback(null, JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] }), '');
   });
   await expect(verifyRelease(transient.execSync, { existsSync: jest.fn(() => false) }, log, { ...validInput, maxPolls: 2, pollMs: 0, sleep: async () => {}, execFile: transient.execFile })).resolves.toMatchObject({ ci: true });
-  const failed = runners({ list: [{ databaseId: 5, status: 'completed', conclusion: 'cancelled', headSha: 'abc', headBranch: 'v1.0.0' }] });
+  const failed = runners({ list: [{ databaseId: 5, status: 'completed', conclusion: 'cancelled', headSha: 'abc', headBranch: 'v1.0.0' }], details: { databaseId: 5, status: 'completed', conclusion: 'cancelled', headSha: 'abc', jobs: [] } });
   await expect(verifyRelease(failed.execSync, { existsSync: () => false }, log, { ...validInput, execFile: failed.execFile })).rejects.toThrow('cancelled');
   const absent = runners({ list: [] });
   await expect(verifyRelease(absent.execSync, {}, log, { ...validInput, execFile: absent.execFile })).rejects.toThrow('did not complete');
