@@ -68,7 +68,7 @@ test('waits for pending CI, then verifies public npm publication', async () => {
   const execFile = jest.fn((executable, args, options, callback) => {
     if (args[1] === 'list') return callback(null, JSON.stringify([{ databaseId: 2, headSha: 'abc', headBranch: 'v1.0.0' }]), '');
     if (args[1] === 'view') return callback(null, JSON.stringify(views++ === 0 ? { status: 'in_progress', conclusion: '', headSha: 'abc', jobs: [] } : { status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }, { name: 'publish', status: 'completed', conclusion: 'success' }] }), '');
-    return callback(null, '{"version":"1.0.0","dist-tags":{"latest":"1.0.0"}}', '');
+    return callback(null, '"1.0.0"', '');
   });
   await expect(verifyRelease(execSync, publicFs, log, { ...validInput, maxPolls: 2, pollMs: 0, npmRetryMs: 0, sleep: async () => {}, execFile })).resolves.toMatchObject({ ci: true, npm: true });
 });
@@ -106,8 +106,8 @@ test('supports refs/tags, skipped optional jobs, private packages, and GHCR', as
     readdirSync: jest.fn(() => ['ci.yml']),
     readFileSync: jest.fn(file => file === 'package.json' ? JSON.stringify({ name: 'demo', private: false }) : 'ghcr.io/eliware/demo'),
   };
-  const publicExec = jest.fn((executable, args, options, callback) => executable === 'npm' || executable === 'npm.cmd'
-    ? callback(null, '{"version":"1.0.0","dist-tags":{"latest":"1.0.0"}}', '')
+  const publicExec = jest.fn((executable, args, options, callback) => executable === 'npm' || executable === 'npm.cmd' || (executable === 'cmd.exe' && args.includes('npm.cmd'))
+    ? callback(null, '"1.0.0"', '')
     : ghcr.execFile(executable, args, options, callback));
   await expect(verifyRelease(ghcr.execSync, publicGhcrFs, log, { ...validInput, release: { ...validInput.release, imageDigest: digest }, execFile: publicExec, pollMs: 0, sleep: async () => {}, maxPolls: 1 })).resolves.toMatchObject({ ghcr: true, npm: true });
 });
