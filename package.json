@@ -2,7 +2,7 @@
     "name": "@eliware/tagit",
     "type": "module",
     "version": "2.5.0",
-    "description": "AI-oriented release notes, safe preflight and dry-run validation, and cross-platform Git release automation.",
+    "description": "Deterministic release preflight and publication verification for Eliware packages.",
     "main": "bin/tagit-cli.mjs",
     "exports": {
         ".": "./bin/tagit-cli.mjs",
@@ -17,7 +17,6 @@
         "specs/",
         "examples/",
         "scripts/typecheck.mjs",
-        "scripts/run-global-test.mjs",
         "README.md",
         "LICENSE",
         "RELEASE_NOTES.md"
@@ -58,7 +57,7 @@
         "ci",
         "github-actions"
     ],
-    "author": "Eliware <eli@eliware.org>",
+    "author": "Eliware <eliware@eliware.org>",
     "license": "MIT",
     "engines": {
         "node": ">=26"

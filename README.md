@@ -2,8 +2,8 @@
 
 ## @eliware/tagit [![npm](https://img.shields.io/npm/v/@eliware/tagit)](https://www.npmjs.com/package/@eliware/tagit) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![CI](https://github.com/eliware/tagit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/tagit/actions/workflows/nodejs.yml)
 
-TagIt is Eliware’s deterministic release-preflight and publication-verification
-CLI. It reports changes, validates repository readiness, pushes already
+TagIt is deterministic release preflight and publication verification for
+Eliware packages. It reports changes, validates repository readiness, pushes already
 committed work, creates release tags for DevOps, and verifies CI and registry
 publication.
 

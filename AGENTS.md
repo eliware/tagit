@@ -3,11 +3,6 @@
 Applies to: the entire `@eliware/tagit` repository unless a more specific
 `AGENTS.md` exists in a descendant directory.
 
-Temporary environment exception: while the current shared `@eliware/test`
-release has a Windows process-launch defect, validation may invoke the global
-`eliware-test` command directly. The package script remains the conventional
-`eliware-test` entrypoint and must not be replaced with a project-local fork.
-
 `@eliware/tagit` provides `tagit notes`, `tagit preflight`, `tagit push`,
 `tagit release --version X.Y.Z`, and `tagit release-wait`. Run from the target
 repository root on Windows or Linux.

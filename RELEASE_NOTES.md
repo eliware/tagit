@@ -17,8 +17,8 @@
   npm, and GHCR visibility, without an initial delay.
 - Added read-only GitOps overlay validation during dry runs.
 - Improved upstream merge/push error handling and release-file restoration.
-- The current development metadata declares the shared test harness
-  `@eliware/test` `^4.0.0`.
+- The current development metadata uses the shared test harness
+  `@eliware/test` `^6.0.1`.
 - Strengthened strict preflight metadata, package allowlist, repository identity,
   release-notes, and publication-workflow consistency checks.
 - Added explicit `.tagit-exceptions.json` support for genuinely inapplicable

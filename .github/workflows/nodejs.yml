@@ -1,4 +1,4 @@
-name: Node.js CI
+name: CI
 
 on:
   workflow_dispatch:
@@ -13,36 +13,26 @@ permissions:
   contents: read
 
 jobs:
-  ubuntu:
-    runs-on: ubuntu-latest
+  validate:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 26
+          cache: npm
       - run: npm ci
       - run: npm test
       - run: npm run lint
       - run: npm run typecheck
       - run: npm audit --omit=dev --audit-level=moderate
-      - run: npm pack --dry-run
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Use Node.js 26.x
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26.x
-      - run: npm ci
-      - run: npm test
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm audit --omit=dev --audit-level=moderate
-      - run: npm pack --dry-run
+      - run: npm run pack
+
   publish:
-    needs: ubuntu
+    needs: validate
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -50,12 +40,10 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js 26.x
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 26.x
-      - name: Configure npm auth token
-        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          node-version: 26
+          registry-url: https://registry.npmjs.org
       - name: Publish to npm
         run: npm publish --access public --provenance
         env:
