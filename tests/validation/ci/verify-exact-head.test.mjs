@@ -96,7 +96,7 @@ test('rejects missing, stale, failed, or incomplete CI evidence', () => {
   expect(() => verifyLatestCi(stale, log, { headSha: 'abc' })).toThrow('No successful');
   const incomplete = jest.fn((command, args) => args[1] === 'list'
     ? JSON.stringify([{ databaseId: 5, status: 'completed', conclusion: 'success', headSha: 'abc' }])
-    : JSON.stringify({ headSha: 'abc', jobs: [{ name: 'windows', status: 'completed', conclusion: 'success' }] }));
+    : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: [{ name: 'windows', status: 'completed', conclusion: 'success' }] }));
   expect(() => verifyLatestCi(incomplete, log, { headSha: 'abc' })).toThrow('lacks a passing Ubuntu');
 });
 
@@ -119,7 +119,7 @@ test('waits for pending runs and reports run details', () => {
 test('reports missing or mismatched platform jobs', () => {
   const exec = jest.fn((command, args) => args[1] === 'list'
     ? JSON.stringify([{ databaseId: 7, status: 'completed', conclusion: 'success', headSha: 'abc' }])
-    : JSON.stringify({ headSha: 'other', jobs: [{ name: 'windows', status: 'completed', conclusion: 'success' }] }));
+    : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'other', jobs: [{ name: 'windows', status: 'completed', conclusion: 'success' }] }));
   expect(() => verifyLatestCi(exec, log, { headSha: 'abc' })).toThrow('lacks a passing Ubuntu');
 });
 
@@ -156,7 +156,7 @@ test('reports failed runs without URLs and malformed job payloads', () => {
   expect(() => verifyLatestCi(failed, log, { headSha: 'abc' })).toThrow('run 10');
   const malformed = jest.fn((command, args) => args[1] === 'list'
     ? JSON.stringify([{ databaseId: 11, status: 'completed', conclusion: 'success', headSha: 'abc' }])
-    : JSON.stringify({ headSha: 'abc', jobs: null }));
+    : JSON.stringify({ status: 'completed', conclusion: 'success', headSha: 'abc', jobs: null }));
   expect(() => verifyLatestCi(malformed, log, { headSha: 'abc' })).toThrow('malformed job records');
   expect(() => verifyLatestCi(failed, log, { headSha: 'abc', waitForCompletion: false })).toThrow('run 10');
   const failedWithUrl = jest.fn(() => JSON.stringify([{ databaseId: 12, status: 'completed', conclusion: 'failure', headSha: 'abc', url: 'https://ci/12' }]));

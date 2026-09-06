@@ -50,6 +50,9 @@ safe handoff sequence. Owners do not run `tagit release` or
 `tagit release-wait`; DevOps runs those after the exact-commit preflight
 handoff.
 
+Run the executable example with `node examples/owner-workflow.mjs`; it prints
+the same read-only handoff commands.
+
 ## Configuration
 
 TagIt has no required application-specific environment variables. The optional
