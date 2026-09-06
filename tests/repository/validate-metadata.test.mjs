@@ -2,7 +2,7 @@ import { validateMetadata } from '../../src/repository/validate-metadata.mjs';
 
 test('reports missing required files and metadata', () => {
   const failures = [];
-  validateMetadata({ existsSync: file => file === 'package.json', readFileSync: () => JSON.stringify({}) }, failures);
+  validateMetadata({ existsSync: (file) => file === 'package.json', readFileSync: () => JSON.stringify({}) }, failures);
   expect(failures.join('\n')).toMatch(/missing|required/);
 });
 

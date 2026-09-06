@@ -11,10 +11,22 @@ export { waitSync } from '../../process/timing/wait-sync.mjs';
 export { sleep as sleepDefault } from '../../process/timing/sleep.mjs';
 export { execFileCommand as releaseCommand } from '../../process/async/exec-file.mjs';
 export { reportCiLinks } from '../../github/links/report-ci-links.mjs';
-export async function verifyRelease(execFileSync, fs, log, {
-  version, release, pollMs = 10000, maxPolls = 30,
-  npmRetries = maxPolls, npmRetryMs = pollMs, sleep = sleepDefault, linksOnly = false, execFile = defaultExecFile,
-} = {}) {
+export async function verifyRelease(
+  execFileSync,
+  fs,
+  log,
+  {
+    version,
+    release,
+    pollMs = 10000,
+    maxPolls = 30,
+    npmRetries = maxPolls,
+    npmRetryMs = pollMs,
+    sleep = sleepDefault,
+    linksOnly = false,
+    execFile = defaultExecFile,
+  } = {},
+) {
   validateReleaseInput(version, release, maxPolls, npmRetries, pollMs, npmRetryMs);
   const repo = readRepositoryName(execFileSync);
   const tag = releaseTag(version);
@@ -24,5 +36,20 @@ export async function verifyRelease(execFileSync, fs, log, {
     reportReleaseLinks(log, repo, tag, run);
     return { repo, tag, headSha, runId: run.databaseId, linksOnly: true };
   }
-  return verifyReleasePublication({ fs, execFile, log, repo, tag, headSha, version, run, release, maxPolls, npmRetries, pollMs, npmRetryMs, sleep });
+  return verifyReleasePublication({
+    fs,
+    execFile,
+    log,
+    repo,
+    tag,
+    headSha,
+    version,
+    run,
+    release,
+    maxPolls,
+    npmRetries,
+    pollMs,
+    npmRetryMs,
+    sleep,
+  });
 }

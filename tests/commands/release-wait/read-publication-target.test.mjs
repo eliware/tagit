@@ -6,15 +6,27 @@ test('reads public and private package publication targets', () => {
 });
 
 test('returns no npm target when package metadata is absent', () => {
-  expect(readPublicationTarget({ existsSync: () => false })).toEqual({ applicable: false, packageName: null, isPrivate: null });
+  expect(readPublicationTarget({ existsSync: () => false })).toEqual({
+    applicable: false,
+    packageName: null,
+    isPrivate: null,
+  });
 });
 test('classifies a private package without a name as applicable but non-publishing', () => {
-  expect(readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ private: true }) })).toEqual({ applicable: true, packageName: null, isPrivate: true });
+  expect(
+    readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ private: true }) }),
+  ).toEqual({ applicable: true, packageName: null, isPrivate: true });
 });
 test('rejects malformed publication names', () => {
-  expect(() => readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ name: 42 }) })).toThrow('must declare a name');
-  expect(() => readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ name: 'not valid' }) })).toThrow('invalid for publication');
+  expect(() =>
+    readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ name: 42 }) }),
+  ).toThrow('must declare a name');
+  expect(() =>
+    readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ name: 'not valid' }) }),
+  ).toThrow('invalid for publication');
 });
 test('rejects a public package without a name', () => {
-  expect(() => readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ private: false }) })).toThrow('must declare a name');
+  expect(() =>
+    readPublicationTarget({ existsSync: () => true, readFileSync: () => JSON.stringify({ private: false }) }),
+  ).toThrow('must declare a name');
 });

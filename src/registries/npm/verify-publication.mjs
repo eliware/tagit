@@ -9,12 +9,19 @@ function readNpmView(output, version) {
 export async function verifyNpmPublication(execFile, log, { packageName, version, retries, retryMs, sleep }) {
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
-      const output = await execFileCommand(execFile, npmExecutable(), ['view', `${packageName}@${version}`, 'version', '--json']);
+      const output = await execFileCommand(execFile, npmExecutable(), [
+        'view',
+        `${packageName}@${version}`,
+        'version',
+        '--json',
+      ]);
       const visible = readNpmView(output, version);
       log.debug?.(`npm visibility attempt ${attempt + 1}/${retries}: expected ${version}, matched=${visible}.`);
       if (visible) return;
     } catch (error) {
-      const detail = String(error.stderr ?? error.stdout ?? error.message ?? 'unknown error').trim().slice(0, 300);
+      const detail = String(error.stderr ?? error.stdout ?? error.message ?? 'unknown error')
+        .trim()
+        .slice(0, 300);
       log.debug?.(`npm visibility attempt ${attempt + 1}/${retries} failed: ${detail}`);
     }
     if (attempt + 1 < retries) await sleep(retryMs);

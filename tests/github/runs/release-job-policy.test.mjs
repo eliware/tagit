@@ -9,13 +9,17 @@ test('accepts successful Ubuntu and optional Windows jobs', () => {
 });
 
 test('rejects failed Windows or missing Ubuntu jobs', () => {
-  expect(() => verifyReleaseJobs([{ name: 'windows', status: 'completed', conclusion: 'failure' }])).toThrow('failing Windows');
+  expect(() => verifyReleaseJobs([{ name: 'windows', status: 'completed', conclusion: 'failure' }])).toThrow(
+    'failing Windows',
+  );
   expect(() => verifyReleaseJobs([{ name: 'security', status: 'completed', conclusion: 'success' }])).toThrow('Ubuntu');
 });
 
 test('reports a failed non-platform job', () => {
-  expect(() => verifyReleaseJobs([
-    { name: 'ubuntu', status: 'completed', conclusion: 'success' },
-    { name: 'publish', status: 'completed', conclusion: 'failure' },
-  ])).toThrow('publish: failure');
+  expect(() =>
+    verifyReleaseJobs([
+      { name: 'ubuntu', status: 'completed', conclusion: 'success' },
+      { name: 'publish', status: 'completed', conclusion: 'failure' },
+    ]),
+  ).toThrow('publish: failure');
 });

@@ -7,7 +7,13 @@ export function dispatchSimpleCommand(command, options, deps, output) {
     return true;
   }
   if (command === 'push') {
-    runPushCommand({ execFileSync: deps.execFileSync, reportCiLinks: deps.reportCiLinks, log: deps.log, exit: deps.exit, dryRun: options.dryRun });
+    runPushCommand({
+      execFileSync: deps.execFileSync,
+      reportCiLinks: deps.reportCiLinks,
+      log: deps.log,
+      exit: deps.exit,
+      dryRun: options.dryRun,
+    });
     return true;
   }
   return false;

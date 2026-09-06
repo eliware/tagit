@@ -11,7 +11,8 @@ export async function runReleaseCommand({ options, fs, execFileSync, execFile, l
   }
   if (fs.existsSync('package.json')) {
     const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    if (packageData.version !== options.version) throw new Error(`package.json version ${packageData.version} does not match --version ${options.version}.`);
+    if (packageData.version !== options.version)
+      throw new Error(`package.json version ${packageData.version} does not match --version ${options.version}.`);
   }
   const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
   await verifyRelease(execFileSync, fs, log, { version: options.version, release, linksOnly: true, execFile });

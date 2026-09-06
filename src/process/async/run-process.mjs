@@ -4,7 +4,12 @@ export async function runProcessAsync(execFile, executable, args = [], options =
   if (!Array.isArray(args)) throw new TypeError('Process arguments must be an array.');
   return new Promise((resolve, reject) => {
     execFile(executable, args, options, (error, stdout, stderr) => {
-      if (error) { error.stdout = stdout; error.stderr = stderr; reject(error); return; }
+      if (error) {
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+        return;
+      }
       resolve({ stdout, stderr });
     });
   });

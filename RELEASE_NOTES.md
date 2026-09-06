@@ -1,5 +1,14 @@
 # Release Notes
 
+## 6.2.0
+
+### Changed
+
+- Updated TagIt to Convention v6.2.
+- Added committed Prettier configuration and `format`/`format:check` scripts.
+- Clarified that formatter validation remains owned by `@eliware/test`; TagIt
+  invokes the authoritative `npm test` command without duplicating it.
+
 ## 2.5.0
 
 ### Added

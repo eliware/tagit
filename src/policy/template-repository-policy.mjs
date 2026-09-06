@@ -1,1 +1,3 @@
-export function isTemplateRepository(fs) { return fs.existsSync('.notag'); }
+export function isTemplateRepository(fs) {
+  return fs.existsSync('.notag');
+}

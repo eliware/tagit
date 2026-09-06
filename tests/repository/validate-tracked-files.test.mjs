@@ -8,6 +8,8 @@ test('reports secret-looking tracked paths', () => {
 
 test('reports Git inspection errors', () => {
   const failures = [];
-  validateTrackedFiles(() => { throw new Error('unavailable'); }, failures);
+  validateTrackedFiles(() => {
+    throw new Error('unavailable');
+  }, failures);
   expect(failures.join('\n')).toContain('tracked-file validation failed');
 });

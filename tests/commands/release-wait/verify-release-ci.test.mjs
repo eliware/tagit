@@ -3,7 +3,13 @@ import { verifyReleaseCi } from '../../../src/commands/release-wait/verify-relea
 
 test('coordinates CI job policy and publication target discovery', () => {
   const log = { info: jest.fn() };
-  const result = verifyReleaseCi({ existsSync: () => false, readFileSync: () => '{}' }, log, 'eliware/tagit', 'v1.0.0', { jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] });
+  const result = verifyReleaseCi(
+    { existsSync: () => false, readFileSync: () => '{}' },
+    log,
+    'eliware/tagit',
+    'v1.0.0',
+    { jobs: [{ name: 'ubuntu', status: 'completed', conclusion: 'success' }] },
+  );
   expect(result).toEqual(expect.objectContaining({ applicable: false, packageName: null, isPrivate: null }));
 });
 test('reports malformed job records', () => {

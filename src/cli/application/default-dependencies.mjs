@@ -9,5 +9,19 @@ import { reportCiLinks } from '../../github/links/report-ci-links.mjs';
 import packageData from '../../../package.json' with { type: 'json' };
 
 export function defaultDependencies() {
-  return { fs, execFileSync, execFile, log, gitOperations, runPreflight, verifyRelease, buildNotesReport, reportCiLinks, registerHandlersFn: registerHandlers, registerSignalsFn: registerSignals, exit: process.exit, packageVersion: packageData.version };
+  return {
+    fs,
+    execFileSync,
+    execFile,
+    log,
+    gitOperations,
+    runPreflight,
+    verifyRelease,
+    buildNotesReport,
+    reportCiLinks,
+    registerHandlersFn: registerHandlers,
+    registerSignalsFn: registerSignals,
+    exit: process.exit,
+    packageVersion: packageData.version,
+  };
 }

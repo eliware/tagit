@@ -5,11 +5,21 @@ export function validateReleaseWorkflow(fs) {
   const path = '.github/workflows/nodejs.yml';
   if (!fs.existsSync(path)) return failures;
   const workflow = fs.readFileSync(path, 'utf8');
-  for (const command of REQUIRED_COMMANDS) if (!workflow.includes(command)) failures.push(`BLOCKED: release workflow must run ${command}.`);
-  if (!/tags:\s*\n\s+-\s*['"]?v\*['"]?/.test(workflow)) failures.push('BLOCKED: release workflow must trigger publication validation for v* tags.');
-  if (!/uses:\s*actions\/checkout@/.test(workflow)) failures.push('BLOCKED: release workflow must check out the exact triggering release commit.');
-  const hasTagGatedPublication = /needs:\s*[^\n]+[\s\S]*if:\s*startsWith\(github\.ref, ['"]refs\/tags\/v/.test(workflow);
-  if (!hasTagGatedPublication) failures.push('BLOCKED: publication must depend on validation and run only for v* tags.');
-  if (!/permissions:\s*\n\s+contents:\s+read/.test(workflow) || !/publish:[\s\S]*permissions:[\s\S]*id-token:\s+write/.test(workflow)) failures.push('BLOCKED: workflow permissions must be read-only globally and grant id-token write only to publish.');
+  for (const command of REQUIRED_COMMANDS)
+    if (!workflow.includes(command)) failures.push(`BLOCKED: release workflow must run ${command}.`);
+  if (!/tags:\s*\n\s+-\s*['"]?v\*['"]?/.test(workflow))
+    failures.push('BLOCKED: release workflow must trigger publication validation for v* tags.');
+  if (!/uses:\s*actions\/checkout@/.test(workflow))
+    failures.push('BLOCKED: release workflow must check out the exact triggering release commit.');
+  const hasTagGatedPublication = /needs:\s*[^\n]+[\s\S]*if:\s*startsWith\(github\.ref, ['"]refs\/tags\/v/.test(
+    workflow,
+  );
+  if (!hasTagGatedPublication)
+    failures.push('BLOCKED: publication must depend on validation and run only for v* tags.');
+  if (
+    !/permissions:\s*\n\s+contents:\s+read/.test(workflow) ||
+    !/publish:[\s\S]*permissions:[\s\S]*id-token:\s+write/.test(workflow)
+  )
+    failures.push('BLOCKED: workflow permissions must be read-only globally and grant id-token write only to publish.');
   return failures;
 }

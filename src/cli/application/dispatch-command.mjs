@@ -8,8 +8,14 @@ export const operatorBoundary = ownerGuidance;
 
 export async function dispatchCommand(options, deps) {
   const { output = console.log } = deps;
-  if (options.versionQuery) { output(deps.packageVersion); return; }
-  if (options.help || !options.command) { output(`${operatorBoundary}\n\n${helpText()}`); return; }
+  if (options.versionQuery) {
+    output(deps.packageVersion);
+    return;
+  }
+  if (options.help || !options.command) {
+    output(`${operatorBoundary}\n\n${helpText()}`);
+    return;
+  }
   registerLifecycle(deps);
   if (dispatchSimpleCommand(options.command, options, deps, output)) return;
   await runReleaseCommand(options, deps);

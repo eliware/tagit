@@ -8,7 +8,9 @@ test('runs an injected asynchronous process and captures output', async () => {
 
 test('propagates asynchronous failures and validates inputs', async () => {
   const error = new Error('failed');
-  await expect(runProcessAsync((command, args, options, callback) => callback(error, 'out', 'err'), 'gh')).rejects.toMatchObject({ message: 'failed', stdout: 'out', stderr: 'err' });
+  await expect(
+    runProcessAsync((command, args, options, callback) => callback(error, 'out', 'err'), 'gh'),
+  ).rejects.toMatchObject({ message: 'failed', stdout: 'out', stderr: 'err' });
   await expect(runProcessAsync(null, 'gh')).rejects.toThrow('asynchronous process runner');
   await expect(runProcessAsync(jest.fn(), '', [])).rejects.toThrow('executable');
   await expect(runProcessAsync(jest.fn(), 'gh', 'run')).rejects.toThrow('array');

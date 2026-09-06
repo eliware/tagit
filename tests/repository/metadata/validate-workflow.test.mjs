@@ -7,13 +7,19 @@ test('accepts a gated tag-only publication workflow', () => {
 });
 
 test('reports missing validation and publication safeguards', () => {
-  const failures = validateReleaseWorkflow({ existsSync: () => true, readFileSync: () => 'jobs:\n  publish:\n    run: npm publish' });
+  const failures = validateReleaseWorkflow({
+    existsSync: () => true,
+    readFileSync: () => 'jobs:\n  publish:\n    run: npm publish',
+  });
   expect(failures.length).toBeGreaterThan(1);
   expect(failures.join('\n')).toContain('npm test');
 });
 
 test('does not confuse a workflow push trigger with publication on branches', () => {
-  expect(validateReleaseWorkflow({ existsSync: () => true, readFileSync: () => valid.replace('refs/tags/v', 'refs/heads/main') })).toEqual([
-    'BLOCKED: publication must depend on validation and run only for v* tags.',
-  ]);
+  expect(
+    validateReleaseWorkflow({
+      existsSync: () => true,
+      readFileSync: () => valid.replace('refs/tags/v', 'refs/heads/main'),
+    }),
+  ).toEqual(['BLOCKED: publication must depend on validation and run only for v* tags.']);
 });

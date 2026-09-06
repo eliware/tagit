@@ -3,7 +3,7 @@
 const secretPattern = /(^|[\\/])(?:\.env(?:$|\.(?!example$))|id_rsa(?:\.|$)|credentials(?:\.|[\\/]|$))/i;
 
 export function findSecretLookingPaths(files) {
-  return files.split(/\r?\n/).filter(file => secretPattern.test(file));
+  return files.split(/\r?\n/).filter((file) => secretPattern.test(file));
 }
 
 export function secretFilesMessage(files) {

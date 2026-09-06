@@ -2,7 +2,11 @@ import { validateAllowedOptions, validateCommandPolicy, validateOptionDuplicates
 
 export function validateOptions(argv, command) {
   validateAllowedOptions(argv);
-  if (argv.some(argument => ['--help', '-h'].includes(argument)) && argv.some(argument => ['--version', '-v'].includes(argument))) throw new Error('Help and version options cannot be combined.');
+  if (
+    argv.some((argument) => ['--help', '-h'].includes(argument)) &&
+    argv.some((argument) => ['--version', '-v'].includes(argument))
+  )
+    throw new Error('Help and version options cannot be combined.');
   for (let index = command ? 1 : 0; index < argv.length; index += 1) {
     if (argv[index] === '--version') {
       index += 1;

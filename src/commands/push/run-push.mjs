@@ -8,5 +8,9 @@ export function runPushCommand({ execFileSync, reportCiLinks, log, exit, dryRun 
     const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
     reportCiLinks(execFileSync, log, headSha, { attempts: 10, delayMs: 2000 });
     log.info('Push completed; untracked files were not staged.');
-  } catch (error) { log.error(error); exit(1); throw error; }
+  } catch (error) {
+    log.error(error);
+    exit(1);
+    throw error;
+  }
 }

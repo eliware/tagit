@@ -1,18 +1,25 @@
 import { readRepositoryExceptions } from './read-exceptions.mjs';
 
 export const requiredRepositoryFiles = [
-  'package.json', 'README.md', 'AGENTS.md', 'RELEASE_NOTES.md', 'docs/', 'specs/',
-  'examples/', '.env.example', '.github/workflows/nodejs.yml',
+  'package.json',
+  'README.md',
+  'AGENTS.md',
+  'RELEASE_NOTES.md',
+  'docs/',
+  'specs/',
+  'examples/',
+  '.env.example',
+  '.github/workflows/nodejs.yml',
 ];
 
 export function findMissingRepositoryFiles(fs) {
   const exceptions = readRepositoryExceptions(fs);
-  const exists = file => {
+  const exists = (file) => {
     if (!fs.existsSync(file)) return false;
     if (!file.endsWith('/') || typeof fs.lstatSync !== 'function') return true;
     return fs.lstatSync(file).isDirectory();
   };
-  return requiredRepositoryFiles.filter(file => !exceptions[file] && !exists(file));
+  return requiredRepositoryFiles.filter((file) => !exceptions[file] && !exists(file));
 }
 
 export function missingFileMessage(file) {

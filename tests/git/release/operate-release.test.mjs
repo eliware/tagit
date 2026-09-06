@@ -24,7 +24,9 @@ test('creates and pushes only the release tag', () => {
   expect(gitOperations(exec, {}, logger, '1.0.0')).toEqual({ commitSha: 'abc123', tag: 'v1.0.0' });
   expect(exec).toHaveBeenCalledWith('git', ['tag', 'v1.0.0', 'abc123'], { stdio: 'inherit' });
   expect(exec).toHaveBeenCalledWith('git', ['push', 'origin', 'v1.0.0'], { stdio: 'inherit' });
-  expect(exec.mock.calls.some(([, args]) => ['add', 'commit', 'push'].includes(args?.[0]) && args?.[0] !== 'push')).toBe(false);
+  expect(
+    exec.mock.calls.some(([, args]) => ['add', 'commit', 'push'].includes(args?.[0]) && args?.[0] !== 'push'),
+  ).toBe(false);
   expect(exec.mock.calls.some(([, args]) => args?.[0] === 'push' && args?.[2] !== 'v1.0.0')).toBe(false);
 });
 
@@ -72,7 +74,9 @@ test('reports tag push failures after the remote operation begins', () => {
   });
   const logger = log();
   expect(() => gitOperations(exec, {}, logger, '1.0.0')).toThrow('push failed');
-  expect(logger.error).toHaveBeenCalledWith('Tag push failed after remote side effects; local files were preserved for reconciliation.');
+  expect(logger.error).toHaveBeenCalledWith(
+    'Tag push failed after remote side effects; local files were preserved for reconciliation.',
+  );
 });
 
 test('rejects a remote tag that resolves to another commit', () => {
@@ -109,7 +113,8 @@ test('uses the peeled commit for annotated remote tags', () => {
   const exec = jest.fn((executable, args) => {
     if (executable === 'git' && args.join(' ') === 'rev-parse HEAD') return 'abc123\n';
     if (executable === 'git' && args[0] === 'tag') return '';
-    if (executable === 'git' && args[0] === 'ls-remote') return 'tagsha\trefs/tags/v1.0.0\nabc123\trefs/tags/v1.0.0^{}\n';
+    if (executable === 'git' && args[0] === 'ls-remote')
+      return 'tagsha\trefs/tags/v1.0.0\nabc123\trefs/tags/v1.0.0^{}\n';
     return '';
   });
   expect(gitOperations(exec, {}, log(), '1.0.0')).toMatchObject({ commitSha: 'abc123', tag: 'v1.0.0' });

@@ -9,11 +9,18 @@ test('runs an executable asynchronously', async () => {
 test('wraps the npm Windows shim without shell execution', async () => {
   const exec = jest.fn((_executable, _args, _options, callback) => callback(null, 'ok', ''));
   await expect(execFileCommand(exec, 'npm.cmd', ['view', 'demo'], undefined, 'win32')).resolves.toBe('ok');
-  expect(exec).toHaveBeenCalledWith('cmd.exe', ['/d', '/s', '/c', 'npm.cmd', 'view', 'demo'], expect.objectContaining({ windowsVerbatimArguments: true }), expect.any(Function));
+  expect(exec).toHaveBeenCalledWith(
+    'cmd.exe',
+    ['/d', '/s', '/c', 'npm.cmd', 'view', 'demo'],
+    expect.objectContaining({ windowsVerbatimArguments: true }),
+    expect.any(Function),
+  );
 });
 
 test('uses default encoding and propagates command output on failure', async () => {
-  const exec = jest.fn((_executable, _args, _options, callback) => callback(Object.assign(new Error('bad'), {}), 'out', 'err'));
+  const exec = jest.fn((_executable, _args, _options, callback) =>
+    callback(Object.assign(new Error('bad'), {}), 'out', 'err'),
+  );
   await expect(execFileCommand(exec, 'gh', [])).rejects.toMatchObject({ stdout: 'out', stderr: 'err' });
 });
 

@@ -6,9 +6,18 @@ test('blocks CI verification for a dirty worktree', () => {
 });
 
 test('verifies exact HEAD and reports CI errors', () => {
-  const exec = jest.fn((command, args) => args[0] === 'rev-parse' ? 'abc\n' : JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }]));
+  const exec = jest.fn((command, args) =>
+    args[0] === 'rev-parse'
+      ? 'abc\n'
+      : JSON.stringify([{ databaseId: 1, status: 'completed', conclusion: 'success', headSha: 'abc' }]),
+  );
   expect(verifyPreflightCi(exec, { info: jest.fn() }, '')).toMatchObject({ passed: false });
   expect(exec).toHaveBeenCalledWith('git', ['rev-parse', 'HEAD'], expect.any(Object));
-  const failing = jest.fn(() => { throw new Error('CI unavailable'); });
-  expect(verifyPreflightCi(failing, { info: jest.fn() }, '')).toMatchObject({ passed: false, error: expect.any(Error) });
+  const failing = jest.fn(() => {
+    throw new Error('CI unavailable');
+  });
+  expect(verifyPreflightCi(failing, { info: jest.fn() }, '')).toMatchObject({
+    passed: false,
+    error: expect.any(Error),
+  });
 });

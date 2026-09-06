@@ -1,80 +1,83 @@
 {
-    "name": "@eliware/tagit",
-    "type": "module",
-    "version": "2.5.0",
-    "description": "Deterministic release preflight and publication verification for Eliware packages.",
-    "main": "bin/tagit-cli.mjs",
-    "exports": {
-        ".": "./bin/tagit-cli.mjs",
-        "./tagit": "./bin/tagit.mjs",
-        "./push": "./bin/push.mjs",
-        "./upstream": "./bin/upstream.mjs"
-    },
-    "files": [
-        "bin/",
-        "src/",
-        "docs/",
-        "specs/",
-        "examples/",
-        "scripts/typecheck.mjs",
-        "README.md",
-        "LICENSE",
-        "RELEASE_NOTES.md"
-    ],
-    "publishConfig": {
-        "access": "public",
-        "provenance": true
-    },
-    "scripts": {
-        "start": "node bin/tagit-cli.mjs",
-        "test": "eliware-test",
-        "lint": "eliware-test --lint",
-        "typecheck": "node scripts/typecheck.mjs",
-        "pack": "npm pack --dry-run"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/eliware/tagit.git"
-    },
-    "keywords": [
-        "tagit",
-        "versioning",
-        "git",
-        "git-tag",
-        "git-release",
-        "automation",
-        "release-automation",
-        "nodejs",
-        "npm",
-        "php",
-        "composer",
-        "package.json",
-        "composer.json",
-        "release",
-        "publishing",
-        "cli",
-        "version-bumping",
-        "ci",
-        "github-actions"
-    ],
-    "author": "Eliware <eliware@eliware.org>",
-    "license": "MIT",
-    "engines": {
-        "node": ">=26"
-    },
-    "bugs": {
-        "url": "https://github.com/eliware/tagit/issues"
-    },
-    "homepage": "https://github.com/eliware/tagit#readme",
-    "devDependencies": {
-        "@eliware/test": "^6.0.1"
-    },
-    "dependencies": {
-        "@eliware/common": "^2.0.0"
-    },
-    "bin": {
-        "tagit": "bin/tagit-cli.mjs",
-        "push": "bin/push-cli.mjs",
-        "upstream": "bin/upstream-cli.mjs"
-    }
+  "name": "@eliware/tagit",
+  "type": "module",
+  "version": "6.2.0",
+  "description": "Deterministic release preflight and publication verification for Eliware packages.",
+  "main": "bin/tagit-cli.mjs",
+  "exports": {
+    ".": "./bin/tagit-cli.mjs",
+    "./tagit": "./bin/tagit.mjs",
+    "./push": "./bin/push.mjs",
+    "./upstream": "./bin/upstream.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "docs/",
+    "specs/",
+    "examples/",
+    "scripts/typecheck.mjs",
+    "README.md",
+    "LICENSE",
+    "RELEASE_NOTES.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "start": "node bin/tagit-cli.mjs",
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "node scripts/typecheck.mjs",
+    "pack": "npm pack --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eliware/tagit.git"
+  },
+  "keywords": [
+    "tagit",
+    "versioning",
+    "git",
+    "git-tag",
+    "git-release",
+    "automation",
+    "release-automation",
+    "nodejs",
+    "npm",
+    "php",
+    "composer",
+    "package.json",
+    "composer.json",
+    "release",
+    "publishing",
+    "cli",
+    "version-bumping",
+    "ci",
+    "github-actions"
+  ],
+  "author": "Eliware <eliware@eliware.org>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=26"
+  },
+  "bugs": {
+    "url": "https://github.com/eliware/tagit/issues"
+  },
+  "homepage": "https://github.com/eliware/tagit#readme",
+  "devDependencies": {
+    "@eliware/test": "^6.0.1",
+    "prettier": "^3.9.6"
+  },
+  "dependencies": {
+    "@eliware/common": "^2.0.0"
+  },
+  "bin": {
+    "tagit": "bin/tagit-cli.mjs",
+    "push": "bin/push-cli.mjs",
+    "upstream": "bin/upstream-cli.mjs"
+  }
 }

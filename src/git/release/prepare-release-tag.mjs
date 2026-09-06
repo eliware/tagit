@@ -8,7 +8,10 @@ export function prepareReleaseTag(execFileSync, log, releaseTag) {
   const existing = resolveExistingTag(runFile, releaseTag, currentHead);
   if (existing.reuse) log.info(`Tag ${releaseTag} already points to HEAD; reusing existing release CI.`);
   else {
-    if (existing.existingTagHead) throw new Error(`Release tag ${releaseTag} already points to ${existing.existingTagHead}, not HEAD ${currentHead}.`);
+    if (existing.existingTagHead)
+      throw new Error(
+        `Release tag ${releaseTag} already points to ${existing.existingTagHead}, not HEAD ${currentHead}.`,
+      );
     log.info(`Tagging commit with tag: ${releaseTag}`);
     createTag((args, options) => runFile('git', args, options), releaseTag, currentHead);
   }

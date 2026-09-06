@@ -1,4 +1,8 @@
-import { validateAllowedOptions, validateCommandPolicy, validateOptionDuplicates } from '../../../src/cli/arguments/option-policy.mjs';
+import {
+  validateAllowedOptions,
+  validateCommandPolicy,
+  validateOptionDuplicates,
+} from '../../../src/cli/arguments/option-policy.mjs';
 
 test('validates option vocabulary and duplicate options', () => {
   expect(() => validateAllowedOptions(['release', '--bad'])).toThrow('Unknown option');
