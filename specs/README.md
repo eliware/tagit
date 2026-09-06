@@ -17,6 +17,7 @@ and [out-of-scope](out-of-scope.md) specifications relevant to the change.
 - [Commands](commands.md)
 - [Release workflow](release-workflow.md)
 - [Validation](validation.md)
+- [Requirements](requirements.md)
 - [GitOps and publication](gitops.md)
 - [Out of scope and unintended behavior](out-of-scope.md)
 
