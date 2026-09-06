@@ -43,6 +43,11 @@ workflow safeguards are also checked structurally.
 
 ## Evidence rules
 
+Release evidence requires successful Ubuntu validation, requires every present
+Windows job to pass, and requires a successful `publish` job for public npm
+packages. Other jobs are optional when they are not platform validation or
+publication jobs.
+
 Post-release verification explicitly marks repositories without `package.json`
 as non-package targets. npm visibility and package publish-job checks are not
 applicable to those targets; package repositories must declare a valid

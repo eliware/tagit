@@ -27,6 +27,11 @@ release operation.
 
 ## Safety rules
 
+Release CI requires a completed successful Ubuntu validation job. Windows jobs
+are optional, but every present Windows job must pass. Public npm packages
+require a completed successful job named `publish`; skipped or neutral Ubuntu,
+Windows, or publication jobs never satisfy those requirements.
+
 - Only the release tag may be created or pushed by the release operation.
 - No release branch is created.
 - No unrelated or untracked files are staged.
