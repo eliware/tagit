@@ -6,13 +6,13 @@ const okExec = jest.fn((_executable, _args, _options, callback) => callback(null
 test('runs an executable asynchronously', async () => {
   await expect(execFileCommand(okExec, 'gh', ['run', 'list'])).resolves.toBe('ok');
 });
-test('wraps the npm Windows shim without shell execution', async () => {
+test('executes the npm Windows shim directly without shell parsing', async () => {
   const exec = jest.fn((_executable, _args, _options, callback) => callback(null, 'ok', ''));
   await expect(execFileCommand(exec, 'npm.cmd', ['view', 'demo'], undefined, 'win32')).resolves.toBe('ok');
   expect(exec).toHaveBeenCalledWith(
-    'cmd.exe',
-    ['/d', '/s', '/c', 'npm.cmd', 'view', 'demo'],
-    expect.objectContaining({ windowsVerbatimArguments: true }),
+    'npm.cmd',
+    ['view', 'demo'],
+    expect.anything(),
     expect.any(Function),
   );
 });

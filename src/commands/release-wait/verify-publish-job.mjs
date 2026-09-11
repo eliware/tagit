@@ -4,7 +4,8 @@ export function verifyPublishJob(jobs, { applicable, packageName, isPrivate }) {
     applicable &&
     packageName &&
     !isPrivate &&
-    !publishJobs.some((job) => job.status === 'completed' && job.conclusion === 'success')
+    (!publishJobs.length ||
+      publishJobs.some((job) => job.status !== 'completed' || job.conclusion !== 'success'))
   )
     throw new Error('Release CI lacks a successful publish job.');
   return publishJobs;

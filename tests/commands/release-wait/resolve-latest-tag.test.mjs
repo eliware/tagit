@@ -13,3 +13,7 @@ test('rejects invalid or changing latest tags', () => {
     resolveLatestReleaseTag(jest.fn((command, args) => (args[0] === 'describe' ? 'v1.2.3' : calls++ ? 'def' : 'abc'))),
   ).toThrow('changed');
 });
+
+test('rejects noncanonical leading-zero release tags', () => {
+  expect(() => resolveLatestReleaseTag(jest.fn(() => 'v01.2.3'))).toThrow('not a semantic');
+});

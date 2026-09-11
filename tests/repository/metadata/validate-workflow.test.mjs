@@ -23,3 +23,8 @@ test('does not confuse a workflow push trigger with publication on branches', ()
     }),
   ).toEqual(['BLOCKED: publication must depend on validation and run only for v* tags.']);
 });
+
+test('accepts the canonical validate job name', () => {
+  const canonical = valid.replaceAll('build:', 'validate:').replace('needs: build', 'needs: validate');
+  expect(validateReleaseWorkflow({ existsSync: () => true, readFileSync: () => canonical })).toEqual([]);
+});

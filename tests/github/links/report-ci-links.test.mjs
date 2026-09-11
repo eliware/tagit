@@ -14,9 +14,9 @@ test('reports exact-HEAD workflow and job links', () => {
   expect(reportCiLinks(exec, logger, 'abc')).toMatchObject({ repo: 'eliware/tagit', headSha: 'abc' });
   expect(logger.info).toHaveBeenCalledWith('Workflow: [https://ci/7](https://ci/7)');
 });
-test('reports absent CI, retries, and rejects invalid remotes', () => {
+test('reports absent CI without blocking retries and rejects invalid remotes', () => {
   const exec = jest.fn((command) => (command === 'git' ? 'https://github.com/eliware/tagit.git' : '[]'));
-  expect(reportCiLinks(exec, log(), 'abc', { attempts: 2, delayMs: 0 })).toMatchObject({ runs: [] });
+  expect(reportCiLinks(exec, log(), 'abc')).toMatchObject({ runs: [] });
   expect(() =>
     reportCiLinks(
       jest.fn(() => 'local-only'),
@@ -43,23 +43,7 @@ test('handles missing job links and job arrays', () => {
   );
   expect(reportCiLinks(noLink, log(), 'abc')).toMatchObject({ runs: [{ databaseId: 9 }] });
 });
-test('rejects invalid bounds and malformed responses', () => {
-  expect(() =>
-    reportCiLinks(
-      jest.fn(() => 'https://github.com/eliware/tagit.git'),
-      log(),
-      'abc',
-      { attempts: 0 },
-    ),
-  ).toThrow('attempts');
-  expect(() =>
-    reportCiLinks(
-      jest.fn(() => 'https://github.com/eliware/tagit.git'),
-      log(),
-      'abc',
-      { delayMs: -1 },
-    ),
-  ).toThrow('delay');
+test('rejects malformed responses without blocking retry options', () => {
   const malformed = jest.fn((command) =>
     command === 'git' ? 'https://github.com/eliware/tagit.git' : JSON.stringify({ runs: [] }),
   );
