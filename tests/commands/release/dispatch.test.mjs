@@ -31,6 +31,12 @@ test('coordinates latest-tag release wait', async () => {
   expect(deps.verifyRelease).toHaveBeenCalled();
 });
 
+test('does not require a release version for release-wait', async () => {
+  const deps = base();
+  deps.execFileSync.mockImplementation((command, args) => (args[0] === 'describe' ? 'v1.2.3' : 'abc'));
+  await expect(runReleaseCommand({ command: 'release-wait' }, deps)).resolves.toBeUndefined();
+});
+
 test('rejects a latest tag that is not a semantic release', async () => {
   const deps = base();
   deps.execFileSync.mockReturnValue('v-next');

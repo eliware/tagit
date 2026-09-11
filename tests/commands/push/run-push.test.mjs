@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { runPushCommand } from '../../../src/commands/push/run-push.mjs';
+import { runTagit } from '../../../src/cli/application/run-tagit.mjs';
 
 test('pushes the existing HEAD and reports its CI links', () => {
   const execFileSync = jest.fn((command, args) => (args[0] === 'rev-parse' ? 'abc\n' : undefined));
@@ -8,6 +9,20 @@ test('pushes the existing HEAD and reports its CI links', () => {
   runPushCommand({ execFileSync, reportCiLinks, log, exit: jest.fn(), dryRun: false });
   expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
   expect(reportCiLinks).toHaveBeenCalledWith(execFileSync, log, 'abc', { attempts: 10, delayMs: 2000 });
+});
+
+test('CLI push dry-run performs no process or CI lookup', async () => {
+  const execFileSync = jest.fn();
+  await runTagit(
+    {
+      execFileSync,
+      log: { info: jest.fn(), error: jest.fn() },
+      registerHandlersFn: jest.fn(),
+      registerSignalsFn: jest.fn(),
+    },
+    ['push', '--dry-run'],
+  );
+  expect(execFileSync).not.toHaveBeenCalled();
 });
 
 test('does not mutate or inspect CI during a dry run', () => {

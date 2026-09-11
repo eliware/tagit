@@ -19,3 +19,12 @@ test('does not poll absent or exhausted runs', () => {
   expect(pollPendingRun(exec, { info: jest.fn() }, { databaseId: 1 }, [], 30)).toBe(false);
   expect(exec).not.toHaveBeenCalled();
 });
+
+test('continues after a watch failure and handles runs without links', () => {
+  const exec = jest.fn(() => {
+    throw new Error('watch timeout');
+  });
+  const log = { info: jest.fn() };
+  expect(pollPendingRun(exec, log, { databaseId: 2 }, [], 0)).toBe(true);
+  expect(log.info).not.toHaveBeenCalled();
+});

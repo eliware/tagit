@@ -8,7 +8,7 @@ export function validateRunRecords(runs, headSha) {
         typeof run !== 'object' ||
         !Number.isInteger(run.databaseId) ||
         typeof run.status !== 'string' ||
-        typeof run.conclusion !== 'string' ||
+        (run.conclusion !== null && typeof run.conclusion !== 'string') ||
         typeof run.headSha !== 'string',
     );
   if (malformed.length) {

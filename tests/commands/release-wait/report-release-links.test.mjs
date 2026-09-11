@@ -11,3 +11,9 @@ test('handles a run without optional job links', () => {
   reportReleaseLinks(log, 'eliware/demo', 'v1.0.0', { url: 'workflow' });
   expect(log.info).toHaveBeenCalledTimes(2);
 });
+
+test('does not report jobs that have no URL', () => {
+  const log = { info: jest.fn() };
+  reportReleaseLinks(log, 'eliware/demo', 'v1.0.0', { url: 'workflow', jobs: [{ name: 'Ubuntu' }] });
+  expect(log.info).toHaveBeenCalledTimes(2);
+});

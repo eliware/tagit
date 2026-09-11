@@ -10,3 +10,6 @@ test('redacts unlabelled npm access tokens', () => {
 test('redacts complete quoted values containing whitespace', () => {
   expect(redactSecrets('token="a b c"')).toBe('token=[REDACTED]');
 });
+test('uses Redact fixed marker for private keys', () => {
+  expect(redactSecrets('-----BEGIN PRIVATE KEY-----secret-----END PRIVATE KEY-----')).toBe('[REDACTED]');
+});

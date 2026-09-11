@@ -13,3 +13,18 @@ test('returns exact-head success when required jobs pass', () => {
     expect.objectContaining({ ubuntu: true, windows: false }),
   );
 });
+
+test('rejects a non-passing Windows job even when Ubuntu passes', () => {
+  const exec = jest.fn(() =>
+    JSON.stringify({
+      status: 'completed',
+      conclusion: 'success',
+      headSha: 'abc',
+      jobs: [
+        { name: 'ubuntu', status: 'completed', conclusion: 'success' },
+        { name: 'windows', status: 'completed', conclusion: 'skipped' },
+      ],
+    }),
+  );
+  expect(verifyCompletedRun(exec, { info: jest.fn() }, { databaseId: 1 }, 'abc')).toBeNull();
+});

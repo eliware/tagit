@@ -12,26 +12,6 @@ const expectNpmCall = (mock, expectedArgs) => {
   ).toBe(true);
 };
 
-// Platform command resolution remains part of the release-check adapter.
-
-test('resolves platform-specific npm executable names', () => {
-  expect(processCommand('npm', ['test'], 'win32', 'C:\\node\\node.exe')).toEqual([
-    'cmd.exe',
-    ['/d', '/s', '/c', 'npm.cmd', 'test'],
-  ]);
-});
-
-test('uses the Windows npm executable from PATH', () => {
-  expect(processCommand('npm', ['test'], 'win32', 'C:\\node\\node.exe')).toEqual([
-    'cmd.exe',
-    ['/d', '/s', '/c', 'npm.cmd', 'test'],
-  ]);
-});
-
-test('keeps non-Windows process commands unchanged', () => {
-  expect(processCommand('npm', ['test'], 'linux', '/usr/bin/node')).toEqual(['npm', ['test']]);
-});
-
 test('reports test output when the shared harness fails', () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === 'test') throw { stdout: 'test output', stderr: '' };

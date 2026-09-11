@@ -11,7 +11,7 @@ export function validateJobRecords(jobs, runId) {
         typeof job !== 'object' ||
         typeof job.name !== 'string' ||
         typeof job.status !== 'string' ||
-        typeof job.conclusion !== 'string',
+        (job.conclusion !== null && typeof job.conclusion !== 'string'),
     );
   if (malformed.length) {
     const details = malformed

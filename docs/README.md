@@ -8,5 +8,6 @@ behavior is defined in [`../specs/README.md`](../specs/README.md).
 
 - [Operations](operations.md) — installation, configuration, and troubleshooting.
 - [Command guide](commands.md) — the supported owner and DevOps command sequence.
+- [Decomposition inventory](decomposition-inventory.md) — module responsibilities and test boundaries.
 
 [Back to the README](../README.md)

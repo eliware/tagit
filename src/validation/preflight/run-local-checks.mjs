@@ -1,8 +1,5 @@
-import { failureMessage } from '../../output/errors/failure-message.mjs';
-import { buildTestCheck } from '../local/test-command.mjs';
-import { coverageWaiverPolicy } from '../../policy/coverage-waiver-policy.mjs';
-import { processCommand } from '../local/process-command.mjs';
-import { processOptions } from '../local/process-options.mjs';
+import { validateLocalTestCheck } from './validate-local-test-check.mjs';
+import { runLocalTestCommand } from './run-local-test-command.mjs';
 
 export function runLocalChecks(
   execFileSync,
@@ -10,10 +7,7 @@ export function runLocalChecks(
   { ignore100x4 = false, ignoreMonolithLimits = false, timeoutMs = 120000 } = {},
 ) {
   const failures = [];
-  const testCheck = buildTestCheck(fs, {
-    ignore100x4: coverageWaiverPolicy(ignore100x4).ignored,
-    ignoreMonolithLimits,
-  });
+  const testCheck = validateLocalTestCheck(fs, { ignore100x4, ignoreMonolithLimits });
   if (testCheck.missing)
     failures.push(
       'BLOCKED: package.json does not declare scripts.test.\nAction: add the shared npm test harness before running preflight.',
@@ -24,14 +18,8 @@ export function runLocalChecks(
     );
   if (!testCheck.check) return { failures, results: {} };
   const results = {};
-  const [executable, args] = testCheck.check[1];
-  try {
-    const [command, commandArgs] = processCommand(executable, args);
-    execFileSync(command, commandArgs, processOptions(command, timeoutMs));
-    results.test = { passed: true };
-  } catch (error) {
-    results.test = { passed: false };
-    failures.push(failureMessage('test', error, `${error.stdout ?? ''}\n${error.stderr ?? ''}`));
-  }
+  const { result, failure } = runLocalTestCommand(execFileSync, testCheck.check, timeoutMs);
+  results.test = result;
+  if (failure) failures.push(failure);
   return { failures, results };
 }

@@ -1,11 +1,10 @@
 import { execFile as defaultExecFile } from 'node:child_process';
 import { sleep as sleepDefault } from '../../process/timing/sleep.mjs';
-import { readRepositoryName } from '../../repository/repository-name/read-repository-name.mjs';
-import { releaseTag } from '../../policy/tag-policy.mjs';
 import { pollReleaseCi } from './release-ci-status.mjs';
 import { verifyReleasePublication } from './release-publication-status.mjs';
 import { validateReleaseInput } from './validate-release-input.mjs';
-import { reportReleaseLinks } from './report-release-links.mjs';
+import { resolveReleaseContext } from './resolve-release-context.mjs';
+import { reportCiResult } from './report-ci-result.mjs';
 export { npmExecutable } from '../../process/commands/npm-executable.mjs';
 export { waitSync } from '../../process/timing/wait-sync.mjs';
 export { sleep as sleepDefault } from '../../process/timing/sleep.mjs';
@@ -28,14 +27,10 @@ export async function verifyRelease(
   } = {},
 ) {
   validateReleaseInput(version, release, maxPolls, npmRetries, pollMs, npmRetryMs);
-  const repo = readRepositoryName(execFileSync);
-  const tag = releaseTag(version);
-  const headSha = release.commitSha;
+  const { repo, tag, headSha } = resolveReleaseContext(execFileSync, version, release);
   const run = await pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly, log });
-  if (linksOnly) {
-    reportReleaseLinks(log, repo, tag, run);
-    return { repo, tag, headSha, runId: run.databaseId, linksOnly: true };
-  }
+  const reported = reportCiResult({ log, repo, tag, headSha, run, linksOnly });
+  if (reported) return reported;
   return verifyReleasePublication({
     fs,
     execFile,

@@ -1,80 +1,16 @@
-import { selectReleaseRun } from '../../github/runs/release-run-selection.mjs';
-import { readGithubJson } from '../../github/cli/read-json.mjs';
-import { validateJobRecords } from '../../validation/ci/validate-job-records.mjs';
+import { runReleaseCiPollAttempt } from './release-ci-poll-attempt.mjs';
+import { handleReleaseCiPollError } from './handle-release-ci-poll-error.mjs';
 
 export async function pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly, log }) {
-  let run;
   for (let poll = 0; poll < maxPolls; poll += 1) {
-    let runs;
     try {
-      runs = await readGithubJson(execFile, 'gh', [
-        'run',
-        'list',
-        '--repo',
-        repo,
-        '--limit',
-        '20',
-        '--json',
-        'databaseId,createdAt,headSha,headBranch',
-      ]);
+      const result = await runReleaseCiPollAttempt({ execFile, repo, headSha, tag, linksOnly, log });
+      if (result && !result.pending) return result;
     } catch (error) {
-      if (error instanceof SyntaxError) throw new Error(`Release CI returned malformed list JSON: ${error.message}`);
-      if (poll + 1 >= maxPolls)
-        throw new Error(`Release CI inspection failed after ${maxPolls} attempts: ${error.message}`);
-      await sleep(pollMs);
+      await handleReleaseCiPollError(error, poll, maxPolls, pollMs, sleep);
       continue;
     }
-    const candidate = selectReleaseRun(runs, headSha, tag);
-    if (candidate) {
-      const details = await readGithubJson(execFile, 'gh', [
-        'run',
-        'view',
-        String(candidate.databaseId),
-        '--repo',
-        repo,
-        '--json',
-        'databaseId,status,conclusion,headSha,jobs,url',
-      ]);
-      if (
-        !details ||
-        (details.databaseId !== undefined && typeof details.databaseId !== 'number') ||
-        typeof details.status !== 'string' ||
-        (details.conclusion !== null && details.conclusion !== undefined && typeof details.conclusion !== 'string') ||
-        typeof details.headSha !== 'string' ||
-        !Array.isArray(details.jobs)
-      )
-        throw new Error(`Release CI returned malformed details for run ${candidate.databaseId}.`);
-      if (details.databaseId !== undefined && details.databaseId !== candidate.databaseId)
-        throw new Error(`Release CI details identify run ${details.databaseId}, expected ${candidate.databaseId}.`);
-      validateJobRecords(details.jobs, candidate.databaseId);
-      if (details.headSha !== headSha)
-        throw new Error(`Release CI details have commit ${details.headSha}, expected ${headSha}.`);
-      if (details.status === 'completed' && details.conclusion !== 'success') {
-        const jobs = details.jobs.map((job) => `${job.name} [${job.status}/${job.conclusion}]`).join(', ');
-        throw new Error(`Release CI failed: ${String(details.conclusion)}. Jobs: ${jobs || 'none reported'}.`);
-      }
-      if (linksOnly)
-        return {
-          ...candidate,
-          ...details,
-          databaseId: candidate.databaseId,
-          headSha: details.headSha,
-          headBranch: candidate.headBranch,
-        };
-      if (details.status === 'completed') {
-        run = {
-          ...candidate,
-          ...details,
-          databaseId: candidate.databaseId,
-          headSha: details.headSha,
-          headBranch: candidate.headBranch,
-        };
-        break;
-      }
-      log.info(`Release CI is ${details.status}; waiting...`);
-    }
-    if (!run && poll + 1 < maxPolls) await sleep(pollMs);
+    if (poll + 1 < maxPolls) await sleep(pollMs);
   }
-  if (!run) throw new Error(`Release CI did not complete for ${repo}@${tag} (${headSha})`);
-  return run;
+  throw new Error(`Release CI did not complete for ${repo}@${tag} (${headSha})`);
 }

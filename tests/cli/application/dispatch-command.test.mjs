@@ -39,3 +39,19 @@ test('uses console output when no output override is supplied', async () => {
     console.log = original;
   }
 });
+import { runTagit } from '../../../src/cli/application/run-tagit.mjs';
+
+test('runs a local command through the CLI coordinator', async () => {
+  const output = jest.fn();
+  await runTagit(
+    {
+      output,
+      buildNotesReport: jest.fn(() => 'REPORT'),
+      log: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+      registerHandlersFn: jest.fn(),
+      registerSignalsFn: jest.fn(),
+    },
+    ['notes'],
+  );
+  expect(output).toHaveBeenCalledWith('REPORT');
+});
