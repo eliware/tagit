@@ -16,6 +16,11 @@ not applicable. A package repository must declare valid publication metadata.
 TagIt does not authenticate operator roles, deploy applications, modify GitOps,
 rewrite package metadata, or publish without the authorized release flow.
 
+## Purpose
+
+TagIt provides deterministic release readiness, handoff, tagging, and
+publication verification for Eliware packages.
+
 ## Requirements
 
 - Node.js 26 or newer
@@ -35,6 +40,11 @@ Or run it without a global installation:
 
 ```text
 npx --yes @eliware/tagit --help
+
+## Setup
+
+Use Node.js 26 or newer, install dependencies with `npm ci`, and run commands
+from the target repository root.
 ```
 
 ## Usage
@@ -85,6 +95,16 @@ For target repositories, `tagit preflight` invokes the declared `npm test`
 command and verifies repository state, package metadata, exact-HEAD CI, and
 required workflow policy. It does not duplicate checks owned by `@eliware/test`.
 Missing, stale, failed, or mismatched CI evidence blocks the handoff.
+
+Successful commands exit with code 0. Validation or operational failures exit
+non-zero and include a bounded remediation report. `--dry-run` performs
+readiness checks without release side effects.
+
+## Operations
+
+Project owners use `notes`, `preflight`, and `push`; DevOps owns `release` and
+`release-wait` after the exact-HEAD handoff passes. See the
+[operations documentation](docs/operations.md) for boundaries.
 
 ## Documentation
 

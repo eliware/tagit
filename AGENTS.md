@@ -1,5 +1,10 @@
 # Agent guidance
 
+Authoritative shared documentation is maintained in `../docs`, repository
+conventions in `../conventions`, and cross-cutting operations in
+`../operations`. Read those sources and the applicable specifications before
+changing repository files.
+
 Applies to: the entire `@eliware/tagit` repository unless a more specific
 `AGENTS.md` exists in a descendant directory.
 
@@ -65,6 +70,8 @@ release validation-only: no version update, commit, tag, push, or publishing.
 - Run `npm test` after changes. The shared `@eliware/test` harness invoked by
   `npm test` owns lint, typecheck, audit, package validation, coverage, and
   other applicable project checks; do not duplicate those checks in Tagit.
+- Validation commands are `npm test`, `npm run lint`, `npm run format:check`,
+  `npm run typecheck`, `npm run audit`, `npm run pack`, and `git diff --check`.
 - Project owners must never tag, publish, release, or run release-wait; DevOps
   owns release and post-release verification after preflight passes.
 - Update README and release notes when behavior changes.

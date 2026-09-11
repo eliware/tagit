@@ -25,6 +25,7 @@
     "access": "public",
     "provenance": true
   },
+  "private": false,
   "scripts": {
     "start": "node bin/tagit-cli.mjs",
     "test": "eliware-test",
@@ -32,7 +33,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "node scripts/typecheck.mjs",
-    "pack": "npm pack --dry-run"
+    "pack": "npm pack --dry-run",
+    "audit": "node scripts/run-audit.mjs"
   },
   "repository": {
     "type": "git",
@@ -75,6 +77,39 @@
   },
   "dependencies": {
     "@eliware/common": "^2.0.0"
+  },
+  "eliware": {
+    "conventions": {
+      "version": "8.0",
+      "apply": [
+        "general",
+        "node",
+        "application",
+        "cli",
+        "npm-published"
+      ],
+      "exemptions": []
+    },
+    "authority": {
+      "authoritativeFor": [
+        "TagIt release preflight and publication verification behavior."
+      ],
+      "notAuthoritativeFor": [
+        "Target repository implementation, CI state, publication state, deployment, or operations."
+      ]
+    },
+    "crosslinks": [
+      {
+        "path": "../docs/authority-map.json",
+        "relation": "relatedAuthority",
+        "authoritativeFor": "Shared platform and documentation authority."
+      },
+      {
+        "path": "../conventions/specs/README.md",
+        "relation": "relatedAuthority",
+        "authoritativeFor": "Applicable repository convention specifications."
+      }
+    ]
   },
   "bin": {
     "tagit": "bin/tagit-cli.mjs",
