@@ -1,28 +1,13 @@
 import { readPackageVersion } from '../../versioning/read-package-version.mjs';
 import { classifyChangeLevel } from '../../versioning/classify-change-level.mjs';
 import { suggestNextVersion } from '../../versioning/suggest-next-version.mjs';
-
-const IGNORED = /(^|\/)(package-lock\.json|coverage|node_modules|\.jest-result|\.jest\.result)(\/|$)/i;
+import { readNotesChangeInput } from './read-notes-change-input.mjs';
+import { filterNotesFiles } from './filter-notes-files.mjs';
 
 export function suggestVersion(fs, execFileSync) {
   const current = readPackageVersion(fs);
-  const run = (args) => execFileSync('git', args, { encoding: 'utf8' });
-  const latestTag = run(['describe', '--tags', '--abbrev=0']).trim();
-  const files = run(['diff', '--name-only', `${latestTag}..HEAD`])
-    .split(/\r?\n/)
-    .map((file) => file.trim())
-    .filter(Boolean)
-    .filter((file) => !IGNORED.test(file));
-  const diff = run([
-    'diff',
-    '--unified=0',
-    `${latestTag}..HEAD`,
-    '--',
-    '.',
-    ':!package-lock.json',
-    ':!coverage',
-    ':!node_modules',
-  ]);
+  const { latestTag, changedFiles, diff } = readNotesChangeInput(execFileSync);
+  const files = filterNotesFiles(changedFiles);
   const { level, reason } = classifyChangeLevel(files, diff);
   return {
     current,
