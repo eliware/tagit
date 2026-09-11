@@ -9,12 +9,7 @@ test('runs an executable asynchronously', async () => {
 test('executes the npm Windows shim directly without shell parsing', async () => {
   const exec = jest.fn((_executable, _args, _options, callback) => callback(null, 'ok', ''));
   await expect(execFileCommand(exec, 'npm.cmd', ['view', 'demo'], undefined, 'win32')).resolves.toBe('ok');
-  expect(exec).toHaveBeenCalledWith(
-    'npm.cmd',
-    ['view', 'demo'],
-    expect.anything(),
-    expect.any(Function),
-  );
+  expect(exec).toHaveBeenCalledWith('npm.cmd', ['view', 'demo'], expect.anything(), expect.any(Function));
 });
 
 test('uses default encoding and propagates command output on failure', async () => {

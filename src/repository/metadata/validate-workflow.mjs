@@ -25,7 +25,9 @@ function parseWorkflow(text) {
 
 function hasTagTrigger(lines) {
   const tags = lines.findIndex((line) => valueAfter(line, 'tags') !== null);
-  return tags >= 0 && lines.slice(tags + 1).some((line) => line.trim().replaceAll("'", '').replaceAll('"', '') === '- v*');
+  return (
+    tags >= 0 && lines.slice(tags + 1).some((line) => line.trim().replaceAll("'", '').replaceAll('"', '') === '- v*')
+  );
 }
 
 function parseJobs(lines) {
