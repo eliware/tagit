@@ -30,10 +30,7 @@
     "start": "node bin/tagit-cli.mjs",
     "test": "eliware-test",
     "lint": "eliware-test --lint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "node scripts/typecheck.mjs",
-    "pack": "npm pack --dry-run"
+    "typecheck": "node scripts/typecheck.mjs"
   },
   "repository": {
     "type": "git",
@@ -70,7 +67,7 @@
   },
   "homepage": "https://github.com/eliware/tagit#readme",
   "devDependencies": {
-    "@eliware/test": "file:../test",
+    "@eliware/test": "^6.0.1",
     "@eliware/redact": "^8.0.0",
     "prettier": "^3.9.6"
   },
