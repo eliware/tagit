@@ -75,17 +75,14 @@
     "@eliware/common": "^2.0.0"
   },
   "eliware": {
-    "conventions": {
-      "version": "8.0",
-      "apply": [
+    "apply": [
         "general",
         "node",
         "application",
         "cli",
         "npm-published"
-      ],
-      "exemptions": []
-    },
+    ],
+    "exempt": [],
     "authority": {
       "authoritativeFor": [
         "TagIt release preflight and publication verification behavior."

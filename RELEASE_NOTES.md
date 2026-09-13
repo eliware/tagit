@@ -9,6 +9,11 @@
 - Clarified that formatter validation remains owned by `@eliware/test`; TagIt
   invokes the authoritative `npm test` command without duplicating it.
 
+### Fixed
+
+- `tagit push` now retries exact-commit CI discovery while GitHub Actions
+  registers a newly pushed commit.
+
 ## 2.5.0
 
 ### Added

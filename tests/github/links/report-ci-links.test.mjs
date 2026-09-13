@@ -14,6 +14,25 @@ test('reports exact-HEAD workflow and job links', () => {
   expect(reportCiLinks(exec, logger, 'abc')).toMatchObject({ repo: 'eliware/tagit', headSha: 'abc' });
   expect(logger.info).toHaveBeenCalledWith('Workflow: [https://ci/7](https://ci/7)');
 });
+test('retries exact-head lookup while Actions registers a newly pushed commit', () => {
+  let lookups = 0;
+  const waitSync = jest.fn();
+  const exec = jest.fn((command, args) =>
+    command === 'git'
+      ? 'https://github.com/eliware/tagit.git\n'
+      : args[1] === 'view'
+        ? JSON.stringify({ jobs: [] })
+        : ++lookups < 3
+          ? '[]'
+          : JSON.stringify([{ databaseId: 7, url: 'https://ci/7', headSha: 'abc' }]),
+  );
+  const logger = log();
+  expect(reportCiLinks(exec, logger, 'abc', { attempts: 3, delayMs: 2000, waitSync })).toMatchObject({
+    runs: [{ databaseId: 7 }],
+  });
+  expect(waitSync).toHaveBeenCalledTimes(2);
+  expect(waitSync).toHaveBeenCalledWith(2000);
+});
 test('reports absent CI without blocking retries and rejects invalid remotes', () => {
   const exec = jest.fn((command) => (command === 'git' ? 'https://github.com/eliware/tagit.git' : '[]'));
   expect(reportCiLinks(exec, log(), 'abc')).toMatchObject({ runs: [] });
