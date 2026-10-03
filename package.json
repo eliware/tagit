@@ -79,6 +79,7 @@
     "@eliware/common": "^2.0.0"
   },
   "eliware": {
+    "id": "E-1100",
     "apply": [
       "general",
       "application",
