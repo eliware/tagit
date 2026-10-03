@@ -30,6 +30,10 @@
     "start": "node bin/tagit-cli.mjs",
     "test": "eliware-test",
     "lint": "eliware-test --lint",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check",
+    "pack": "eliware-test --pack",
     "typecheck": "node scripts/typecheck.mjs"
   },
   "repository": {
@@ -76,13 +80,15 @@
   },
   "eliware": {
     "apply": [
-        "general",
-        "node",
-        "application",
-        "cli",
-        "npm-published"
+      "general",
+      "application",
+      "cli",
+      "npm-published"
     ],
     "exempt": [],
+    "capabilities": [
+      "typecheck"
+    ],
     "authority": {
       "authoritativeFor": [
         "TagIt release preflight and publication verification behavior."
@@ -98,7 +104,7 @@
         "authoritativeFor": "Shared platform and documentation authority."
       },
       {
-        "path": "../conventions/specs/README.md",
+        "path": "../test/specs/conventions/README.md",
         "relation": "relatedAuthority",
         "authoritativeFor": "Applicable repository convention specifications."
       }
