@@ -24,6 +24,7 @@ export async function pollReleaseCi({
       });
       if (result && !result.pending) return result;
     } catch (error) {
+      if (error.code === "ERR_RELEASE_CI_FAILED") throw error;
       await handleReleaseCiPollError(error, poll, maxPolls, pollMs, sleep);
       continue;
     }

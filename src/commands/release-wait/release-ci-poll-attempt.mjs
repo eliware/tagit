@@ -10,7 +10,11 @@ export async function runReleaseCiPollAttempt({ execFile, repo, headSha, tag, li
   const details = await readReleaseCiDetails(execFile, repo, candidate.databaseId);
   validateReleaseRunDetails(details, candidate, headSha);
   const failure = formatReleaseCiFailure(details);
-  if (failure) throw new Error(failure);
+  if (failure) {
+    const error = new Error(failure);
+    error.code = "ERR_RELEASE_CI_FAILED";
+    throw error;
+  }
   if (linksOnly || details.status === "completed") return mergeReleaseRun(candidate, details);
   log.info(`Release CI is ${details.status}; waiting...`);
   return { pending: true };

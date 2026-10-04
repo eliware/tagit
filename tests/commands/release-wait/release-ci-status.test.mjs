@@ -67,19 +67,30 @@ test("reports malformed list data and exhausted inspection", async () => {
 
 test("reports completed release failures and waits for pending runs", async () => {
   const failed = { databaseId: 3, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
+  const failedJobs = [
+    { name: "validate", status: "completed", conclusion: "failure" },
+    { name: "publish", status: "completed", conclusion: "skipped" },
+  ];
+  const sleep = jest.fn();
+  const failedRun = executor([failed], {
+    databaseId: 3,
+    status: "completed",
+    conclusion: "failure",
+    headSha: "abc",
+    jobs: failedJobs,
+  });
   await expect(
     pollReleaseCi({
       ...options,
-      execFile: executor([failed], {
-        databaseId: 3,
-        status: "completed",
-        conclusion: "failure",
-        headSha: "abc",
-        jobs: [],
-      }),
-      maxPolls: 1,
+      execFile: failedRun,
+      maxPolls: 4,
+      sleep,
     }),
-  ).rejects.toThrow();
+  ).rejects.toThrow(
+    "Release CI failed: failure. Jobs: validate [completed/failure], publish [completed/skipped].",
+  );
+  expect(failedRun).toHaveBeenCalledTimes(2);
+  expect(sleep).not.toHaveBeenCalled();
   const pending = { databaseId: 4, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
   const exec = executor([pending], {
     databaseId: 4,
