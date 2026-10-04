@@ -65,32 +65,38 @@ test("accepts npm view array output", async () => {
 });
 
 test("logs each npm visibility attempt and enables Windows command shims", async () => {
+  const originalPlatform = process.platform;
+  Object.defineProperty(process, "platform", { configurable: true, value: "win32" });
   const info = jest.fn();
   const exec = jest.fn((_command, _args, _options, callback) => callback(null, '["8.0.0"]', ""));
-  await verifyNpmPublication(
-    exec,
-    { info },
-    {
-      packageName: "@eliware/test",
-      version: "8.0.0",
-      retries: 2,
-      sleep: jest.fn(),
-    },
-  );
-  expect(info).toHaveBeenNthCalledWith(
-    1,
-    "Checking npm visibility for @eliware/test@8.0.0 (attempt 1/2)...",
-  );
-  expect(info).toHaveBeenNthCalledWith(
-    2,
-    "npm visibility attempt 1/2: published version is visible.",
-  );
-  expect(exec).toHaveBeenCalledWith(
-    'npm.cmd "view" "@eliware/test@8.0.0" "version" "--json"',
-    [],
-    expect.objectContaining({ encoding: "utf8", shell: true }),
-    expect.any(Function),
-  );
+  try {
+    await verifyNpmPublication(
+      exec,
+      { info },
+      {
+        packageName: "@eliware/test",
+        version: "8.0.0",
+        retries: 2,
+        sleep: jest.fn(),
+      },
+    );
+    expect(info).toHaveBeenNthCalledWith(
+      1,
+      "Checking npm visibility for @eliware/test@8.0.0 (attempt 1/2)...",
+    );
+    expect(info).toHaveBeenNthCalledWith(
+      2,
+      "npm visibility attempt 1/2: published version is visible.",
+    );
+    expect(exec).toHaveBeenCalledWith(
+      'npm.cmd "view" "@eliware/test@8.0.0" "version" "--json"',
+      [],
+      expect.objectContaining({ encoding: "utf8", shell: true }),
+      expect.any(Function),
+    );
+  } finally {
+    Object.defineProperty(process, "platform", { configurable: true, value: originalPlatform });
+  }
 });
 
 test("rejects unsafe npm package names and versions before constructing a Windows command", async () => {
