@@ -1,7 +1,7 @@
-import { readRepositoryName } from './read-repository-name.mjs';
-import { readCiRuns } from './read-ci-run-links.mjs';
-import { reportCiRunLinks } from './report-ci-run-links.mjs';
-import { waitSync as waitSyncDefault } from '../../process/timing/wait-sync.mjs';
+import { readRepositoryName } from "./read-repository-name.mjs";
+import { readCiRuns } from "./read-ci-run-links.mjs";
+import { reportCiRunLinks } from "./report-ci-run-links.mjs";
+import { waitSync as waitSyncDefault } from "../../process/timing/wait-sync.mjs";
 
 export function reportCiLinks(
   execFileSync,

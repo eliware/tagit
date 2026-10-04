@@ -33,15 +33,22 @@ HEAD. Windows is optional, but present Windows jobs must pass. Malformed
 GitHub run or job records are reported with their location and remediation
 guidance; they are never silently ignored.
 
-Standard repositories must provide `package.json`, `README.md`, `AGENTS.md`,
-`RELEASE_NOTES.md`, `docs/`, `specs/`, `examples/`, `.env.example`, and the
-required CI workflow. A genuinely inapplicable path must be listed with a
-non-empty reason in the root `.tagit-exceptions.json` `inapplicable` object;
-missing paths are never silently skipped. Package metadata, package-file
-allowlists, release-note version headings, Git origin, and tag-only publication
-workflow safeguards are also checked structurally.
+Repositories must provide `package.json`, `README.md`, `AGENTS.md`,
+`RELEASE_NOTES.md`, `docs/`, `specs/`, `.env.example`, and
+`.github/workflows/ci.yaml`. Repositories that apply the `library` profile must
+also provide `examples/`; repositories applying `npm-published` or
+`ghcr-published` must provide the separate `.github/workflows/publish.yaml`.
+Examples are not required by default. A genuinely inapplicable required path
+must be listed with a non-empty reason in the root `.tagit-exceptions.json`
+`inapplicable` object. Package metadata, package-file allowlists, release-note
+version headings, Git origin, and publication workflow safeguards are also
+checked structurally.
 
 ## Evidence rules
+
+Ubuntu is identified from the GitHub Actions runner labels, not from the job's
+display name. This supports platform-neutral names such as `test` while still
+verifying that the job ran on an Ubuntu runner.
 
 Release evidence requires successful Ubuntu validation, requires every present
 Windows job to pass, and requires a successful `publish` job for public npm

@@ -1,4 +1,5 @@
-const IGNORED = /(^|\/)(package-lock\.json|coverage|node_modules|\.jest-result|\.jest\.result)(\/|$)/i;
+const IGNORED =
+  /(^|\/)(package-lock\.json|coverage|node_modules|\.jest-result|\.jest\.result)(\/|$)/i;
 
 export function filterNotesFiles(changedFiles) {
   return changedFiles

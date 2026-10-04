@@ -1,27 +1,32 @@
-import { validateJobRecords } from './validate-job-records.mjs';
-import { evaluateJobPolicy } from './evaluate-job-policy.mjs';
+import { validateJobRecords } from "./validate-job-records.mjs";
+import { evaluateJobPolicy } from "./evaluate-job-policy.mjs";
 
-export function verifyCompletedRun(execFileSync, log, run, headSha) {
+export function verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName = {}) {
   const data = JSON.parse(
-    execFileSync('gh', ['run', 'view', String(run.databaseId), '--json', 'status,conclusion,headSha,jobs'], {
-      encoding: 'utf8',
-    }),
+    execFileSync(
+      "gh",
+      ["run", "view", String(run.databaseId), "--json", "status,conclusion,headSha,jobs"],
+      {
+        encoding: "utf8",
+      },
+    ),
   );
-  if (!data || typeof data.status !== 'string' || typeof data.conclusion !== 'string')
+  if (!data || typeof data.status !== "string" || typeof data.conclusion !== "string")
     throw new Error(`GitHub Actions run ${run.databaseId} returned malformed completion metadata.`);
   const jobs = validateJobRecords(data.jobs, run.databaseId);
-  const successful = (job) => job.status === 'completed' && job.conclusion === 'success';
+  for (const job of jobs) job.labels = runnerLabelsByJobName[job.name] ?? [];
+  const successful = (job) => job.status === "completed" && job.conclusion === "success";
   const { failed, ubuntu, windows } = evaluateJobPolicy(jobs, successful);
   if (
     !failed &&
-    data.status === 'completed' &&
-    data.conclusion === 'success' &&
+    data.status === "completed" &&
+    data.conclusion === "success" &&
     data.headSha === headSha &&
     ubuntu &&
     windows.passed
   ) {
     log.info(
-      `GitHub Actions CI verified for ${headSha}: Ubuntu passed${windows.successful ? '; Windows passed.' : '; Windows optional.'}`,
+      `GitHub Actions CI verified for ${headSha}: Ubuntu passed${windows.successful ? "; Windows passed." : "; Windows optional."}`,
     );
     return { runId: run.databaseId, headSha, ubuntu: true, windows: windows.successful };
   }

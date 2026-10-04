@@ -1,6 +1,6 @@
-import { validateReleaseVersion } from './validate-release-version.mjs';
-import { validatePackageFiles } from './validate-package-files.mjs';
-import { validateOrigin } from './validate-origin.mjs';
+import { validateReleaseVersion } from "./validate-release-version.mjs";
+import { validatePackageFiles } from "./validate-package-files.mjs";
+import { validateOrigin } from "./validate-origin.mjs";
 
 export function validateReleaseMetadata(fs, execFileSync, packageData) {
   const failures = [];

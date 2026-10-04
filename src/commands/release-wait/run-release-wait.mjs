@@ -1,4 +1,4 @@
-import { resolveLatestReleaseTag } from './resolve-latest-tag.mjs';
+import { resolveLatestReleaseTag } from "./resolve-latest-tag.mjs";
 
 export async function runReleaseWaitCommand({ execFileSync, fs, log, verifyRelease, execFile }) {
   const { version, commitSha } = resolveLatestReleaseTag(execFileSync);

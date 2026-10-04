@@ -1,12 +1,17 @@
-import { runNotesCommand } from '../../commands/notes/run-notes.mjs';
-import { runPushCommand } from '../../commands/push/run-push.mjs';
+import { runNotesCommand } from "../../commands/notes/run-notes.mjs";
+import { runPushCommand } from "../../commands/push/run-push.mjs";
 
 export function dispatchSimpleCommand(command, options, deps, output) {
-  if (command === 'notes') {
-    runNotesCommand({ fs: deps.fs, execFileSync: deps.execFileSync, buildNotesReport: deps.buildNotesReport, output });
+  if (command === "notes") {
+    runNotesCommand({
+      fs: deps.fs,
+      execFileSync: deps.execFileSync,
+      buildNotesReport: deps.buildNotesReport,
+      output,
+    });
     return true;
   }
-  if (command === 'push') {
+  if (command === "push") {
     runPushCommand({
       execFileSync: deps.execFileSync,
       reportCiLinks: deps.reportCiLinks,

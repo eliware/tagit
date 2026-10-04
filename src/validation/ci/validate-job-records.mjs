@@ -8,18 +8,18 @@ export function validateJobRecords(jobs, runId) {
     .filter(
       ({ job }) =>
         !job ||
-        typeof job !== 'object' ||
-        typeof job.name !== 'string' ||
-        typeof job.status !== 'string' ||
-        (job.conclusion !== null && typeof job.conclusion !== 'string'),
+        typeof job !== "object" ||
+        typeof job.name !== "string" ||
+        typeof job.status !== "string" ||
+        (job.conclusion !== null && typeof job.conclusion !== "string"),
     );
   if (malformed.length) {
     const details = malformed
       .map(
         ({ job, index }) =>
-          `job ${index + 1}: ${job === null ? 'null' : typeof job === 'object' ? JSON.stringify(job) : typeof job}`,
+          `job ${index + 1}: ${job === null ? "null" : typeof job === "object" ? JSON.stringify(job) : typeof job}`,
       )
-      .join('; ');
+      .join("; ");
     throw new Error(
       `GitHub Actions run ${runId} returned malformed job records: ${details}. Action: inspect the GitHub run metadata, then rerun tagit preflight.`,
     );

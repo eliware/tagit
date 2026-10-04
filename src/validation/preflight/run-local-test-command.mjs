@@ -1,6 +1,6 @@
-import { failureMessage } from '../../output/errors/failure-message.mjs';
-import { processCommand } from '../local/process-command.mjs';
-import { processOptions } from '../local/process-options.mjs';
+import { failureMessage } from "../../output/errors/failure-message.mjs";
+import { processCommand } from "../local/process-command.mjs";
+import { processOptions } from "../local/process-options.mjs";
 
 export function runLocalTestCommand(execFileSync, check, timeoutMs) {
   const [executable, args] = check[1];
@@ -11,7 +11,7 @@ export function runLocalTestCommand(execFileSync, check, timeoutMs) {
   } catch (error) {
     return {
       result: { passed: false },
-      failure: failureMessage('test', error, `${error.stdout ?? ''}\n${error.stderr ?? ''}`),
+      failure: failureMessage("test", error, `${error.stdout ?? ""}\n${error.stderr ?? ""}`),
     };
   }
 }

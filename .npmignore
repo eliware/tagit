@@ -1,6 +1,0 @@
-tests/
-coverage/
-.github/
-.knit/
-AGENTS.md
-.env.example

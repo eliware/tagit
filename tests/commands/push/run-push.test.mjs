@@ -1,17 +1,20 @@
-import { jest } from '@jest/globals';
-import { runPushCommand } from '../../../src/commands/push/run-push.mjs';
-import { runTagit } from '../../../src/cli/application/run-tagit.mjs';
+import { jest } from "@jest/globals";
+import { runPushCommand } from "../../../src/commands/push/run-push.mjs";
+import { runTagit } from "../../../src/cli/application/run-tagit.mjs";
 
-test('pushes the existing HEAD and reports its CI links', () => {
-  const execFileSync = jest.fn((command, args) => (args[0] === 'rev-parse' ? 'abc\n' : undefined));
+test("pushes the existing HEAD and reports its CI links", () => {
+  const execFileSync = jest.fn((command, args) => (args[0] === "rev-parse" ? "abc\n" : undefined));
   const reportCiLinks = jest.fn();
   const log = { info: jest.fn(), error: jest.fn() };
   runPushCommand({ execFileSync, reportCiLinks, log, exit: jest.fn(), dryRun: false });
-  expect(execFileSync).toHaveBeenCalledWith('git', ['push'], { stdio: 'inherit' });
-  expect(reportCiLinks).toHaveBeenCalledWith(execFileSync, log, 'abc', { attempts: 10, delayMs: 2000 });
+  expect(execFileSync).toHaveBeenCalledWith("git", ["push"], { stdio: "inherit" });
+  expect(reportCiLinks).toHaveBeenCalledWith(execFileSync, log, "abc", {
+    attempts: 10,
+    delayMs: 2000,
+  });
 });
 
-test('CLI push dry-run performs no process or CI lookup', async () => {
+test("CLI push dry-run performs no process or CI lookup", async () => {
   const execFileSync = jest.fn();
   await runTagit(
     {
@@ -20,31 +23,31 @@ test('CLI push dry-run performs no process or CI lookup', async () => {
       registerHandlersFn: jest.fn(),
       registerSignalsFn: jest.fn(),
     },
-    ['push', '--dry-run'],
+    ["push", "--dry-run"],
   );
   expect(execFileSync).not.toHaveBeenCalled();
 });
 
-test('does not mutate or inspect CI during a dry run', () => {
+test("does not mutate or inspect CI during a dry run", () => {
   const execFileSync = jest.fn();
   const log = { info: jest.fn(), error: jest.fn() };
   runPushCommand({ execFileSync, reportCiLinks: jest.fn(), log, exit: jest.fn(), dryRun: true });
   expect(execFileSync).not.toHaveBeenCalled();
 });
 
-test('reports push failures and exits nonzero', () => {
+test("reports push failures and exits nonzero", () => {
   const exit = jest.fn();
   const log = { info: jest.fn(), error: jest.fn() };
   expect(() =>
     runPushCommand({
       execFileSync: jest.fn(() => {
-        throw new Error('push failed');
+        throw new Error("push failed");
       }),
       reportCiLinks: jest.fn(),
       log,
       exit,
       dryRun: false,
     }),
-  ).toThrow('push failed');
+  ).toThrow("push failed");
   expect(exit).toHaveBeenCalledWith(1);
 });

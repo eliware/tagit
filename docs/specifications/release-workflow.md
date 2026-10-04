@@ -27,6 +27,11 @@ release operation.
 
 ## Safety rules
 
+Validation runs in `.github/workflows/ci.yaml`; publication runs separately in
+`.github/workflows/publish.yaml` for repositories that publish. TagIt identifies
+Ubuntu and Windows jobs from their GitHub runner labels, regardless of job
+display name.
+
 Release CI requires a completed successful Ubuntu validation job. Windows jobs
 are optional, but every present Windows job must pass. The publication job must
 be named exactly `publish` and public npm packages require it to complete

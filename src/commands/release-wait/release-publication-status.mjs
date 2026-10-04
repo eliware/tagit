@@ -1,8 +1,9 @@
-import { verifyReleaseCi } from './verify-release-ci.mjs';
-import { verifyRegistries } from './verify-registries.mjs';
+import { verifyReleaseCi } from "./verify-release-ci.mjs";
+import { verifyRegistries } from "./verify-registries.mjs";
 
 export async function verifyReleasePublication({
   fs,
+  runnerLabelsByJobName,
   execFile,
   log,
   repo,
@@ -17,7 +18,14 @@ export async function verifyReleasePublication({
   npmRetryMs,
   sleep,
 }) {
-  const { packageName, isPrivate } = verifyReleaseCi(fs, log, repo, tag, run);
+  const { packageName, isPrivate } = verifyReleaseCi(
+    fs,
+    log,
+    repo,
+    tag,
+    run,
+    runnerLabelsByJobName,
+  );
   const registries = await verifyRegistries({
     fs,
     execFile,

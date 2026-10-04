@@ -1,0 +1,19 @@
+version: "11.0"
+description: Specification for the @eliware/tagit release CLI and repository validation behavior.
+directives:
+  - id: E-1100
+    dos:
+      - Provide deterministic release preflight, owner handoff, and post-release verification for Eliware repositories.
+      - Keep TagIt validation read-only apart from documented local test outputs; target implementation and external release state remain owned by their respective projects and operators.
+      - Require CI evidence for the exact commit and classify runner platforms from configured runner labels.
+    donts:
+      - Do not stage, commit, deploy, publish, or authorize releases on behalf of a target repository.
+      - Do not infer a job's operating system from its display name.
+    directives:
+      - id: A-1100.0
+        dos:
+          - Accept the v11 ci.yaml and publish.yaml workflow names and validate applicable release gates.
+          - Require environment example files only when the target declares supported runtime environment configuration.
+        donts:
+          - Do not require .env.example for every target repository.
+          - Do not classify GitHub jobs by job name when runner labels are available.

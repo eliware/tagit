@@ -1,25 +1,30 @@
-import { readRepositoryExceptions } from './read-exceptions.mjs';
+import { readRepositoryExceptions } from "./read-exceptions.mjs";
 
-export const requiredRepositoryFiles = [
-  'package.json',
-  'README.md',
-  'AGENTS.md',
-  'RELEASE_NOTES.md',
-  'docs/',
-  'specs/',
-  'examples/',
-  '.env.example',
-  '.github/workflows/nodejs.yml',
+const requiredRepositoryFiles = [
+  "package.json",
+  "README.md",
+  "AGENTS.md",
+  "RELEASE_NOTES.md",
+  "docs/",
+  "specs/",
+  "specs/directives.yaml",
+  ".github/workflows/ci.yaml",
 ];
 
-export function findMissingRepositoryFiles(fs) {
+export function findMissingRepositoryFiles(fs, packageData = null) {
   const exceptions = readRepositoryExceptions(fs);
+  const metadata = packageData ?? JSON.parse(fs.readFileSync("package.json", "utf8"));
+  const profiles = metadata.eliware?.apply ?? [];
+  const required = [...requiredRepositoryFiles];
+  if (profiles.includes("library")) required.push("examples/");
+  if (profiles.includes("npm-published") || profiles.includes("ghcr-published"))
+    required.push(".github/workflows/publish.yaml");
   const exists = (file) => {
     if (!fs.existsSync(file)) return false;
-    if (!file.endsWith('/') || typeof fs.lstatSync !== 'function') return true;
+    if (!file.endsWith("/") || typeof fs.lstatSync !== "function") return true;
     return fs.lstatSync(file).isDirectory();
   };
-  return requiredRepositoryFiles.filter((file) => !exceptions[file] && !exists(file));
+  return required.filter((file) => !exceptions[file] && !exists(file));
 }
 
 export function missingFileMessage(file) {

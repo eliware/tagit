@@ -1,15 +1,16 @@
-import { execFile as defaultExecFile } from 'node:child_process';
-import { sleep as sleepDefault } from '../../process/timing/sleep.mjs';
-import { pollReleaseCi } from './release-ci-status.mjs';
-import { verifyReleasePublication } from './release-publication-status.mjs';
-import { validateReleaseInput } from './validate-release-input.mjs';
-import { resolveReleaseContext } from './resolve-release-context.mjs';
-import { reportCiResult } from './report-ci-result.mjs';
-export { npmExecutable } from '../../process/commands/npm-executable.mjs';
-export { waitSync } from '../../process/timing/wait-sync.mjs';
-export { sleep as sleepDefault } from '../../process/timing/sleep.mjs';
-export { execFileCommand as releaseCommand } from '../../process/async/exec-file.mjs';
-export { reportCiLinks } from '../../github/links/report-ci-links.mjs';
+import { execFile as defaultExecFile } from "node:child_process";
+import { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
+import { pollReleaseCi } from "./release-ci-status.mjs";
+import { verifyReleasePublication } from "./release-publication-status.mjs";
+import { validateReleaseInput } from "./validate-release-input.mjs";
+import { resolveReleaseContext } from "./resolve-release-context.mjs";
+import { reportCiResult } from "./report-ci-result.mjs";
+import { readWorkflowRunnerLabelsFromGit } from "../../github/runs/read-workflow-runner-labels.mjs";
+export { npmExecutable } from "../../process/commands/npm-executable.mjs";
+export { waitSync } from "../../process/timing/wait-sync.mjs";
+export { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
+export { execFileCommand as releaseCommand } from "../../process/async/exec-file.mjs";
+export { reportCiLinks } from "../../github/links/report-ci-links.mjs";
 export async function verifyRelease(
   execFileSync,
   fs,
@@ -28,11 +29,26 @@ export async function verifyRelease(
 ) {
   validateReleaseInput(version, release, maxPolls, npmRetries, pollMs, npmRetryMs);
   const { repo, tag, headSha } = resolveReleaseContext(execFileSync, version, release);
-  const run = await pollReleaseCi({ execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly, log });
+  const runnerLabelsByJobName = readWorkflowRunnerLabelsFromGit(execFileSync, headSha, [
+    ".github/workflows/ci.yaml",
+    ".github/workflows/publish.yaml",
+  ]);
+  const run = await pollReleaseCi({
+    execFile,
+    repo,
+    headSha,
+    tag,
+    pollMs,
+    maxPolls,
+    sleep,
+    linksOnly,
+    log,
+  });
   const reported = reportCiResult({ log, repo, tag, headSha, run, linksOnly });
   if (reported) return reported;
   return verifyReleasePublication({
     fs,
+    runnerLabelsByJobName,
     execFile,
     log,
     repo,

@@ -1,18 +1,26 @@
-import { evaluateJobPolicy } from '../../../src/validation/ci/evaluate-job-policy.mjs';
+import { evaluateJobPolicy } from "../../../src/validation/ci/evaluate-job-policy.mjs";
 
-const success = (job) => job.status === 'completed' && job.conclusion === 'success';
+const success = (job) => job.status === "completed" && job.conclusion === "success";
 
-test('requires Ubuntu and treats absent Windows as optional', () => {
+test("requires Ubuntu and treats absent Windows as optional", () => {
   expect(
-    evaluateJobPolicy([{ name: 'ubuntu-latest', status: 'completed', conclusion: 'success' }], success),
+    evaluateJobPolicy(
+      [{ name: "build", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" }],
+      success,
+    ),
   ).toMatchObject({ failed: false, ubuntu: true, windows: { passed: true, successful: false } });
 });
 
-test('requires present Windows jobs to pass and rejects failed jobs', () => {
+test("requires present Windows jobs to pass and rejects failed jobs", () => {
   const result = evaluateJobPolicy(
     [
-      { name: 'ubuntu-latest', status: 'completed', conclusion: 'success' },
-      { name: 'windows-latest', status: 'completed', conclusion: 'failure' },
+      { name: "build", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+      {
+        name: "build-windows",
+        labels: ["windows-latest"],
+        status: "completed",
+        conclusion: "failure",
+      },
     ],
     success,
   );

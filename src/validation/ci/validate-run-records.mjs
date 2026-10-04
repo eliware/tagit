@@ -1,23 +1,23 @@
 export function validateRunRecords(runs, headSha) {
-  if (!Array.isArray(runs)) throw new Error('GitHub CI run response must be an array.');
+  if (!Array.isArray(runs)) throw new Error("GitHub CI run response must be an array.");
   const malformed = runs
     .map((run, index) => ({ run, index }))
     .filter(
       ({ run }) =>
         !run ||
-        typeof run !== 'object' ||
+        typeof run !== "object" ||
         !Number.isInteger(run.databaseId) ||
-        typeof run.status !== 'string' ||
-        (run.conclusion !== null && typeof run.conclusion !== 'string') ||
-        typeof run.headSha !== 'string',
+        typeof run.status !== "string" ||
+        (run.conclusion !== null && typeof run.conclusion !== "string") ||
+        typeof run.headSha !== "string",
     );
   if (malformed.length) {
     const details = malformed
       .map(
         ({ run, index }) =>
-          `entry ${index + 1}: ${run === null ? 'null' : typeof run === 'object' ? JSON.stringify(run) : typeof run}`,
+          `entry ${index + 1}: ${run === null ? "null" : typeof run === "object" ? JSON.stringify(run) : typeof run}`,
       )
-      .join('; ');
+      .join("; ");
     throw new Error(
       `GitHub Actions returned malformed CI run records for ${headSha}: ${details}. Action: inspect the GitHub CLI response or workflow metadata, then rerun tagit preflight.`,
     );

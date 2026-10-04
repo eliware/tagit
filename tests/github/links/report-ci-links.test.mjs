@@ -1,88 +1,95 @@
-import { jest } from '@jest/globals';
-import { reportCiLinks } from '../../../src/github/links/report-ci-links.mjs';
+import { jest } from "@jest/globals";
+import { reportCiLinks } from "../../../src/github/links/report-ci-links.mjs";
 
 const log = () => ({ info: jest.fn() });
-test('reports exact-HEAD workflow and job links', () => {
+test("reports exact-HEAD workflow and job links", () => {
   const exec = jest.fn((command, args) =>
-    command === 'git'
-      ? 'https://github.com/eliware/tagit.git\n'
-      : args[1] === 'list'
-        ? JSON.stringify([{ databaseId: 7, url: 'https://ci/7', headSha: 'abc' }])
-        : JSON.stringify({ jobs: [{ name: 'Ubuntu', url: 'https://ci/7/jobs/1' }] }),
+    command === "git"
+      ? "https://github.com/eliware/tagit.git\n"
+      : args[1] === "list"
+        ? JSON.stringify([{ databaseId: 7, url: "https://ci/7", headSha: "abc" }])
+        : JSON.stringify({ jobs: [{ name: "Ubuntu", url: "https://ci/7/jobs/1" }] }),
   );
   const logger = log();
-  expect(reportCiLinks(exec, logger, 'abc')).toMatchObject({ repo: 'eliware/tagit', headSha: 'abc' });
-  expect(logger.info).toHaveBeenCalledWith('Workflow: [https://ci/7](https://ci/7)');
+  expect(reportCiLinks(exec, logger, "abc")).toMatchObject({
+    repo: "eliware/tagit",
+    headSha: "abc",
+  });
+  expect(logger.info).toHaveBeenCalledWith("Workflow: [https://ci/7](https://ci/7)");
 });
-test('retries exact-head lookup while Actions registers a newly pushed commit', () => {
+test("retries exact-head lookup while Actions registers a newly pushed commit", () => {
   let lookups = 0;
   const waitSync = jest.fn();
   const exec = jest.fn((command, args) =>
-    command === 'git'
-      ? 'https://github.com/eliware/tagit.git\n'
-      : args[1] === 'view'
+    command === "git"
+      ? "https://github.com/eliware/tagit.git\n"
+      : args[1] === "view"
         ? JSON.stringify({ jobs: [] })
         : ++lookups < 3
-          ? '[]'
-          : JSON.stringify([{ databaseId: 7, url: 'https://ci/7', headSha: 'abc' }]),
+          ? "[]"
+          : JSON.stringify([{ databaseId: 7, url: "https://ci/7", headSha: "abc" }]),
   );
   const logger = log();
-  expect(reportCiLinks(exec, logger, 'abc', { attempts: 3, delayMs: 2000, waitSync })).toMatchObject({
+  expect(
+    reportCiLinks(exec, logger, "abc", { attempts: 3, delayMs: 2000, waitSync }),
+  ).toMatchObject({
     runs: [{ databaseId: 7 }],
   });
   expect(waitSync).toHaveBeenCalledTimes(2);
   expect(waitSync).toHaveBeenCalledWith(2000);
 });
-test('reports absent CI without blocking retries and rejects invalid remotes', () => {
-  const exec = jest.fn((command) => (command === 'git' ? 'https://github.com/eliware/tagit.git' : '[]'));
-  expect(reportCiLinks(exec, log(), 'abc')).toMatchObject({ runs: [] });
+test("reports absent CI without blocking retries and rejects invalid remotes", () => {
+  const exec = jest.fn((command) =>
+    command === "git" ? "https://github.com/eliware/tagit.git" : "[]",
+  );
+  expect(reportCiLinks(exec, log(), "abc")).toMatchObject({ runs: [] });
   expect(() =>
     reportCiLinks(
-      jest.fn(() => 'local-only'),
+      jest.fn(() => "local-only"),
       log(),
-      'abc',
+      "abc",
     ),
-  ).toThrow('Cannot determine');
+  ).toThrow("Cannot determine");
 });
-test('handles missing job links and job arrays', () => {
+test("handles missing job links and job arrays", () => {
   const exec = jest.fn((command, args) =>
-    command === 'git'
-      ? 'git@github.com:eliware/tagit.git'
-      : args[1] === 'list'
-        ? JSON.stringify([{ databaseId: 8, url: 'https://ci/8', headSha: 'abc' }])
+    command === "git"
+      ? "git@github.com:eliware/tagit.git"
+      : args[1] === "list"
+        ? JSON.stringify([{ databaseId: 8, url: "https://ci/8", headSha: "abc" }])
         : JSON.stringify({ jobs: null }),
   );
-  expect(() => reportCiLinks(exec, log(), 'abc')).toThrow('malformed job records');
+  expect(() => reportCiLinks(exec, log(), "abc")).toThrow("malformed job records");
   const noLink = jest.fn((command, args) =>
-    command === 'git'
-      ? 'git@github.com:eliware/tagit.git'
-      : args[1] === 'list'
-        ? JSON.stringify([{ databaseId: 9, url: 'https://ci/9', headSha: 'abc' }])
-        : JSON.stringify({ jobs: [{ name: 'metadata-only' }] }),
+    command === "git"
+      ? "git@github.com:eliware/tagit.git"
+      : args[1] === "list"
+        ? JSON.stringify([{ databaseId: 9, url: "https://ci/9", headSha: "abc" }])
+        : JSON.stringify({ jobs: [{ name: "metadata-only" }] }),
   );
-  expect(reportCiLinks(noLink, log(), 'abc')).toMatchObject({ runs: [{ databaseId: 9 }] });
+  expect(reportCiLinks(noLink, log(), "abc")).toMatchObject({ runs: [{ databaseId: 9 }] });
 });
-test('rejects malformed responses without blocking retry options', () => {
+test("rejects malformed responses without blocking retry options", () => {
   const malformed = jest.fn((command) =>
-    command === 'git' ? 'https://github.com/eliware/tagit.git' : JSON.stringify({ runs: [] }),
+    command === "git" ? "https://github.com/eliware/tagit.git" : JSON.stringify({ runs: [] }),
   );
-  expect(() => reportCiLinks(malformed, log(), 'abc')).toThrow('must be an array');
+  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("must be an array");
 });
-test('rejects malformed individual run records', () => {
+test("rejects malformed individual run records", () => {
   const malformed = jest.fn((command) =>
-    command === 'git'
-      ? 'https://github.com/eliware/tagit.git'
-      : JSON.stringify([{ databaseId: 'bad', url: 'https://ci', headSha: 'abc' }]),
+    command === "git"
+      ? "https://github.com/eliware/tagit.git"
+      : JSON.stringify([{ databaseId: "bad", url: "https://ci", headSha: "abc" }]),
   );
-  expect(() => reportCiLinks(malformed, log(), 'abc')).toThrow('malformed run records');
+  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("malformed run records");
 });
-test('rejects malformed individual job records', () => {
+test("rejects malformed individual job records", () => {
   const malformed = jest.fn((command, args) =>
-    command === 'git'
-      ? 'https://github.com/eliware/tagit.git'
-      : args[1] === 'list'
-        ? JSON.stringify([{ databaseId: 10, url: 'https://ci/10', headSha: 'abc' }])
-        : JSON.stringify({ jobs: [null, 42, { url: 'https://ci/job' }] }),
+    command === "git"
+      ? "https://github.com/eliware/tagit.git"
+      : args[1] === "list"
+        ? JSON.stringify([{ databaseId: 10, url: "https://ci/10", headSha: "abc" }])
+        : JSON.stringify({ jobs: [null, 42, { url: "https://ci/job" }] }),
   );
-  expect(() => reportCiLinks(malformed, log(), 'abc')).toThrow('malformed job records');
+  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("malformed job records");
 });

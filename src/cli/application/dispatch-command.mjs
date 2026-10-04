@@ -1,8 +1,8 @@
-import { runReleaseCommand } from '../../commands/release/dispatch.mjs';
-import { helpText } from '../guidance/help-text.mjs';
-import { ownerGuidance } from '../../policy/owner-guidance.mjs';
-import { registerLifecycle } from './register-lifecycle.mjs';
-import { dispatchSimpleCommand } from './dispatch-simple-command.mjs';
+import { runReleaseCommand } from "../../commands/release/dispatch.mjs";
+import { helpText } from "../guidance/help-text.mjs";
+import { ownerGuidance } from "../../policy/owner-guidance.mjs";
+import { registerLifecycle } from "./register-lifecycle.mjs";
+import { dispatchSimpleCommand } from "./dispatch-simple-command.mjs";
 
 export const operatorBoundary = ownerGuidance;
 

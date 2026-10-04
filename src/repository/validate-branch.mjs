@@ -1,5 +1,5 @@
-import { readCurrentBranch } from './branch/read-current-branch.mjs';
-import { requireMain } from './branch/require-main.mjs';
+import { readCurrentBranch } from "./branch/read-current-branch.mjs";
+import { requireMain } from "./branch/require-main.mjs";
 
 export function validateBranch(execFileSync, failures) {
   try {

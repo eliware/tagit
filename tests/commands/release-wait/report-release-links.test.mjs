@@ -1,19 +1,25 @@
-import { jest } from '@jest/globals';
-import { reportReleaseLinks } from '../../../src/commands/release-wait/report-release-links.mjs';
-test('reports workflow and available job links', () => {
+import { jest } from "@jest/globals";
+import { reportReleaseLinks } from "../../../src/commands/release-wait/report-release-links.mjs";
+test("reports workflow and available job links", () => {
   const log = { info: jest.fn() };
-  reportReleaseLinks(log, 'eliware/tagit', 'v1.2.3', { url: 'workflow', jobs: [{ name: 'Ubuntu', url: 'job' }] });
-  expect(log.info).toHaveBeenCalledWith('Workflow: [workflow](workflow)');
-  expect(log.info).toHaveBeenCalledWith('Ubuntu: [job](job)');
+  reportReleaseLinks(log, "eliware/tagit", "v1.2.3", {
+    url: "workflow",
+    jobs: [{ name: "Ubuntu", url: "job" }],
+  });
+  expect(log.info).toHaveBeenCalledWith("Workflow: [workflow](workflow)");
+  expect(log.info).toHaveBeenCalledWith("Ubuntu: [job](job)");
 });
-test('handles a run without optional job links', () => {
+test("handles a run without optional job links", () => {
   const log = { info: jest.fn() };
-  reportReleaseLinks(log, 'eliware/demo', 'v1.0.0', { url: 'workflow' });
+  reportReleaseLinks(log, "eliware/demo", "v1.0.0", { url: "workflow" });
   expect(log.info).toHaveBeenCalledTimes(2);
 });
 
-test('does not report jobs that have no URL', () => {
+test("does not report jobs that have no URL", () => {
   const log = { info: jest.fn() };
-  reportReleaseLinks(log, 'eliware/demo', 'v1.0.0', { url: 'workflow', jobs: [{ name: 'Ubuntu' }] });
+  reportReleaseLinks(log, "eliware/demo", "v1.0.0", {
+    url: "workflow",
+    jobs: [{ name: "Ubuntu" }],
+  });
   expect(log.info).toHaveBeenCalledTimes(2);
 });

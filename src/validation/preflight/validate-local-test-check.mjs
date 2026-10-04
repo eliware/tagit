@@ -1,5 +1,5 @@
-import { buildTestCheck } from '../local/test-command.mjs';
-import { coverageWaiverPolicy } from '../../policy/coverage-waiver-policy.mjs';
+import { buildTestCheck } from "../local/test-command.mjs";
+import { coverageWaiverPolicy } from "../../policy/coverage-waiver-policy.mjs";
 
 export function validateLocalTestCheck(fs, { ignore100x4, ignoreMonolithLimits }) {
   return buildTestCheck(fs, {

@@ -1,7 +1,7 @@
-import { parseSemver } from './parse-semver.mjs';
+import { parseSemver } from "./parse-semver.mjs";
 
 export function readPackageVersion(fs) {
-  const current = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+  const current = JSON.parse(fs.readFileSync("package.json", "utf8")).version;
   try {
     parseSemver(current);
   } catch {

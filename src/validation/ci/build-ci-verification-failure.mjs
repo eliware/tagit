@@ -1,8 +1,10 @@
-import { summarizeCiJobs } from './summarize-ci-jobs.mjs';
+import { summarizeCiJobs } from "./summarize-ci-jobs.mjs";
 
 export function buildCiVerificationFailure(candidates, headSha) {
   const matching = candidates.filter((run) => run.headSha === headSha);
-  const details = matching.map((run) => `run ${run.databaseId} [${run.status}/${run.conclusion}]`).join(', ');
+  const details = matching
+    .map((run) => `run ${run.databaseId} [${run.status}/${run.conclusion}]`)
+    .join(", ");
   return details
     ? `No successful GitHub Actions run exists for ${headSha}. Observed: ${details}`
     : `No successful GitHub Actions run exists for ${headSha}.`;

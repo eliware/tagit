@@ -1,7 +1,7 @@
 {
   "name": "@eliware/tagit",
   "type": "module",
-  "version": "6.2.0",
+  "version": "11.0.0",
   "description": "Deterministic release preflight and publication verification for Eliware packages.",
   "main": "bin/tagit-cli.mjs",
   "exports": {
@@ -11,15 +11,13 @@
     "./upstream": "./bin/upstream.mjs"
   },
   "files": [
-    "bin/",
     "src/",
     "docs/",
-    "specs/",
-    "examples/",
-    "scripts/typecheck.mjs",
     "README.md",
+    "AGENTS.md",
     "LICENSE",
-    "RELEASE_NOTES.md"
+    "RELEASE_NOTES.md",
+    "bin/"
   ],
   "publishConfig": {
     "access": "public",
@@ -38,45 +36,37 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/eliware/tagit.git"
+    "url": "git+https://github.com/eliware/tagit.git"
   },
   "keywords": [
     "tagit",
-    "versioning",
-    "git",
-    "git-tag",
-    "git-release",
-    "automation",
-    "release-automation",
     "nodejs",
-    "npm",
-    "php",
-    "composer",
-    "package.json",
-    "composer.json",
-    "release",
-    "publishing",
     "cli",
-    "version-bumping",
+    "git",
+    "github-actions",
+    "release",
+    "release-automation",
+    "preflight",
+    "versioning",
+    "npm",
     "ci",
-    "github-actions"
+    "automation"
   ],
   "author": "Eliware <eliware@eliware.org>",
   "license": "MIT",
   "engines": {
-    "node": ">=26"
+    "node": "26"
   },
   "bugs": {
     "url": "https://github.com/eliware/tagit/issues"
   },
   "homepage": "https://github.com/eliware/tagit#readme",
   "devDependencies": {
-    "@eliware/test": "^6.0.1",
-    "@eliware/redact": "^8.0.0",
-    "prettier": "^3.9.6"
+    "@eliware/test": "^10.0.0"
   },
   "dependencies": {
-    "@eliware/common": "^2.0.0"
+    "@eliware/common": "^2.0.0",
+    "@eliware/redact": "^6.0.0"
   },
   "eliware": {
     "id": "E-1100",
@@ -86,30 +76,28 @@
       "cli",
       "npm-published"
     ],
-    "exempt": [],
-    "capabilities": [
-      "typecheck"
+    "exempt": []
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
     ],
-    "authority": {
-      "authoritativeFor": [
-        "TagIt release preflight and publication verification behavior."
-      ],
-      "notAuthoritativeFor": [
-        "Target repository implementation, CI state, publication state, deployment, or operations."
-      ]
-    },
-    "crosslinks": [
-      {
-        "path": "../docs/authority-map.json",
-        "relation": "relatedAuthority",
-        "authoritativeFor": "Shared platform and documentation authority."
-      },
-      {
-        "path": "../test/specs/conventions/README.md",
-        "relation": "relatedAuthority",
-        "authoritativeFor": "Applicable repository convention specifications."
+    "collectCoverageFrom": [
+      "src/**/*.mjs"
+    ],
+    "coverageReporters": [
+      "text",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
       }
-    ]
+    }
   },
   "bin": {
     "tagit": "bin/tagit-cli.mjs",

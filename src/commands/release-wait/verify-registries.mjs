@@ -1,6 +1,6 @@
-import { publishesGhcr } from '../../registries/ghcr/discover-publication.mjs';
-import { verifyNpmPublication } from '../../registries/npm/verify-publication.mjs';
-import { verifyGhcrPublication } from '../../registries/ghcr/verify-publication.mjs';
+import { publishesGhcr } from "../../registries/ghcr/discover-publication.mjs";
+import { verifyNpmPublication } from "../../registries/npm/verify-publication.mjs";
+import { verifyGhcrPublication } from "../../registries/ghcr/verify-publication.mjs";
 
 export async function verifyRegistries({
   fs,
@@ -27,7 +27,7 @@ export async function verifyRegistries({
       sleep,
     });
     log.info(`npm verified: ${packageName}@${version}.`);
-  } else log.info('npm verification: not applicable.');
+  } else log.info("npm verification: not applicable.");
   if (publishesGhcr(fs)) {
     const { imageDigest } = await verifyGhcrPublication(execFile, log, {
       repository: repo,
@@ -39,6 +39,6 @@ export async function verifyRegistries({
     });
     return { npm, ghcr: true, imageDigest };
   }
-  log.info('GHCR verification: not applicable.');
+  log.info("GHCR verification: not applicable.");
   return { npm, ghcr: false };
 }
