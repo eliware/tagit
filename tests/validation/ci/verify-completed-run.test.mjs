@@ -9,9 +9,13 @@ test("recognizes Ubuntu from workflow runner metadata when the job name is test"
       jobs: [{ databaseId: 10, name: "test", status: "completed", conclusion: "success" }],
     }),
   );
-  expect(
-    verifyCompletedRun(exec, { info: jest.fn() }, { databaseId: 1 }, "abc", { test: ["ubuntu"] }),
-  ).toMatchObject({ ubuntu: true, windows: false });
+  const log = { info: jest.fn() };
+  expect(verifyCompletedRun(exec, log, { databaseId: 1 }, "abc", { test: ["ubuntu"] })).toEqual({
+    runId: 1,
+    headSha: "abc",
+    ubuntu: true,
+  });
+  expect(log.info).toHaveBeenCalledWith("GitHub Actions CI verified for abc: Ubuntu passed.");
 });
 
 test("rejects a non-passing Windows job even when Ubuntu passes", () => {

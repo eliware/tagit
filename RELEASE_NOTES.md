@@ -10,6 +10,7 @@
 ### Changed
 
 - Set the package version to 11.0.0, update dependencies and Jest configuration, and use the exact npm files allowlist and npm Trusted Publishing workflow.
+- Omit Windows status from preflight output when the target has no Windows job.
 - Require environment templates only when a target project supports runtime environment configuration; TagIt itself has no required environment settings.
 - Use numeric semantic-version tags and cancel superseded CI runs for the same repository and ref.
 - Move human-readable behavior guides into `docs/specifications/` and keep `specs/` for indexed structured directives.

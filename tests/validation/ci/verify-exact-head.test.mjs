@@ -36,7 +36,6 @@ test("verifies a successful exact-head Ubuntu run", () => {
   ).toMatchObject({
     runId: 1,
     ubuntu: true,
-    windows: false,
   });
 });
 

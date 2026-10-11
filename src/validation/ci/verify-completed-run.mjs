@@ -25,10 +25,14 @@ export function verifyCompletedRun(execFileSync, log, run, headSha, runnerLabels
     ubuntu &&
     windows.passed
   ) {
-    log.info(
-      `GitHub Actions CI verified for ${headSha}: Ubuntu passed${windows.successful ? "; Windows passed." : "; Windows optional."}`,
-    );
-    return { runId: run.databaseId, headSha, ubuntu: true, windows: windows.successful };
+    const platforms = windows.successful ? "Ubuntu and Windows passed" : "Ubuntu passed";
+    log.info(`GitHub Actions CI verified for ${headSha}: ${platforms}.`);
+    return {
+      runId: run.databaseId,
+      headSha,
+      ubuntu: true,
+      ...(windows.successful ? { windows: true } : {}),
+    };
   }
   return null;
 }

@@ -14,7 +14,7 @@ declared `npm test` harness, and exact-commit CI evidence. A dirty worktree,
 missing evidence, stale CI, failed CI, or cancelled required check blocks handoff.
 
 Windows CI is optional. If a Windows workflow is present, its required jobs
-must pass.
+must pass. If no Windows job exists, preflight omits Windows from its result.
 
 `--ignore-100x4` is a documented workflow waiver for the coverage threshold.
 It does not waive any other check. The decision to use it is an organizational

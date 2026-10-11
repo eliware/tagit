@@ -15,9 +15,7 @@ export function runPreflightCommand({
     ignoreMonolithLimits,
   });
   if (report) {
-    log.info(
-      "Preflight passed: local gates and exact-HEAD Ubuntu CI are green; Windows CI is optional.",
-    );
+    log.info("Preflight passed: local gates and exact-HEAD Ubuntu CI are green.");
     output(JSON.stringify({ ok: true, checks }));
   }
   return checks;
