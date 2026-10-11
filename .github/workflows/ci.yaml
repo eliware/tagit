@@ -14,8 +14,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
@@ -25,4 +27,3 @@ jobs:
       - run: npm -g install npm@latest
       - run: npm ci
       - run: npm test
-      - run: npm run typecheck

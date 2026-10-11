@@ -1,43 +1,8 @@
 {
   "name": "@eliware/tagit",
+  "version": "12.0.0",
   "type": "module",
-  "version": "11.0.0",
   "description": "Deterministic release preflight and publication verification for Eliware packages.",
-  "main": "bin/tagit-cli.mjs",
-  "exports": {
-    ".": "./bin/tagit-cli.mjs",
-    "./tagit": "./bin/tagit.mjs",
-    "./push": "./bin/push.mjs",
-    "./upstream": "./bin/upstream.mjs"
-  },
-  "files": [
-    "src/",
-    "docs/",
-    "README.md",
-    "AGENTS.md",
-    "LICENSE",
-    "RELEASE_NOTES.md",
-    "bin/"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "private": false,
-  "scripts": {
-    "start": "node bin/tagit-cli.mjs",
-    "test": "eliware-test",
-    "lint": "eliware-test --lint",
-    "audit": "eliware-test --audit",
-    "format": "eliware-test --format",
-    "format:check": "eliware-test --format-check",
-    "pack": "eliware-test --pack",
-    "typecheck": "node scripts/typecheck.mjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/tagit.git"
-  },
   "keywords": [
     "tagit",
     "nodejs",
@@ -52,31 +17,46 @@
     "ci",
     "automation"
   ],
-  "author": "Eliware <eliware@eliware.org>",
-  "license": "MIT",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "main": "bin/tagit-cli.mjs",
+  "bin": {
+    "tagit": "bin/tagit-cli.mjs",
+    "push": "bin/push-cli.mjs",
+    "upstream": "bin/upstream-cli.mjs"
+  },
+  "files": [
+    "src/",
+    "docs/",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE",
+    "RELEASE_NOTES.md",
+    "bin/",
+    "specs/"
+  ],
+  "scripts": {
+    "start": "node bin/tagit-cli.mjs",
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check",
+    "pack": "eliware-test --pack",
+    "typecheck": "node bin/typecheck.mjs"
+  },
   "engines": {
-    "node": "26"
-  },
-  "bugs": {
-    "url": "https://github.com/eliware/tagit/issues"
-  },
-  "homepage": "https://github.com/eliware/tagit#readme",
-  "devDependencies": {
-    "@eliware/test": "^11.0.0"
+    "node": ">=26"
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
     "@eliware/redact": "^6.0.0"
   },
-  "eliware": {
-    "id": "E-1100",
-    "apply": [
-      "general",
-      "application",
-      "cli",
-      "npm-published"
-    ],
-    "exempt": []
+  "devDependencies": {
+    "@eliware/test": "^11.0.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -99,11 +79,6 @@
       }
     }
   },
-  "bin": {
-    "tagit": "bin/tagit-cli.mjs",
-    "push": "bin/push-cli.mjs",
-    "upstream": "bin/upstream-cli.mjs"
-  },
   "prettier": {
     "printWidth": 100,
     "tabWidth": 2,
@@ -118,5 +93,31 @@
     "arrowParens": "always",
     "proseWrap": "preserve",
     "endOfLine": "lf"
+  },
+  "author": "Eliware <eliware@eliware.org>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/tagit.git"
+  },
+  "homepage": "https://github.com/eliware/tagit#readme",
+  "bugs": {
+    "url": "https://github.com/eliware/tagit/issues"
+  },
+  "eliware": {
+    "id": "E-1100",
+    "apply": [
+      "general",
+      "application",
+      "cli",
+      "npm-published"
+    ],
+    "exempt": []
+  },
+  "exports": {
+    ".": "./bin/tagit-cli.mjs",
+    "./tagit": "./bin/tagit.mjs",
+    "./push": "./bin/push.mjs",
+    "./upstream": "./bin/upstream.mjs"
   }
 }

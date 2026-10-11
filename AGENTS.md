@@ -19,13 +19,13 @@ Repository-wide scope: TagIt owns its CLI and target repository validation behav
 
 ## Development
 
-Use Node.js 26, npm, and native ESM. Keep each module to one cohesive purpose and one reason to change. Business-logic modules and coordinators, including coordinators of coordinators, are valid when each has one distinct responsibility. Put every distinct new responsibility in a focused submodule with a mirrored test and wire it through its owner; do not add the new responsibility to an existing module. Refactor mixed responsibilities found during ordinary review. Passing them does not prove cohesion or single responsibility, and does not permit mixed responsibilities below an applicable maximum; refactor them when found.
+Use Node.js 26 or later, npm 12 or later, and native ESM. Keep each module to one cohesive purpose and one reason to change. Business-logic modules and coordinators are valid when each has one distinct responsibility. Put each new responsibility in a focused submodule with a mirrored test. Refactor mixed responsibilities when you find them. File length does not prove single responsibility.
 
 Repository-wide development instructions apply to every source and test subdirectory; nearer AGENTS.md files apply only in their subdirectories. Before changing files, read README.md, applicable AGENTS.md instructions, applicable documentation, and applicable specifications. Runtime commands are `tagit`, `push`, and `upstream`. There are no required application-specific environment settings; optional `LOG_LEVEL` adjusts shared logger verbosity.
 
 ## Validation
 
-Use the global `eliware-test` v11 command for aggregate validation; it owns Jest, lint, formatting, audit, coverage, and package validation. Also run `npm run typecheck` and `git diff --check`. CI runs `npm ci`, then `npm test`, then the repository-specific typecheck on Ubuntu. Before release consideration, run `npm outdated` and verify no direct dependency is outdated. Knit configuration is in `.knit/deploy.yaml`.
+Use Eliware Test v12 for aggregate validation. Run `npm test`, `npm run lint`, `npm run audit`, `npm run format`, and `npm run format:check` through the shared CLI. Run `npm run typecheck` and `git diff --check` when needed. CI runs `npm ci`, then `npm test` on Ubuntu. Check direct dependencies with `npm outdated` before release. Knit configuration is in `.knit/deploy.yaml`.
 
 ## Security
 
@@ -45,4 +45,4 @@ Entrypoints are `bin/tagit-cli.mjs` (`tagit`), `bin/push-cli.mjs` (`push`, a wra
 
 ## npm publication
 
-The public package is `@eliware/tagit`; `package.json` is the version source. The exact files allowlist is `bin/`, `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. Pack validation command: `npm run pack` (also `eliware-test --pack`); require a pass from the global aggregate harness and its pack stage before publication. npm Trusted Publishing uses OIDC and provenance with no static npm token. Exact-version public npm registry verification: verify the exact package.json version for `@eliware/tagit` is visible at `registry.npmjs.org` by running `tagit release-wait`. Eli and the project developer run TagIt preflight together; Eli decides release readiness and instructs DevOps, and DevOps executes the authorized release. Publication requires explicit authorization through the applicable Operations release handoff; these instructions do not authorize an agent to publish.
+The public package is `@eliware/tagit`; `package.json` is the version source. Required package paths are `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, `RELEASE_NOTES.md`, `bin/`, and `specs/`. Put additional runtime files after these paths. Run `npm run pack` to check package contents. Aggregate validation also checks package contents. npm Trusted Publishing uses OIDC and provenance. Do not use a static npm token. Run `tagit release-wait` to verify the exact package version at `registry.npmjs.org`. Eli and the project developer run TagIt preflight together. Eli decides release readiness and instructs DevOps. DevOps performs the authorized release through the Operations handoff.

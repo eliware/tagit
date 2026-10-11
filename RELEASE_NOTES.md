@@ -1,5 +1,13 @@
 # Release Notes
 
+## 12.0.0 — 2026-10-11
+
+### Changed
+
+- Align package metadata, specifications, documentation, and workflows with Eliware Test v12.
+- Include `specs/` in the published package and guard publication with the canonical version tag.
+- Use the v12 README layout, specification IDs, indexes, and shared package rules.
+
 ## 11.0.0 — 2026-10-03
 
 ### Added
