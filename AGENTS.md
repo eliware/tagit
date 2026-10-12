@@ -2,47 +2,50 @@
 
 ## Project
 
-Repository: `eliware/tagit`. Purpose: provide the `@eliware/tagit` Node.js CLI for release preflight, owner handoff, and post-release verification. Repository-wide development instructions apply throughout this repository; subdirectory AGENTS.md instructions apply only within their subdirectories. Before changing files, read the root README.md, applicable AGENTS.md instructions, applicable documentation, and applicable specifications.
+This repository is `eliware/tagit`.
+
+It checks package release readiness and publication.
 
 ## Scope and boundaries
 
-Repository-wide scope: TagIt owns its CLI and target repository validation behavior. It does not own target-project implementation, CI state, publication state, deployment, GitOps desired state, or release authorization. Shared requirements are authoritative in the Docs, Test, and Operations repositories. Project-specific deviation does not waive convention IDs or validation stages. Instructions must be actionable, current, and concise.
+Use README.md for repository purpose, scope, and ownership.
 
 ## Layout
 
-- `bin/`: executable package entrypoints.
-- `src/`: native ESM implementation.
-- `tests/`: mirrored Jest tests.
-- `docs/`: user documentation and operational boundaries.
-- `specs/`: indexed structured directives.
-- `.github/workflows/ci.yaml`: validation; `publish.yaml`: npm Trusted Publishing.
+Use README.md and specs/README.md to find repository files.
 
 ## Development
 
-Use Node.js 26 or later, npm 12 or later, and native ESM. Keep each module to one cohesive purpose and one reason to change. Business-logic modules and coordinators are valid when each has one distinct responsibility. Put each new responsibility in a focused submodule with a mirrored test. Refactor mixed responsibilities when you find them. File length does not prove single responsibility.
-
-Repository-wide development instructions apply to every source and test subdirectory; nearer AGENTS.md files apply only in their subdirectories. Before changing files, read README.md, applicable AGENTS.md instructions, applicable documentation, and applicable specifications. Runtime commands are `tagit`, `push`, and `upstream`. There are no required application-specific environment settings; optional `LOG_LEVEL` adjusts shared logger verbosity.
+Keep each source and test module focused on one responsibility.
 
 ## Validation
 
-Use Eliware Test v12 for aggregate validation. Run `npm test`, `npm run lint`, `npm run audit`, `npm run format`, and `npm run format:check` through the shared CLI. Run `npm run typecheck` and `git diff --check` when needed. CI runs `npm ci`, then `npm test` on Ubuntu. Check direct dependencies with `npm outdated` before release. Knit configuration is in `.knit/deploy.yaml`.
+Use Node.js 26 or later and npm 12 or later.
+Use native ESM for maintained JavaScript modules.
+Run `npm test` for aggregate validation.
+Run `npm run lint` for lint checks.
+Run `npm run audit` for dependency checks.
+Run `npm run format` to format files.
+Run `npm run format:check` to check formatting.
 
 ## Security
 
-Never commit secrets, credentials, `.env`, generated sessions, or machine state. Use approved CLI credential stores. Keep validation read-only except documented local test outputs. Do not weaken shared security requirements or treat project instructions as waivers.
+Keep credentials, secret values, private data, and runtime state out of Git.
 
 ## Changes
 
-Add focused regression tests and update user documentation and release notes for behavior changes. Record only approved deviations. Do not commit, tag, push, release, or publish without explicit authorization for the current task. Release and publication require the applicable DevOps handoff.
+Keep changes within this repository scope.
+Use Eliware Operations for approval before external changes.
 
 ## Application
 
-The application runtime starts at `bin/tagit-cli.mjs`, with `push` and `upstream` executable entrypoints. TagIt has no service lifecycle to start or stop and opens no application network connections. This is the operational boundary. It has no required runtime configuration; `LOG_LEVEL` is optional. Validate externally observable CLI workflows with the aggregate harness and review the documented workflow inventory; passing tests alone does not prove every workflow is documented or covered.
+Document entrypoints, workflows, settings, startup, and shutdown in README.md.
 
 ## CLI
 
-Entrypoints are `bin/tagit-cli.mjs` (`tagit`), `bin/push-cli.mjs` (`push`, a wrapper for `tagit push`), and `bin/upstream-cli.mjs` (`upstream`). Commands are `notes`, `preflight`, `push`, `release --version X.Y.Z`, and `release-wait`. Options include `--help`, `--version`, `--dry-run`, `--ignore-100x4`, and `--ignore-monolith-limits`; the parser rejects unsupported options, positional arguments, and invalid combinations. Test waivers reach only supported preflight/release commands. `upstream` accepts optional merge-message text (default UTC timestamp) and `--dry-run`; dry run reports the selected branch without fetching, merging, or pushing. All entrypoints provide help and version. Success exit code is 0; invalid input, validation failures, and operational errors map to exit code 1. Requirements are Node.js 26, Git, and GitHub CLI for CI inspection. Ubuntu is directly validated in CI. Windows has been exercised for platform-specific behavior; macOS compatibility is inferred from shared Node.js and Git behavior, not directly validated. State supported platforms separately from validation evidence. `push` pushes existing commits only; release operations create and push only the requested release tag. Dry run checks readiness without release side effects.
+Document commands, options, arguments, defaults, errors, and exit codes in README.md.
 
 ## npm publication
 
-The public package is `@eliware/tagit`; `package.json` is the version source. Required package paths are `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, `RELEASE_NOTES.md`, `bin/`, and `specs/`. Put additional runtime files after these paths. Run `npm run pack` to check package contents. Aggregate validation also checks package contents. npm Trusted Publishing uses OIDC and provenance. Do not use a static npm token. Run `tagit release-wait` to verify the exact package version at `registry.npmjs.org`. Eli and the project developer run TagIt preflight together. Eli decides release readiness and instructs DevOps. DevOps performs the authorized release through the Operations handoff.
+Include specs/ in the package.
+Document install, entrypoints, contents, and release limits in README.md.
