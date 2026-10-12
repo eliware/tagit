@@ -2,16 +2,18 @@ name: Validation
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.repository }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   test:
