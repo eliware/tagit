@@ -1,5 +1,11 @@
 # Release Notes
 
+## Unreleased
+
+### Changed
+
+- Report release-wait progress before each CI and registry check.
+
 ## 12.0.0 — 2026-10-11
 
 ### Changed

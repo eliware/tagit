@@ -8,6 +8,9 @@ export async function pollGhcrVisibility(
 ) {
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
+      log.info(
+        `GHCR visibility check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`,
+      );
       let versions = JSON.parse(
         await execFileCommand(execFile, "gh", [
           "api",

@@ -14,6 +14,7 @@ export async function pollReleaseCi({
 }) {
   for (let poll = 0; poll < maxPolls; poll += 1) {
     try {
+      log.info(`Release CI check ${poll + 1}/${maxPolls} for ${repo}@${tag}.`);
       const result = await runReleaseCiPollAttempt({
         execFile,
         repo,

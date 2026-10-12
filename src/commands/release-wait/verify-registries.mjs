@@ -19,6 +19,7 @@ export async function verifyRegistries({
 }) {
   const npm = Boolean(packageName && !isPrivate);
   if (npm) {
+    log.info(`Checking npm publication for ${packageName}@${version}.`);
     await verifyNpmPublication(execFile, log, {
       packageName,
       version,
@@ -29,6 +30,7 @@ export async function verifyRegistries({
     log.info(`npm verified: ${packageName}@${version}.`);
   } else log.info("npm verification: not applicable.");
   if (publishesGhcr(fs)) {
+    log.info(`Checking GHCR publication for ${repo}:${version}.`);
     const { imageDigest } = await verifyGhcrPublication(execFile, log, {
       repository: repo,
       version,

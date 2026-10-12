@@ -39,7 +39,8 @@ that tag. It does not rewrite files or create a release commit.
 `release-wait` resolves the latest release tag, monitors its CI, and verifies
 publication in applicable registries. It fails for missing, stale, mismatched,
 incomplete, or failed evidence. Registry propagation checks are bounded. Each
-npm visibility attempt reports one status line.
+npm visibility attempt reports one status line. It reports the start of each CI
+and registry check before it waits for a result.
 
 ## Help and errors
 

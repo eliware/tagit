@@ -1,4 +1,4 @@
-import { redactText } from "@eliware/redact";
+import { redactText } from "@eliware/common";
 
 export function redactSecrets(output) {
   return redactText(output, { maxString: 10000 });
