@@ -1,21 +1,15 @@
+import { jobValue, parseJobs, parseWorkflow } from "../../repository/metadata/workflow-format.mjs";
+
 export function parseWorkflowRunnerLabels(workflowText) {
-  const lines = workflowText.split(/\r?\n/);
-  const jobsIndex = lines.findIndex((line) => line.trim() === "jobs:");
-  if (jobsIndex < 0) return {};
+  const sections = parseWorkflow(workflowText);
+  const jobs = parseJobs(sections.get("jobs") ?? []);
   const labelsByName = {};
-  for (let index = jobsIndex + 1; index < lines.length; index += 1) {
-    if (!/^  [A-Za-z0-9_-]+:\s*$/.test(lines[index])) continue;
-    const jobId = lines[index].trim().slice(0, -1);
-    const end = lines.findIndex(
-      (line, candidate) => candidate > index && /^  [A-Za-z0-9_-]+:\s*$/.test(line),
-    );
-    const jobLines = lines.slice(index + 1, end < 0 ? undefined : end);
-    const nameLine = jobLines.find((line) => /^    name:\s*/.test(line));
-    const runnerLine = jobLines.find((line) => /^    runs-on:\s*/.test(line));
-    if (!runnerLine) continue;
-    const runner = runnerLine.replace(/^    runs-on:\s*/, "").replaceAll(/["']/g, "");
+  for (const [jobId, jobLines] of jobs) {
+    const runnerValue = jobValue(jobLines, "runs-on");
+    if (runnerValue === null) continue;
+    const runner = runnerValue.replaceAll(/["']/g, "");
     const labels = /ubuntu/i.test(runner) ? ["ubuntu"] : /windows/i.test(runner) ? ["windows"] : [];
-    const displayName = nameLine?.replace(/^    name:\s*/, "").replaceAll(/["']/g, "") ?? jobId;
+    const displayName = (jobValue(jobLines, "name") ?? jobId).replaceAll(/["']/g, "");
     labelsByName[displayName] = labels;
     labelsByName[jobId] = labels;
   }
