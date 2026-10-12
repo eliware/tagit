@@ -3,6 +3,7 @@ import { verifyNpmPublication } from "../../../src/registries/npm/verify-publica
 
 test("waits for npm visibility and succeeds at the expected version", async () => {
   let attempts = 0;
+  const info = jest.fn();
   const exec = jest.fn((_command, _args, _options, callback) =>
     callback(null, attempts++ === 0 ? '"2.0.0"' : '"2.1.0"', ""),
   );
@@ -10,11 +11,14 @@ test("waits for npm visibility and succeeds at the expected version", async () =
   await expect(
     verifyNpmPublication(
       exec,
-      { debug: jest.fn() },
+      { info },
       { packageName: "@eliware/demo", version: "2.1.0", retries: 2, retryMs: 10, sleep },
     ),
   ).resolves.toBeUndefined();
   expect(sleep).toHaveBeenCalledWith(10);
+  expect(info).toHaveBeenCalledTimes(2);
+  expect(info).toHaveBeenNthCalledWith(1, "npm view @eliware/demo@2.1.0 (1/2): not visible.");
+  expect(info).toHaveBeenNthCalledWith(2, "npm view @eliware/demo@2.1.0 (2/2): visible.");
 });
 test("reports bounded npm visibility failures", async () => {
   const exec = jest.fn((_command, _args, _options, callback) =>
@@ -48,9 +52,10 @@ test("includes bounded command diagnostics in retry logging", async () => {
         { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
       ),
     ).rejects.toThrow("after 1 attempts");
-    expect(info).toHaveBeenCalledWith(
-      expect.stringContaining(error.stderr ?? error.stdout ?? error.message ?? "unknown error"),
-    );
+    const detail = error.stderr ?? error.stdout ?? error.message ?? "unknown error";
+    expect(info).toHaveBeenCalledTimes(2);
+    expect(info).toHaveBeenNthCalledWith(1, `npm view demo@1.0.0 (1/1): failed (${detail}).`);
+    expect(info).toHaveBeenNthCalledWith(2, "npm did not expose demo@1.0.0 after 1 attempts.");
   }
 });
 test("accepts npm view array output", async () => {
@@ -80,14 +85,8 @@ test("logs each npm visibility attempt and enables Windows command shims", async
         sleep: jest.fn(),
       },
     );
-    expect(info).toHaveBeenNthCalledWith(
-      1,
-      "Checking npm visibility for @eliware/test@8.0.0 (attempt 1/2)...",
-    );
-    expect(info).toHaveBeenNthCalledWith(
-      2,
-      "npm visibility attempt 1/2: published version is visible.",
-    );
+    expect(info).toHaveBeenCalledTimes(1);
+    expect(info).toHaveBeenCalledWith("npm view @eliware/test@8.0.0 (1/2): visible.");
     expect(exec).toHaveBeenCalledWith(
       'npm.cmd "view" "@eliware/test@8.0.0" "version" "--json"',
       [],
@@ -143,7 +142,7 @@ test("logs invisible registry output and the final visibility failure", async ()
       },
     ),
   ).rejects.toThrow("after 1 attempts");
-  expect(info).toHaveBeenCalledWith(expect.stringContaining('registry returned "0.9.0"'));
+  expect(info).toHaveBeenNthCalledWith(1, "npm view demo@1.0.0 (1/1): not visible.");
   expect(info).toHaveBeenCalledWith("npm did not expose demo@1.0.0 after 1 attempts.");
 });
 
@@ -162,7 +161,7 @@ test("handles an empty JSON response separately from an invalid response", async
       },
     ),
   ).rejects.toThrow("after 1 attempts");
-  expect(info).toHaveBeenCalledWith(expect.stringContaining('registry returned ""'));
+  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not visible.");
 });
 
 test("rejects missing npm publication arguments", async () => {

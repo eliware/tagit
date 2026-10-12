@@ -25,24 +25,21 @@ export async function verifyNpmPublication(
     : npmExecutable();
   const args = windows ? [] : npmArgs;
   for (let attempt = 0; attempt < retries; attempt += 1) {
+    const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
     try {
-      log.info?.(
-        `Checking npm visibility for ${packageName}@${version} (attempt ${attempt + 1}/${retries})...`,
-      );
       const output = await execFileCommand(execFile, executable, args, {
         encoding: "utf8",
         ...(windows ? { shell: true } : {}),
       });
       const visible = readNpmView(output, version);
-      log.info?.(
-        `npm visibility attempt ${attempt + 1}/${retries}: ${visible ? "published version is visible" : `registry returned ${output.trim()}`}.`,
-      );
+      log.info?.(`${status}: ${visible ? "visible" : "not visible"}.`);
       if (visible) return;
     } catch (error) {
       const detail = String(error.stderr ?? error.stdout ?? error.message ?? "unknown error")
         .trim()
+        .replace(/\s+/g, " ")
         .slice(0, 300);
-      log.info?.(`npm visibility attempt ${attempt + 1}/${retries} failed: ${detail}`);
+      log.info?.(`${status}: failed (${detail}).`);
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }

@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Use one concise status line for each npm visibility check in `release-wait`.
+- Update `@eliware/common` and `@eliware/redact` to v12.
 - Align package metadata, specifications, documentation, and workflows with Eliware Test v12.
 - Include `specs/` in the published package and guard publication with the canonical version tag.
 - Use the v12 README layout, specification IDs, indexes, and shared package rules.
