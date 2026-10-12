@@ -37,3 +37,15 @@ test("rejects a non-completed publish job", () => {
     }),
   ).toThrow("successful publish job");
 });
+
+test("rejects mixed successful and failed publish jobs", () => {
+  expect(() =>
+    verifyPublishJob(
+      [
+        { name: "publish", status: "completed", conclusion: "success" },
+        { name: "publish", status: "completed", conclusion: "failure" },
+      ],
+      { applicable: true, packageName: "demo", isPrivate: false },
+    ),
+  ).toThrow("successful publish job");
+});

@@ -9,3 +9,9 @@ test("increments major, minor, and patch levels", () => {
 test("rejects invalid input", () => {
   expect(() => suggestNextVersion("bad", "patch")).toThrow("Invalid version");
 });
+
+test("rejects an increment that exceeds the safe integer limit", () => {
+  expect(() => suggestNextVersion("9007199254740991.0.0", "major")).toThrow(
+    "Invalid version increment",
+  );
+});

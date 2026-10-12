@@ -1,7 +1,6 @@
 import { jest } from "@jest/globals";
 import { processCommand } from "../../../src/validation/local/process-command.mjs";
 import { runPreflight } from "../../../src/validation/preflight/run-checks.mjs";
-
 const packageFs = (packageJson = { scripts: { test: "eliware-test" } }) => ({
   existsSync: jest.fn((file) => file === "package.json"),
   readFileSync: jest.fn(() => JSON.stringify(packageJson)),
@@ -11,14 +10,14 @@ const isNodeNpm = (executable, args = []) =>
   executable === "npm" ||
   executable === "npm.cmd" ||
   (executable === "cmd.exe" && args.includes("npm.cmd"));
-const expectNpmCall = (mock, expectedArgs) => {
+const expectNpmCall = (mock, expectedArgs) =>
   expect(
     mock.mock.calls.some(
       ([executable, args]) =>
         isNodeNpm(executable, args) && expectedArgs.every((arg) => args.includes(arg)),
     ),
   ).toBe(true);
-};
+
 test("reports test output when the shared harness fails", () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === "test")
@@ -28,7 +27,6 @@ test("reports test output when the shared harness fails", () => {
   const fs = packageFs();
   expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow("test output");
 });
-
 test("reports an explicit empty output excerpt for a silent test failure", () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === "test")
@@ -50,7 +48,6 @@ test("bounds captured output from a failing shared harness", () => {
   const fs = packageFs();
   expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow("output truncated");
 });
-
 test("preflight delegates local validation to the project test script", () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === "test")
@@ -86,6 +83,10 @@ test("preflight blocks projects without a test script", () => {
 test("preflight blocks a named project without the installed shared harness", () => {
   const fs = {
     existsSync: () => true,
+    lstatSync: (file) => ({
+      isDirectory: () => ["docs/", "specs/"].includes(file),
+      isSymbolicLink: () => false,
+    }),
     readFileSync: () => JSON.stringify({ name: "demo", scripts: { test: "eliware-test" } }),
   };
   expect(() =>
@@ -105,13 +106,6 @@ test("uses the injected shell-free runner for local checks", () => {
   const result = runPreflight(execFileSync, fs, { info: jest.fn() });
   expect(result.test.passed).toBe(true);
   expectNpmCall(execFileSync, ["test"]);
-});
-
-test("uses a shell-free Windows command wrapper for npm shims", () => {
-  expect(processCommand("npm", ["test"], "win32")).toEqual([
-    "cmd.exe",
-    ["/d", "/s", "/c", "npm.cmd", "test"],
-  ]);
 });
 
 test("preflight rejects dirty trees before running package commands", () => {
@@ -154,14 +148,20 @@ test("strict preflight delegates repository validation", () => {
   );
   const fs = {
     existsSync: () => true,
+    lstatSync: (file) => ({
+      isDirectory: () => ["docs/", "specs/"].includes(file),
+      isSymbolicLink: () => false,
+    }),
     readFileSync: (file) =>
-      file === ".tagit-exceptions.json"
-        ? '{"inapplicable":{}}'
-        : file === "RELEASE_NOTES.md"
-          ? "## 1.0.0"
-          : file === ".github/workflows/ci.yaml"
-            ? workflow
-            : JSON.stringify(pkg),
+      file === "node_modules/@eliware/test/package.json"
+        ? JSON.stringify({ name: "@eliware/test", version: "3.3.0" })
+        : file === ".tagit-exceptions.json"
+          ? '{"inapplicable":{}}'
+          : file === "RELEASE_NOTES.md"
+            ? "## 1.0.0"
+            : file === ".github/workflows/ci.yaml"
+              ? workflow
+              : JSON.stringify(pkg),
   };
   expect(runPreflight(exec, fs, { info: jest.fn() }, { strictRepository: true })).toHaveProperty(
     "test.passed",

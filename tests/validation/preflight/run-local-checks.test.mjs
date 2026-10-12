@@ -2,6 +2,7 @@ import { jest } from "@jest/globals";
 import { runLocalChecks } from "../../../src/validation/preflight/run-local-checks.mjs";
 
 const fs = {
+  lstatSync: () => ({ isSymbolicLink: () => false }),
   existsSync: (file) =>
     file === "package.json" ||
     file === "node_modules/@eliware/test/package.json" ||
@@ -9,11 +10,13 @@ const fs = {
   readFileSync: (file) =>
     file === ".github/workflows/ci.yaml"
       ? "jobs:\n  linux:\n    name: Ubuntu\n    runs-on: ubuntu-latest\n  windows:\n    name: Windows\n    runs-on: windows-latest"
-      : JSON.stringify({
-          name: "demo",
-          scripts: { test: "eliware-test" },
-          devDependencies: { "@eliware/test": "^4.0.0" },
-        }),
+      : file === "node_modules/@eliware/test/package.json"
+        ? JSON.stringify({ name: "@eliware/test", version: "4.1.0" })
+        : JSON.stringify({
+            name: "demo",
+            scripts: { test: "eliware-test" },
+            devDependencies: { "@eliware/test": "^4.0.0" },
+          }),
 };
 test("runs the declared shared test command", () =>
   expect(runLocalChecks(jest.fn(), fs).results.test).toEqual({ passed: true }));

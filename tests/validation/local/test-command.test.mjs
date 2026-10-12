@@ -5,24 +5,32 @@ test("builds the shared npm test check and coverage waiver form", () => {
   const fs = {
     existsSync: jest.fn(() => true),
     lstatSync: jest.fn(() => ({ isSymbolicLink: () => false })),
-    readFileSync: jest.fn(() =>
-      JSON.stringify({
-        name: "demo",
-        devDependencies: { "@eliware/test": "^3.0.0" },
-        scripts: { test: "eliware-test" },
-      }),
+    readFileSync: jest.fn((file) =>
+      JSON.stringify(
+        file === "node_modules/@eliware/test/package.json"
+          ? { name: "@eliware/test", version: "3.5.0" }
+          : {
+              name: "demo",
+              devDependencies: { "@eliware/test": "^3.0.0" },
+              scripts: { test: "eliware-test" },
+            },
+      ),
     ),
   };
   expect(buildTestCheck(fs).check).toEqual(["test", ["npm", ["test"]]]);
   expect(
     buildTestCheck({
       ...fs,
-      readFileSync: () =>
-        JSON.stringify({
-          name: "demo",
-          devDependencies: { "@eliware/test": "^3.0.0" },
-          scripts: { test: "eliware-test" },
-        }),
+      readFileSync: (file) =>
+        JSON.stringify(
+          file === "node_modules/@eliware/test/package.json"
+            ? { name: "@eliware/test", version: "3.5.0" }
+            : {
+                name: "demo",
+                devDependencies: { "@eliware/test": "^3.0.0" },
+                scripts: { test: "eliware-test" },
+              },
+        ),
     }).check,
   ).toEqual(["test", ["npm", ["test"]]]);
   expect(buildTestCheck(fs, { ignore100x4: true }).check).toEqual([
@@ -58,12 +66,16 @@ test("accepts the shared harness command and its Node wrapper form", () => {
   const fs = {
     existsSync: () => true,
     lstatSync: () => ({ isSymbolicLink: () => false }),
-    readFileSync: () =>
-      JSON.stringify({
-        name: "demo",
-        devDependencies: { "@eliware/test": "^3.0.0" },
-        scripts: { test: "node bin/eliware-test.mjs" },
-      }),
+    readFileSync: (file) =>
+      JSON.stringify(
+        file === "node_modules/@eliware/test/package.json"
+          ? { name: "@eliware/test", version: "3.5.0" }
+          : {
+              name: "demo",
+              devDependencies: { "@eliware/test": "^3.0.0" },
+              scripts: { test: "node bin/eliware-test.mjs" },
+            },
+      ),
   };
   expect(buildTestCheck(fs).invalid).toBe(true);
 });
