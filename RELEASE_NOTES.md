@@ -1,151 +1,141 @@
 # Release Notes
 
-## Unreleased
-
-### Changed
-
-- Report release-wait progress before each CI and registry check.
-
-## 12.0.0 — 2026-10-11
-
-### Changed
-
-- Use one concise status line for each npm visibility check in `release-wait`.
-- Update `@eliware/common` and `@eliware/redact` to v12.
-- Align package metadata, specifications, documentation, and workflows with Eliware Test v12.
-- Include `specs/` in the published package and guard publication with the canonical version tag.
-- Use the v12 README layout, specification IDs, indexes, and shared package rules.
-
-## 11.0.0 — 2026-10-03
+## 12.0.0 — 2026-10-12
 
 ### Added
 
-- Align repository metadata, contributor guidance, structured directives, documentation, and package contents with the v11 general, application, CLI, and npm-published conventions.
-- Validate v11 `ci.yaml` and `publish.yaml` workflow paths and classify Ubuntu and Windows CI from configured runner labels rather than job names.
+- Apply Eliware Test v11 and v12 rules to package data, contributor rules, workflows, docs, and package contents.
+- Check exact-commit CI before release actions. Require Ubuntu CI and each Windows job that exists.
+- Keep Windows CI optional when the workflow has no Windows job.
+- Check release CI and required registry publication for the exact commit and version.
+- Add `tagit push` for existing commits and bounded CI lookup after push.
+- Add `release` and `release-wait` commands for split owner and DevOps release work.
+- Add package exports, package file rules, public publish data, cross-platform checks, and GitOps pin checks.
+- Add explicit release waivers and a safe dry-run option.
 
 ### Changed
 
-- Set the package version to 11.0.0, update dependencies and Jest configuration, and use the exact npm files allowlist and npm Trusted Publishing workflow.
-- Omit Windows status from preflight output when the target has no Windows job.
-- Require environment templates only when a target project supports runtime environment configuration; TagIt itself has no required environment settings.
-- Use numeric semantic-version tags and cancel superseded CI runs for the same repository and ref.
-- Move human-readable behavior guides into `docs/specifications/` and keep `specs/` for indexed structured directives.
-- Retain the existing transactional release updates, dry-run boundaries, upstream behavior, and exact-commit release verification.
+- Use Eliware Test v12 for aggregate validation and the required Jest and Istanbul profile.
+- Use `redactText` from `@eliware/common`; remove the direct `@eliware/redact` dependency.
+- Report release-wait progress before each CI and registry check. Report one line per npm visibility attempt.
+- Keep package publication in the GitHub workflow. Use npm Trusted Publishing and provenance.
+- Push only the requested release tag. Do not change package files or create a release commit.
+- Use numeric SemVer tags and the required `.yaml` workflow paths.
+- Keep GitOps checks read-only. Do not deploy applications or change deployment pins.
+- Update CI and Knit workflows to v11 and v12 conventions.
 
 ### Fixed
 
-- Correct runner classification for jobs with generic display names and update preflight/release workflow lookups to `.yaml` paths.
-- Keep publication verification tied to numeric version tags and the exact package version.
-- Update command entrypoints and target metadata checks for current workflow conventions.
+- Return a nonzero exit code when release CI or publication fails.
+- Handle Windows npm command shims with shell-free process arguments.
+- Keep preflight quiet when the target has no Windows CI job.
+- Keep release actions out of template repositories that contain `.notag`.
 
 ## 2.5.0 — 2026-09-01
 
 ### Added
 
-- Add validation for release versions, GitOps pin arguments, image references, and malformed CI/GHCR responses.
-- Add explicit `.tagit-exceptions.json` support for genuinely inapplicable standard repository paths.
+- Validate release versions, GitOps pin values, image references, and malformed CI or GHCR data.
+- Support explicit exceptions for standard repository paths that do not apply.
 
 ### Changed
 
-- Improve exact-HEAD CI selection, release verification across GitHub tag reference formats, bounded release-wait polling, read-only GitOps overlay checks, and upstream merge/push error handling.
-- Strengthen preflight metadata, package allowlist, repository identity, release notes, and publication workflow checks.
-
-## 2.4.2 — 2026-08-30
-
-### Changed
-
-- Clarify that TagIt's Knit configuration is validation-only and does not deploy applications or modify production GitOps state.
-- Document the required GitOps staging pull-request workflow for deployable consumer projects.
+- Improve exact-commit CI selection, release checks, bounded polling, read-only GitOps checks, and upstream error handling.
+- Check repository metadata, package files, release notes, and publication workflow rules.
 
 ## 2.4.1 — 2026-08-30
 
 ### Fixed
 
-- Fix waived preflight test reporting and preserve captured output for unsuccessful commands.
+- Report waived preflight checks correctly and keep command output after failure.
 
 ## 2.4.0 — 2026-08-30
 
 ### Added
 
-- Add safe `--dry-run` handling for push and DevOps release workflows and document owner/DevOps command boundaries.
+- Add a safe `--dry-run` option for push and release commands.
 
 ### Changed
 
-- Move process execution to shell-free cross-platform runners, include release notes in package contents, and expand Windows regression coverage.
+- Use shell-free process calls and add Windows regression coverage.
+- Include release notes in the npm package.
 
 ## 2.3.0 — 2026-08-26
 
 ### Added
 
-- Add a DevOps-only `--ignore-100x4` coverage waiver for preflight and release.
+- Add the DevOps-only `--ignore-100x4` coverage waiver.
+- Add package exports, package file rules, public publish data, and cross-platform type checks.
 
 ### Changed
 
-- Make release version updates transactional, strengthen preflight validation, clarify owner/DevOps boundaries, and exclude tests and internal deployment guidance from npm packages.
-- Add explicit package exports, package file allowlisting, public publish metadata, and cross-platform typechecking.
+- Make version updates transactional and strengthen preflight checks.
+- Exclude tests and deployment guidance from npm packages.
 
 ## 2.2.2 — 2026-08-24
 
 ### Added
 
-- Add `tagit push` for pushing existing commits without staging or committing files and bounded workflow discovery after push.
-- Expand the owner-to-DevOps release handoff help.
+- Add `tagit push` for existing commits and bounded CI discovery after push.
+- Expand the owner-to-DevOps handoff help.
 
 ## 2.1.0 — 2026-08-24
 
 ### Added
 
-- Split release execution and verification into `release` and `release-wait`.
-- Add read-only `tagit notes`, post-release CI/npm/GHCR checks, and bounded polling with actionable timeout guidance.
+- Split release work into `release` and `release-wait` commands.
+- Add read-only notes, post-release CI and registry checks, and bounded polling.
 
 ### Changed
 
-- Aggregate preflight failures, block CI validation for dirty worktrees, and preserve `.notag` template validation while skipping release side effects.
+- Report all preflight failures and block CI checks for dirty worktrees.
+- Keep template validation active while TagIt skips release actions.
 
 ## 1.1.24 — 2026-08-23
 
 ### Changed
 
-- Run required CI validation on Ubuntu and Windows for every `main` push and gate npm publication on version tags.
+- Require Ubuntu and Windows CI on each `main` push. Gate npm publication on version tags.
 
 ## 1.1.23 — 2026-08-23
 
 ### Changed
 
-- Require an explicit `--bump X.Y.Z` version for release and dry-run invocations and remove automatic version increments.
+- Require an explicit `--bump X.Y.Z` value for release and dry-run commands.
+- Remove automatic version changes.
 
 ## 1.1.22 — 2026-08-23
 
 ### Fixed
 
-- Make Git commit messages safe for Windows shells and add Windows-compatible GitOps path coverage.
+- Make Git commit messages safe for Windows shells and test GitOps paths on Windows.
 
 ## 1.1.21 — 2026-08-21
 
 ### Fixed
 
-- Reassert package and lockfile versions after npm dependency updates and prevent releases from committing or tagging when metadata drifts.
+- Restore package versions after dependency updates and block release when metadata differs.
 
 ## 1.1.19 — 2026-08-13
 
 ### Changed
 
-- Use `v<version>` release tags, such as `v1.1.19`.
+- Use `v<version>` tags, such as `v1.1.19`.
 
 ## 1.1.18 — 2026-08-12
 
 ### Added
 
-- Add a non-destructive `--dry-run` release preview, help/version commands, explicit confirmation, and target-version arguments.
+- Add a read-only release preview, help and version options, confirmation, and target version input.
 
 ## 1.1.17 — 2026-08-06
 
 ### Added
 
-- Add `tagit --version` and `tagit -v` without starting a release.
+- Add `tagit --version` and `tagit -v` without a release action.
 
 ## 1.1.16 — 2026-08-06
 
 ### Changed
 
-- Add initial dependency installation and outdated dependency inspection to the release workflow.
+- Install dependencies and check for outdated packages in the release workflow.

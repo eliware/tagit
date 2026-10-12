@@ -2,13 +2,11 @@
 
 ## Project
 
-This repository is `eliware/tagit`.
-
-It checks package release readiness and publication.
+This repository is `eliware/tagit`. It checks release readiness and publication.
 
 ## Scope and boundaries
 
-Use README.md for repository purpose, scope, and ownership.
+Use README.md for project purpose, scope, and ownership.
 
 ## Layout
 
@@ -16,7 +14,7 @@ Use README.md and specs/README.md to find repository files.
 
 ## Development
 
-Keep each source and test module focused on one responsibility.
+Keep each source module and test module focused on one task.
 
 ## Validation
 
@@ -30,11 +28,11 @@ Run `npm run format:check` to check formatting.
 
 ## Security
 
-Keep credentials, secret values, private data, and runtime state out of Git.
+Keep credentials, secrets, private data, and runtime state out of Git.
 
 ## Changes
 
-Keep changes within this repository scope.
+Keep changes within this repository.
 Use Eliware Operations for approval before external changes.
 
 ## Application
@@ -47,5 +45,5 @@ Document commands, options, arguments, defaults, errors, and exit codes in READM
 
 ## npm publication
 
-Include specs/ in the package.
+Include specs/ in the npm package.
 Document install, entrypoints, contents, and release limits in README.md.
