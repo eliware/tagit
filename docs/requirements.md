@@ -16,9 +16,9 @@ Preflight requires the target repository to provide these files:
 - `RELEASE_NOTES.md`
 - `docs/`
 - `specs/`
-- `.env.example`
 - `.github/workflows/ci.yaml`
 
+If the target declares supported runtime environment configuration, it must include `.env.example`.
 Public npm packages also need `.github/workflows/publish.yaml`. The package needs a valid name, version, and repository URL. Its test script must run the shared `@eliware/test` harness through `npm test`.
 
 The test package must be an installed package. Do not use a local link or junction for `@eliware/test`.
