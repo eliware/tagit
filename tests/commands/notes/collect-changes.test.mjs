@@ -11,4 +11,7 @@ test("collects commits, changed files, and bounded source diff", () => {
     excerpt: "+change",
   });
   expect(exec).toHaveBeenCalledTimes(3);
+  expect(exec).toHaveBeenNthCalledWith(2, "git", ["diff", "--name-status", "v1.0.0..HEAD", "--"], {
+    encoding: "utf8",
+  });
 });
