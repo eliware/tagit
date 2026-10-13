@@ -1,9 +1,8 @@
 import { validateRepository } from "../../repository/validate-repository.mjs";
 import { runLocalChecks } from "./run-local-checks.mjs";
-import { verifyPreflightCi } from "../ci/verify-preflight-ci.mjs";
 import { throwPreflightFailures } from "./report.mjs";
 import { collectPreflightContext } from "./collect-context.mjs";
-import { ciFailureMessage } from "./ci-failure-message.mjs";
+import { runCiCheck } from "./run-ci-check.mjs";
 
 const CHECK_TIMEOUT_MS = 120000;
 export function runPreflight(
@@ -30,9 +29,9 @@ export function runPreflight(
   const results = local.results;
   // A blocked result is produced only for the already-reported dirty worktree; CI errors are independent blockers.
   if (verifyCi) {
-    results.ci = verifyPreflightCi(execFileSync, log, status, fs);
-    const ciFailure = ciFailureMessage(results.ci.error);
-    if (ciFailure) failures.push(ciFailure);
+    const ci = runCiCheck(execFileSync, log, status, fs);
+    results.ci = ci.result;
+    if (ci.failure) failures.push(ci.failure);
   }
   throwPreflightFailures(failures);
   return results;

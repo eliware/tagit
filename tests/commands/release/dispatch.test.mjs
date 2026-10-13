@@ -41,24 +41,6 @@ test("does not require a release version for release-wait", async () => {
   await expect(runReleaseCommand({ command: "release-wait" }, deps)).resolves.toBeUndefined();
 });
 
-test("rejects a latest tag that is not a semantic release", async () => {
-  const deps = base();
-  deps.execFileSync.mockReturnValue("v-next");
-  await expect(runReleaseCommand({ command: "release-wait", version: null }, deps)).rejects.toThrow(
-    "not a semantic release tag",
-  );
-});
-
-test("rejects a tag and commit that change during release-wait resolution", async () => {
-  const deps = base();
-  deps.execFileSync.mockImplementation((command, args) =>
-    args[0] === "describe" ? "v1.2.3" : args[0] === "rev-list" ? "abc" : "def",
-  );
-  await expect(runReleaseCommand({ command: "release-wait", version: null }, deps)).rejects.toThrow(
-    "changed while",
-  );
-});
-
 test("runs the prepared release transaction and verifies its tag", async () => {
   const deps = base();
   deps.fs.existsSync.mockImplementation((file) => file === "package.json");

@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { processCommand } from "../../../src/validation/local/process-command.mjs";
 import { runLocalChecks } from "../../../src/validation/preflight/run-local-checks.mjs";
 
 const fs = {
@@ -20,6 +21,16 @@ test("runs the declared shared test command", () => {
   expect(runLocalChecks(run, fs).results.test).toEqual({ passed: true });
   expect(run).toHaveBeenCalledTimes(1);
   expect(run.mock.calls[0][1].at(-1)).toBe("test");
+});
+
+test("uses the shell-free npm runner", () => {
+  const run = jest.fn();
+  runLocalChecks(run, fs);
+  expect(run).toHaveBeenCalledWith(...processCommand("npm", ["test"]), {
+    stdio: "pipe",
+    timeout: 120000,
+    ...(processCommand("npm", ["test"])[0] === "cmd.exe" ? { windowsVerbatimArguments: true } : {}),
+  });
 });
 
 test("reports a failed local command with captured output", () => {

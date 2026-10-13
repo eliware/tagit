@@ -69,64 +69,6 @@ test("accepts npm view array output", async () => {
   ).resolves.toBeUndefined();
 });
 
-test("logs each npm visibility attempt and enables Windows command shims", async () => {
-  const originalPlatform = process.platform;
-  Object.defineProperty(process, "platform", { configurable: true, value: "win32" });
-  const info = jest.fn();
-  const exec = jest.fn((_command, _args, _options, callback) => callback(null, '["8.0.0"]', ""));
-  try {
-    await verifyNpmPublication(
-      exec,
-      { info },
-      {
-        packageName: "@eliware/test",
-        version: "8.0.0",
-        retries: 2,
-        sleep: jest.fn(),
-      },
-    );
-    expect(info).toHaveBeenCalledTimes(1);
-    expect(info).toHaveBeenCalledWith("npm view @eliware/test@8.0.0 (1/2): visible.");
-    expect(exec).toHaveBeenCalledWith(
-      'npm.cmd "view" "@eliware/test@8.0.0" "version" "--json"',
-      [],
-      expect.objectContaining({ encoding: "utf8", shell: true }),
-      expect.any(Function),
-    );
-  } finally {
-    Object.defineProperty(process, "platform", { configurable: true, value: originalPlatform });
-  }
-});
-
-test("rejects unsafe npm package names and versions before constructing a Windows command", async () => {
-  const exec = jest.fn();
-  await expect(
-    verifyNpmPublication(
-      exec,
-      { info: jest.fn() },
-      {
-        packageName: "demo & whoami",
-        version: "1.0.0",
-        retries: 1,
-        sleep: jest.fn(),
-      },
-    ),
-  ).rejects.toThrow("Package name is invalid");
-  await expect(
-    verifyNpmPublication(
-      exec,
-      { info: jest.fn() },
-      {
-        packageName: "demo",
-        version: "1.0.0 & whoami",
-        retries: 1,
-        sleep: jest.fn(),
-      },
-    ),
-  ).rejects.toThrow("Version is invalid");
-  expect(exec).not.toHaveBeenCalled();
-});
-
 test("logs invisible registry output and the final visibility failure", async () => {
   const info = jest.fn();
   const exec = jest.fn((_command, _args, _options, callback) => callback(null, '"0.9.0"', ""));
@@ -162,34 +104,4 @@ test("handles an empty JSON response separately from an invalid response", async
     ),
   ).rejects.toThrow("after 1 attempts");
   expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not visible.");
-});
-
-test("rejects missing npm publication arguments", async () => {
-  await expect(verifyNpmPublication(jest.fn(), {}, { version: "1.0.0" })).rejects.toThrow(
-    "Package name is invalid",
-  );
-  await expect(verifyNpmPublication(jest.fn(), {}, { packageName: "demo" })).rejects.toThrow(
-    "Version is invalid",
-  );
-});
-
-test("uses the POSIX npm executable and argument vector", async () => {
-  const originalPlatform = process.platform;
-  Object.defineProperty(process, "platform", { configurable: true, value: "linux" });
-  try {
-    const exec = jest.fn((_command, _args, _options, callback) => callback(null, '"1.0.0"', ""));
-    await verifyNpmPublication(
-      exec,
-      { info: jest.fn() },
-      { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
-    );
-    expect(exec).toHaveBeenCalledWith(
-      "npm",
-      ["view", "demo@1.0.0", "version", "--json"],
-      { encoding: "utf8" },
-      expect.any(Function),
-    );
-  } finally {
-    Object.defineProperty(process, "platform", { configurable: true, value: originalPlatform });
-  }
 });

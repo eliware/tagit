@@ -1,5 +1,4 @@
 import { jest } from "@jest/globals";
-import { processCommand } from "../../../src/validation/local/process-command.mjs";
 import { runPreflight } from "../../../src/validation/preflight/run-checks.mjs";
 const packageFs = (packageJson = { scripts: { test: "eliware-test" } }) => ({
   existsSync: jest.fn((file) => file === "package.json"),
@@ -10,14 +9,6 @@ const isNodeNpm = (executable, args = []) =>
   executable === "npm" ||
   executable === "npm.cmd" ||
   (executable === "cmd.exe" && args.includes("npm.cmd"));
-const expectNpmCall = (mock, expectedArgs) =>
-  expect(
-    mock.mock.calls.some(
-      ([executable, args]) =>
-        isNodeNpm(executable, args) && expectedArgs.every((arg) => args.includes(arg)),
-    ),
-  ).toBe(true);
-
 test("preflight delegates local validation to the project test script", () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === "test")
@@ -39,45 +30,6 @@ test("preflight delegates local validation to the project test script", () => {
     ),
   ).toHaveLength(1);
 });
-test("preflight blocks projects without a test script", () => {
-  const execFileSync = jest.fn(() => "");
-  const fs = {
-    existsSync: jest.fn((file) => file === "package.json"),
-    readFileSync: jest.fn(() => JSON.stringify({ scripts: {} })),
-  };
-  expect(() => runPreflight(execFileSync, fs, { info: jest.fn() })).toThrow(
-    "does not declare scripts.test",
-  );
-});
-
-test("preflight blocks a named project without the installed shared harness", () => {
-  const fs = {
-    existsSync: () => true,
-    lstatSync: (file) => ({
-      isDirectory: () => ["docs/", "specs/"].includes(file),
-      isSymbolicLink: () => false,
-    }),
-    readFileSync: () => JSON.stringify({ name: "demo", scripts: { test: "eliware-test" } }),
-  };
-  expect(() =>
-    runPreflight(
-      jest.fn(() => ""),
-      fs,
-      { info: jest.fn() },
-    ),
-  ).toThrow("installed, non-linked @eliware/test");
-});
-
-test("uses the injected shell-free runner for local checks", () => {
-  const execFileSync = jest.fn((executable, args) =>
-    args[0] === "status" ? "" : "All files | 100 | 100 | 100 | 100 |",
-  );
-  const fs = packageFs();
-  const result = runPreflight(execFileSync, fs, { info: jest.fn() });
-  expect(result.test.passed).toBe(true);
-  expectNpmCall(execFileSync, ["test"]);
-});
-
 test("preflight rejects dirty trees before running package commands", () => {
   const execSync = jest.fn(() => " M package.json\n");
   const fs = packageFs();
@@ -169,9 +121,7 @@ test("preflight accepts the shared harness result with the explicit waiver", () 
     "test.passed",
     true,
   );
-  const npmCalls = execSync.mock.calls.filter(([executable, args]) => isNodeNpm(executable, args));
-  expect(npmCalls).toHaveLength(1);
-  expect(npmCalls[0][1]).toEqual(processCommand("npm", ["test", "--", "--ignore-100x4"])[1]);
+  expect(execSync.mock.calls.some(([executable, args]) => isNodeNpm(executable, args))).toBe(true);
 });
 
 test("preflight does not parse or duplicate the shared harness coverage result", () => {

@@ -1,5 +1,5 @@
-import { npmExecutable } from "../../process/commands/npm-executable.mjs";
 import { execFileCommand } from "../../process/async/exec-file.mjs";
+import { buildNpmViewCommand } from "./build-view-command.mjs";
 
 function readNpmView(output, version) {
   const value = JSON.parse(output);
@@ -11,26 +11,11 @@ export async function verifyNpmPublication(
   log,
   { packageName, version, retries, retryMs, sleep },
 ) {
-  if (!/^(?:@[a-z0-9._-]+\/)?[a-z0-9._-]+$/i.test(packageName ?? ""))
-    throw new Error("Package name is invalid for npm publication verification.");
-  if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version ?? ""))
-    throw new Error("Version is invalid for npm publication verification.");
-  const npmArgs = ["view", `${packageName}@${version}`, "version", "--json"];
-  const windows = process.platform === "win32";
-  // execFile requires shell mode for Windows .cmd shims. Pass the fully quoted
-  // command as the executable string (and no separate args) to avoid Node's
-  // deprecated shell+args path; packageName and version are constrained above.
-  const executable = windows
-    ? `npm.cmd ${npmArgs.map((argument) => `"${argument}"`).join(" ")}`
-    : npmExecutable();
-  const args = windows ? [] : npmArgs;
+  const { executable, args, options } = buildNpmViewCommand(packageName, version);
   for (let attempt = 0; attempt < retries; attempt += 1) {
     const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
     try {
-      const output = await execFileCommand(execFile, executable, args, {
-        encoding: "utf8",
-        ...(windows ? { shell: true } : {}),
-      });
+      const output = await execFileCommand(execFile, executable, args, options);
       const visible = readNpmView(output, version);
       log.info?.(`${status}: ${visible ? "visible" : "not visible"}.`);
       if (visible) return;
