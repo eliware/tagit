@@ -7,8 +7,10 @@ export async function readReleaseCiCandidate(execFile, repo, headSha, tag) {
     "list",
     "--repo",
     repo,
+    "--commit",
+    headSha,
     "--limit",
-    "20",
+    "1000",
     "--json",
     "databaseId,createdAt,headSha,headBranch",
   ]);

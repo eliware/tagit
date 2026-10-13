@@ -14,4 +14,20 @@ test("collects commits, changed files, and bounded source diff", () => {
   expect(exec).toHaveBeenNthCalledWith(2, "git", ["diff", "--name-status", "v1.0.0..HEAD", "--"], {
     encoding: "utf8",
   });
+  expect(exec).toHaveBeenNthCalledWith(
+    3,
+    "git",
+    [
+      "diff",
+      "v1.0.0..HEAD",
+      "--",
+      ".",
+      ":!package-lock.json",
+      ":!coverage",
+      ":!node_modules",
+      ":!**/.jest-result",
+      ":!**/.jest.result",
+    ],
+    { encoding: "utf8" },
+  );
 });

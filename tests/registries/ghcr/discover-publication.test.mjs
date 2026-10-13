@@ -1,21 +1,18 @@
 import { publishesGhcr } from "../../../src/registries/ghcr/discover-publication.mjs";
 
-test("detects GHCR declarations in workflow files", () => {
+test("detects the declared GHCR publication profile", () => {
   const fs = {
-    existsSync: () => true,
-    readdirSync: () => ["ci.yaml", "notes.txt", "other.yaml"],
-    readFileSync: (file) =>
-      file.endsWith("ci.yaml") ? "image: ghcr.io/eliware/demo" : "name: test",
+    existsSync: (file) => file === "package.json",
+    readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
   };
   expect(publishesGhcr(fs)).toBe(true);
 });
-test("does not infer GHCR publication from missing or unrelated workflows", () => {
+test("ignores GHCR text unless the package declares the profile", () => {
   expect(publishesGhcr({ existsSync: () => false })).toBe(false);
   expect(
     publishesGhcr({
       existsSync: () => true,
-      readdirSync: () => ["ci.yaml"],
-      readFileSync: () => "npm publish",
+      readFileSync: () => JSON.stringify({ description: "See ghcr.io/eliware/demo" }),
     }),
   ).toBe(false);
 });

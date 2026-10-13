@@ -18,7 +18,7 @@ export function readExactHeadRuns(execFileSync, headSha, repository, selectedRun
         headSha,
         ...repoArg,
         "--limit",
-        "20",
+        "1000",
         "--json",
         "databaseId,status,conclusion,headSha,url",
       ];

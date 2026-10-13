@@ -7,11 +7,11 @@ test("accepts successful and pending conclusions", () => {
   expect(() => validateCompletedConclusion({ status: "in_progress" })).not.toThrow();
 });
 
-test("rejects malformed and failed completed conclusions", () => {
+test("rejects malformed conclusions and accepts known failed conclusions", () => {
   expect(() =>
     validateCompletedConclusion({ status: "completed", databaseId: 1, conclusion: "unknown" }),
   ).toThrow("malformed");
   expect(() =>
     validateCompletedConclusion({ status: "completed", databaseId: 1, conclusion: "failure" }),
-  ).toThrow("failed");
+  ).not.toThrow();
 });

@@ -13,6 +13,8 @@ export function collectNotesChanges(execFileSync, tag) {
     ":!package-lock.json",
     ":!coverage",
     ":!node_modules",
+    ":!**/.jest-result",
+    ":!**/.jest.result",
   ]);
   return { commits, files, excerpt: formatDiffExcerpt(diff) };
 }

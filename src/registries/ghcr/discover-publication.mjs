@@ -1,15 +1,7 @@
-import path from "node:path";
-
-/** Find workflow files that declare an organization-owned GHCR publication. */
+/** Read the declared publication profile for GHCR. */
 export function publishesGhcr(fs) {
-  const directory = ".github/workflows";
-  if (!fs.existsSync(directory)) return false;
-  return fs
-    .readdirSync(directory)
-    .filter((file) => /\.(yml|yaml)$/i.test(file))
-    .some((file) =>
-      /(^|\s|["'])ghcr\.io\/[\w.-]+\/[\w./-]+/.test(
-        fs.readFileSync(path.join(directory, file), "utf8"),
-      ),
-    );
+  if (!fs.existsSync("package.json")) return false;
+  const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
+  const profiles = packageData?.eliware?.apply;
+  return Array.isArray(profiles) && profiles.includes("ghcr-published");
 }

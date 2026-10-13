@@ -6,6 +6,18 @@ test("reads and validates runs for an exact commit", () => {
     JSON.stringify([{ databaseId: 1, status: "completed", conclusion: "success", headSha: "abc" }]),
   );
   expect(readExactHeadRuns(execFileSync, "abc", "eliware/demo").runs).toHaveLength(1);
+  expect(execFileSync.mock.calls[0][1]).toEqual([
+    "run",
+    "list",
+    "--commit",
+    "abc",
+    "--repo",
+    "eliware/demo",
+    "--limit",
+    "1000",
+    "--json",
+    "databaseId,status,conclusion,headSha,url",
+  ]);
 });
 
 test("reads a selected run using view mode and merges its identity", () => {

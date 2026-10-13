@@ -22,21 +22,19 @@ export function verifyLatestCi(
   const { repoArg, runs } = readExactHeadRuns(execFileSync, headSha, repo, selectedRun);
   const latest = selectLatestRun(runs, headSha);
   validateCompletedConclusion(latest);
-  const { candidates, pending } = selectCiCandidate(latest, headSha);
+  const { candidates, pending } = selectCiCandidate(runs, headSha);
+  for (const run of candidates) {
+    const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
+    if (result) return result;
+  }
   if (waitForCompletion && pollPendingRun(execFileSync, log, pending, repoArg, pollAttempt))
     return verifyLatestCi(
       execFileSync,
       log,
       { headSha, repository: repo, waitForCompletion: true, runnerLabelsByJobName },
       pollAttempt + 1,
-      pending,
+      null,
     );
-  if (!candidates.length) {
-    throw new Error(buildCiVerificationFailure(runs, headSha));
-  }
-  for (const run of candidates) {
-    const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
-    if (result) return result;
-  }
+  if (!candidates.length) throw new Error(buildCiVerificationFailure(runs, headSha));
   throw new Error(buildPlatformVerificationFailure(execFileSync, candidates, headSha));
 }

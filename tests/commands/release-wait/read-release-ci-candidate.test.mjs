@@ -16,4 +16,16 @@ test("reads and selects the release workflow candidate", async () => {
   ).resolves.toMatchObject({
     databaseId: 7,
   });
+  expect(execFile.mock.calls[0][1]).toEqual([
+    "run",
+    "list",
+    "--repo",
+    "eliware/demo",
+    "--commit",
+    "abc",
+    "--limit",
+    "1000",
+    "--json",
+    "databaseId,createdAt,headSha,headBranch",
+  ]);
 });

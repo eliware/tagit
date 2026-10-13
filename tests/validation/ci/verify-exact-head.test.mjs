@@ -62,7 +62,7 @@ test("polls an in-progress exact-head run and rechecks it", () => {
   ).toMatchObject({ runId: 2 });
 });
 
-test("rejects missing, stale, or failed exact-head evidence", () => {
+test("rejects missing or stale exact-head evidence", () => {
   expect(() => verifyLatestCi(jest.fn(), log)).toThrow("commit SHA is required");
   expect(() =>
     verifyLatestCi(
@@ -73,19 +73,31 @@ test("rejects missing, stale, or failed exact-head evidence", () => {
       { headSha: "abc", runnerLabelsByJobName: { "ubuntu-latest": ["ubuntu"] } },
     ),
   ).toThrow("No successful");
-  expect(() =>
-    verifyLatestCi(
-      jest.fn((command, args) =>
-        args[0] === "remote"
-          ? "https://github.com/eliware/demo.git"
-          : JSON.stringify([
-              { databaseId: 3, status: "completed", conclusion: "failure", headSha: "abc" },
-            ]),
-      ),
-      log,
-      { headSha: "abc", runnerLabelsByJobName: { "ubuntu-latest": ["ubuntu"] } },
-    ),
-  ).toThrow("run 3");
+});
+
+test("uses older successful exact-head evidence when the newest run failed", () => {
+  let viewed = 0;
+  const exec = jest.fn((command, args) => {
+    if (args[0] === "remote") return "https://github.com/eliware/demo.git";
+    if (args[0] === "api")
+      return JSON.stringify({
+        jobs: [{ id: 10, name: "ubuntu-latest", labels: ["ubuntu-latest"] }],
+      });
+    if (args[1] === "list")
+      return JSON.stringify([
+        { databaseId: 4, status: "completed", conclusion: "failure", headSha: "abc" },
+        { databaseId: 3, status: "completed", conclusion: "success", headSha: "abc" },
+      ]);
+    viewed += 1;
+    return successfulDetails();
+  });
+  expect(
+    verifyLatestCi(exec, log, {
+      headSha: "abc",
+      runnerLabelsByJobName: { "ubuntu-latest": ["ubuntu"] },
+    }),
+  ).toMatchObject({ runId: 3 });
+  expect(viewed).toBe(1);
 });
 
 test("rejects exact-head runs without passing Ubuntu evidence", () => {
