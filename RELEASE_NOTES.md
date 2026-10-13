@@ -2,10 +2,23 @@
 
 ## 12.0.1 — 2026-10-12
 
+### Changed
+
+- Validate CI and publication workflows by the declared publication profiles.
+- Check numeric release tag triggers and required npm or GHCR workflow steps.
+- Select CI evidence for the exact commit and classify jobs from runner labels.
+- Exclude generated Jest result files from version notes and limit diff excerpts.
+- Split CLI, workflow, registry, preflight, and version checks into focused modules.
+
 ### Fixed
 
-- Apply npm publication checks only to npm-published repositories.
-- Check GHCR tag triggers, publication environments, and Docker image push steps for GHCR-published repositories.
+- Skip npm job and registry checks when the npm-published profile does not apply.
+- Require npm setup, install, and publish commands in the required order.
+- Require the exact npm version and successful publication job for release checks.
+- Resolve the exact release tag selected by Git and reject changed tag references.
+- Check the package version before a release dry run.
+- Recognize the tagit, push, and upstream command entrypoints.
+- Handle workflow job names that match object prototype properties.
 
 ## 12.0.0 — 2026-10-12
 
