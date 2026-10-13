@@ -2,6 +2,7 @@ import { validateReleaseWorkflow } from "../../../src/repository/metadata/valida
 
 const valid = `on:\n  push:\n    branches:\n      - main\n  pull_request:\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: actions/setup-node@v7\n      - run: npm -g install npm@latest\n      - run: npm ci\n      - run: npm test`;
 const publish = `on:\n  push:\n    tags:\n      - 'v[0-9]*.[0-9]*.[0-9]*'\njobs:\n  publish:\n    needs: validate\n    steps:\n      - uses: actions/checkout@v6\n      - uses: actions/setup-node@v7\n      - run: npm -g install npm@latest\n      - run: npm ci\n      - run: npm publish --provenance\n    permissions:\n      id-token: write`;
+const ghcrPublish = `on:\n  push:\n    tags:\n      - 'v[0-9]*.[0-9]*.[0-9]*'\njobs:\n  publish:\n    environment: ghcr-publish\n    steps:\n      - uses: docker/build-push-action@v6`;
 
 test("accepts a gated tag-only publication workflow", () => {
   expect(validateReleaseWorkflow({ existsSync: () => true, readFileSync: () => valid })).toEqual(
@@ -67,4 +68,70 @@ test("reports a missing publication trigger", () => {
       { eliware: { apply: ["npm-published"] } },
     ),
   ).toContain("BLOCKED: publication workflow must trigger for numeric version tags.");
+});
+
+test("checks GHCR publication without requiring npm commands", () => {
+  const files = {
+    ".github/workflows/ci.yaml": valid,
+    ".github/workflows/publish.yaml": ghcrPublish,
+  };
+  expect(
+    validateReleaseWorkflow(
+      { existsSync: (path) => path in files, readFileSync: (path) => files[path] },
+      { eliware: { apply: ["ghcr-published"] } },
+    ),
+  ).toEqual([]);
+});
+
+test("keeps npm checks for npm-only packages", () => {
+  const files = {
+    ".github/workflows/ci.yaml": valid,
+    ".github/workflows/publish.yaml": publish,
+  };
+  expect(
+    validateReleaseWorkflow(
+      { existsSync: (path) => path in files, readFileSync: (path) => files[path] },
+      { eliware: { apply: ["npm-published"] } },
+    ),
+  ).toEqual([]);
+});
+
+test("reports missing GHCR publication safeguards", () => {
+  const files = {
+    ".github/workflows/ci.yaml": valid,
+    ".github/workflows/publish.yaml": "jobs:\n  validate:\n    steps: []",
+  };
+  expect(
+    validateReleaseWorkflow(
+      { existsSync: (path) => path in files, readFileSync: (path) => files[path] },
+      { eliware: { apply: ["ghcr-published"] } },
+    ),
+  ).toEqual([
+    "BLOCKED: GHCR workflow must trigger for numeric version tags.",
+    "BLOCKED: GHCR workflow must contain a publish job.",
+    "BLOCKED: GHCR publish job must use the ghcr-publish environment.",
+    "BLOCKED: GHCR publish job must build and push its image with Docker.",
+  ]);
+});
+
+test("does not inspect a missing GHCR workflow", () => {
+  expect(
+    validateReleaseWorkflow(
+      { existsSync: (path) => path === ".github/workflows/ci.yaml", readFileSync: () => valid },
+      { eliware: { apply: ["ghcr-published"] } },
+    ),
+  ).toEqual([]);
+});
+
+test("reports missing GHCR jobs when the workflow has no jobs section", () => {
+  const files = {
+    ".github/workflows/ci.yaml": valid,
+    ".github/workflows/publish.yaml": "on: []",
+  };
+  expect(
+    validateReleaseWorkflow(
+      { existsSync: (path) => path in files, readFileSync: (path) => files[path] },
+      { eliware: { apply: ["ghcr-published"] } },
+    ),
+  ).toContain("BLOCKED: GHCR workflow must contain a publish job.");
 });

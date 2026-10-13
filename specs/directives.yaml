@@ -12,7 +12,9 @@ directives:
     children:
       - id: E-1100.0.0
         dos:
-          - Accept the v12 ci.yaml and publish.yaml workflow names and validate applicable release gates.
+          - Accept the v12 ci.yaml and publish.yaml workflow names and validate release gates by publication profile.
+          - Apply npm workflow checks only when npm-published applies.
+          - Require a numeric tag trigger, ghcr-publish environment, and Docker image push when ghcr-published applies.
           - Require environment example files only when the target declares supported runtime environment configuration.
         donts:
           - Do not require .env.example for every target repository.

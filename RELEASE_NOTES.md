@@ -1,5 +1,12 @@
 # Release Notes
 
+## 12.0.1 — 2026-10-12
+
+### Fixed
+
+- Apply npm publication checks only to npm-published repositories.
+- Check GHCR tag triggers, publication environments, and Docker image push steps for GHCR-published repositories.
+
 ## 12.0.0 — 2026-10-12
 
 ### Added
