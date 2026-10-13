@@ -11,6 +11,17 @@ test("accepts a valid npm publication workflow", () => {
   expect(validate(valid)).toEqual([]);
 });
 
+test("requires npm setup and publication commands in order", () => {
+  const reversed = valid.replace(
+    "      - run: npm -g install npm@latest\n      - run: npm ci\n      - run: npm publish --provenance",
+    "      - run: npm publish --provenance\n      - run: npm ci\n      - run: npm -g install npm@latest",
+  );
+  expect(validate(reversed)).toEqual([
+    "BLOCKED: publication job must install npm@latest before npm ci.",
+    "BLOCKED: publication job must run npm ci before npm publish.",
+  ]);
+});
+
 test("reports missing npm publication safeguards and static tokens", () => {
   expect(validate("jobs:\n  publish:\n    steps:\n      - run: echo NODE_AUTH_TOKEN")).toEqual([
     "BLOCKED: publication job must install npm@latest before npm ci.",

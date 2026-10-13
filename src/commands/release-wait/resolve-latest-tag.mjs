@@ -3,10 +3,11 @@ export function resolveLatestReleaseTag(execFileSync) {
   const version = tag.replace(/^v/, "");
   if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version))
     throw new Error(`Latest tag is not a semantic release tag: ${tag}`);
-  const tagRef = `refs/tags/${tag}^{}`;
-  const commitSha = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
-  const confirmedSha = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
-  if (commitSha !== confirmedSha)
+  const tagRef = `refs/tags/${tag}`;
+  const tagObject = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
+  const commitSha = execFileSync("git", ["rev-list", "-n", "1", tagObject]).toString().trim();
+  const confirmedTagObject = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
+  if (tagObject !== confirmedTagObject)
     throw new Error(`Latest tag ${tag} changed while it was being resolved.`);
   return { version, commitSha };
 }

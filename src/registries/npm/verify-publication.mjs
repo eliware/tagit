@@ -3,7 +3,7 @@ import { buildNpmViewCommand } from "./build-view-command.mjs";
 
 function readNpmView(output, version) {
   const value = JSON.parse(output);
-  return Array.isArray(value) ? value.includes(version) : value === version;
+  return Array.isArray(value) ? value.length === 1 && value[0] === version : value === version;
 }
 
 export async function verifyNpmPublication(

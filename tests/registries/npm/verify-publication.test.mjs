@@ -69,6 +69,21 @@ test("accepts npm view array output", async () => {
   ).resolves.toBeUndefined();
 });
 
+test("rejects npm view arrays with extra versions", async () => {
+  const info = jest.fn();
+  const exec = jest.fn((_command, _args, _options, callback) =>
+    callback(null, '["1.0.0","1.0.1"]', ""),
+  );
+  await expect(
+    verifyNpmPublication(
+      exec,
+      { info },
+      { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
+    ),
+  ).rejects.toThrow("after 1 attempts");
+  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not visible.");
+});
+
 test("logs invisible registry output and the final visibility failure", async () => {
   const info = jest.fn();
   const exec = jest.fn((_command, _args, _options, callback) => callback(null, '"0.9.0"', ""));
