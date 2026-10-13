@@ -16,4 +16,6 @@ test("enforces command-specific option policy", () => {
   expect(() =>
     validateCommandPolicy(["release-wait", "--version", "1.0.0"], "release-wait"),
   ).toThrow("latest tag");
+  expect(() => validateCommandPolicy(["release"], "release")).toThrow("required");
+  expect(() => validateCommandPolicy(["release", "--version", "1.2.3"], "release")).not.toThrow();
 });

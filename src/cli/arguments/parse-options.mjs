@@ -11,7 +11,6 @@ export function getReleaseVersion(argv, options = {}) {
 export function parseOptions(argv) {
   const command = classifyCommand(argv);
   validateOptions(argv, command);
-  if (command === "release") parseVersionOption(argv, { required: true });
   return {
     command,
     help: isHelp(argv),

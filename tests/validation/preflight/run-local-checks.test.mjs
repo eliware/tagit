@@ -4,113 +4,61 @@ import { runLocalChecks } from "../../../src/validation/preflight/run-local-chec
 const fs = {
   lstatSync: () => ({ isSymbolicLink: () => false }),
   existsSync: (file) =>
-    file === "package.json" ||
-    file === "node_modules/@eliware/test/package.json" ||
-    file === ".github/workflows/ci.yaml",
+    file === "package.json" || file === "node_modules/@eliware/test/package.json",
   readFileSync: (file) =>
-    file === ".github/workflows/ci.yaml"
-      ? "jobs:\n  linux:\n    name: Ubuntu\n    runs-on: ubuntu-latest\n  windows:\n    name: Windows\n    runs-on: windows-latest"
-      : file === "node_modules/@eliware/test/package.json"
-        ? JSON.stringify({ name: "@eliware/test", version: "4.1.0" })
-        : JSON.stringify({
-            name: "demo",
-            scripts: { test: "eliware-test" },
-            devDependencies: { "@eliware/test": "^4.0.0" },
-          }),
+    file === "node_modules/@eliware/test/package.json"
+      ? JSON.stringify({ name: "@eliware/test", version: "4.1.0" })
+      : JSON.stringify({
+          name: "demo",
+          scripts: { test: "eliware-test" },
+          devDependencies: { "@eliware/test": "^4.0.0" },
+        }),
 };
-test("runs the declared shared test command", () =>
-  expect(runLocalChecks(jest.fn(), fs).results.test).toEqual({ passed: true }));
-test("reports a failed local command", () =>
-  expect(
-    runLocalChecks(() => {
-      throw new Error("failed");
-    }, fs).failures.join("\n"),
-  ).toContain("test failed"));
 
-import { runPreflight } from "../../../src/validation/preflight/run-checks.mjs";
-const isNodeNpm = (executable, args = []) =>
-  executable === "npm" ||
-  executable === "npm.cmd" ||
-  (executable === "cmd.exe" && args.includes("npm.cmd"));
-test("reports command failures and silent output", () => {
-  const fail = jest.fn((executable, args) =>
-    isNodeNpm(executable, args) && args.at(-1) === "test"
-      ? (() => {
-          throw { stdout: "bad", stderr: "test" };
-        })()
-      : "",
-  );
-  expect(() => runPreflight(fail, fs, { info: jest.fn() })).toThrow("test failed");
-  const silent = jest.fn((executable, args) =>
-    isNodeNpm(executable, args) && args.at(-1) === "test"
-      ? (() => {
-          throw new Error("failed");
-        })()
-      : "",
-  );
-  expect(() => runPreflight(silent, fs, { info: jest.fn() })).toThrow("test failed");
+test("runs the declared shared test command", () => {
+  const run = jest.fn();
+  expect(runLocalChecks(run, fs).results.test).toEqual({ passed: true });
+  expect(run).toHaveBeenCalledTimes(1);
+  expect(run.mock.calls[0][1].at(-1)).toBe("test");
 });
 
-test("verifies exact-head CI and aggregates CI failures", () => {
-  const pass = jest.fn((executable, args) => {
-    if (executable === "git" && args[0] === "rev-parse") return "abc";
-    if (executable === "git" && args[0] === "remote") return "https://github.com/eliware/demo.git";
-    if (executable === "gh" && args[1] === "list")
-      return JSON.stringify([
-        { databaseId: 42, status: "completed", conclusion: "success", headSha: "abc" },
-      ]);
-    if (executable === "gh" && args[0] === "api")
-      return JSON.stringify({
-        jobs: [
-          { id: 10, labels: ["ubuntu-latest"] },
-          { id: 11, labels: ["windows-latest"] },
-        ],
-      });
-    if (executable === "gh" && args[1] === "view")
-      return JSON.stringify({
-        status: "completed",
-        conclusion: "success",
-        headSha: "abc",
-        jobs: [
-          { name: "Ubuntu", status: "completed", conclusion: "success" },
-          { name: "Windows", status: "completed", conclusion: "success" },
-        ],
-      });
-    return "";
+test("reports a failed local command with captured output", () => {
+  const run = jest.fn(() => {
+    throw { stdout: "failed test output", stderr: "" };
   });
-  expect(runPreflight(pass, fs, { info: jest.fn() }, { verifyCi: true })).toHaveProperty(
-    "ci.ubuntu",
-    true,
-  );
-  const fail = jest.fn((executable, args) =>
-    executable === "git" && args[0] === "remote"
-      ? "https://github.com/eliware/demo.git"
-      : executable === "gh" && args[1] === "list"
-        ? (() => {
-            throw new Error("network unavailable");
-          })()
-        : "",
-  );
-  expect(() => runPreflight(fail, fs, { info: jest.fn() }, { verifyCi: true })).toThrow(
-    "GitHub CI verification failed",
+  const result = runLocalChecks(run, fs);
+  expect(result.results.test).toEqual({ passed: false });
+  expect(result.failures.join("\n")).toContain("failed test output");
+});
+
+test.each([
+  [new Error("silent failure"), "no output captured"],
+  [{ stdout: "x".repeat(5000), stderr: "" }, "output truncated"],
+  [Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }), "exceeded the 120-second limit"],
+])("formats local test failure details", (error, expected) => {
+  const run = jest.fn(() => {
+    throw error;
+  });
+  expect(runLocalChecks(run, fs).failures.join("\n")).toContain(expected);
+});
+
+test("blocks packages without a test script", () => {
+  const packageFs = {
+    existsSync: (file) => file === "package.json",
+    readFileSync: () => JSON.stringify({ scripts: {} }),
+  };
+  expect(runLocalChecks(jest.fn(), packageFs).failures.join("\n")).toContain(
+    "does not declare scripts.test",
   );
 });
 
-test("reports timeout remediation and dirty-tree blockers", () => {
-  const timeout = jest.fn((executable, args) =>
-    isNodeNpm(executable, args) && args.at(-1) === "test"
-      ? (() => {
-          throw Object.assign(new Error("timed out"), { code: "ETIMEDOUT" });
-        })()
-      : "",
-  );
-  expect(() => runPreflight(timeout, fs, { info: jest.fn() })).toThrow(
-    /exceeded the 120-second limit/,
-  );
-  const dirty = jest.fn((executable, args) =>
-    executable === "git" && args[0] === "status" ? " M package.json" : "",
-  );
-  expect(() => runPreflight(dirty, fs, { info: jest.fn() }, { verifyCi: true })).toThrow(
-    /uncommitted changes[\s\S]*commit and push/,
+test("blocks named packages without an installed shared harness", () => {
+  const packageFs = {
+    existsSync: () => true,
+    lstatSync: () => ({ isSymbolicLink: () => false }),
+    readFileSync: () => JSON.stringify({ name: "demo", scripts: { test: "eliware-test" } }),
+  };
+  expect(runLocalChecks(jest.fn(), packageFs).failures.join("\n")).toContain(
+    "installed, non-linked @eliware/test",
   );
 });

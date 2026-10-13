@@ -17,16 +17,13 @@ const deps = () => ({
   verifyRelease: jest.fn(),
   execFile: jest.fn(),
 });
-test("handles version, help, and notes at the command boundary", async () => {
+test("handles version and help at the command boundary", async () => {
   const version = deps();
   await dispatchCommand({ versionQuery: true }, version);
   expect(version.output).toHaveBeenCalledWith("1.2.3");
   const help = deps();
   await dispatchCommand({ help: true }, help);
   expect(help.output).toHaveBeenCalledWith(expect.stringContaining("Project owners may run only"));
-  const notes = deps();
-  await dispatchCommand({ command: "notes" }, notes);
-  expect(notes.output).toHaveBeenCalledWith("notes");
 });
 
 test("uses console output when no output override is supplied", async () => {

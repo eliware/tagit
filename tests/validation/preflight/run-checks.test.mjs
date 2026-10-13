@@ -18,36 +18,6 @@ const expectNpmCall = (mock, expectedArgs) =>
     ),
   ).toBe(true);
 
-test("reports test output when the shared harness fails", () => {
-  const execSync = jest.fn((executable, args) => {
-    if (isNodeNpm(executable, args) && args.at(-1) === "test")
-      throw { stdout: "test output", stderr: "" };
-    return "";
-  });
-  const fs = packageFs();
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow("test output");
-});
-test("reports an explicit empty output excerpt for a silent test failure", () => {
-  const execSync = jest.fn((executable, args) => {
-    if (isNodeNpm(executable, args) && args.at(-1) === "test")
-      throw new Error("silent test failure");
-    return "";
-  });
-  const fs = packageFs();
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow(
-    "Output: (no output captured)",
-  );
-});
-
-test("bounds captured output from a failing shared harness", () => {
-  const execSync = jest.fn((executable, args) => {
-    if (isNodeNpm(executable, args) && args.at(-1) === "test")
-      throw { stdout: "x".repeat(5000), stderr: "" };
-    return "";
-  });
-  const fs = packageFs();
-  expect(() => runPreflight(execSync, fs, { info: jest.fn() })).toThrow("output truncated");
-});
 test("preflight delegates local validation to the project test script", () => {
   const execSync = jest.fn((executable, args) => {
     if (isNodeNpm(executable, args) && args.at(-1) === "test")
@@ -176,6 +146,17 @@ test("preflight blocks CI evidence when the worktree is dirty", () => {
   const fs = { existsSync: jest.fn(() => false) };
   expect(() => runPreflight(execSync, fs, { info: jest.fn() }, { verifyCi: true })).toThrow(
     "uncommitted changes are present",
+  );
+});
+
+test("preflight reports an exact-HEAD CI verification error", () => {
+  const exec = jest.fn((command, args) => {
+    if (args[0] === "status") return "";
+    if (args[0] === "rev-parse") throw new Error("CI unavailable");
+    return "";
+  });
+  expect(() => runPreflight(exec, packageFs(), { info: jest.fn() }, { verifyCi: true })).toThrow(
+    "GitHub CI verification failed",
   );
 });
 

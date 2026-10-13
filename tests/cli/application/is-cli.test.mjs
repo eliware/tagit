@@ -4,4 +4,6 @@ test("recognizes supported executable names", () => {
   expect(isCli(["node", "tagit.mjs"])).toBe(true);
   expect(isCli(["node", "other.mjs"])).toBe(false);
   expect(isCli(["node"])).toBe(false);
+  expect(isCli(["node", "/opt/tagit/bin/tagit.mjs"])).toBe(true);
+  expect(isCli(["node", "/opt/test.mjs"])).toBe(false);
 });

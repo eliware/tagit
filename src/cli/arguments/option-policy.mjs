@@ -1,3 +1,5 @@
+import { parseVersionOption } from "./parse-version-option.mjs";
+
 const allowedOptions = new Set([
   "--help",
   "-h",
@@ -37,4 +39,5 @@ export function validateCommandPolicy(argv, command) {
     );
   if (command === "release-wait" && argv.includes("--version"))
     throw new Error("release-wait always verifies the latest tag; do not pass --version.");
+  if (command === "release") parseVersionOption(argv, { required: true });
 }
