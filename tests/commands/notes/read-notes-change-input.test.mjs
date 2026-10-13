@@ -11,4 +11,31 @@ test("reads the latest tag, changed files, and diff through injected Git", () =>
     diff: "+change",
   });
   expect(exec).toHaveBeenCalledTimes(3);
+  expect(exec).toHaveBeenNthCalledWith(
+    1,
+    "git",
+    ["describe", "--tags", "--abbrev=0"],
+    expect.any(Object),
+  );
+  expect(exec).toHaveBeenNthCalledWith(
+    2,
+    "git",
+    ["diff", "--name-only", "v1.2.3..HEAD"],
+    expect.any(Object),
+  );
+  expect(exec).toHaveBeenNthCalledWith(
+    3,
+    "git",
+    [
+      "diff",
+      "--unified=0",
+      "v1.2.3..HEAD",
+      "--",
+      ".",
+      ":!package-lock.json",
+      ":!coverage",
+      ":!node_modules",
+    ],
+    expect.any(Object),
+  );
 });

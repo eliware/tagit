@@ -1,4 +1,6 @@
-import { hasTagTrigger, jobValue, parseJobs, parseWorkflow } from "./workflow-format.mjs";
+import { parseJobs, parseWorkflow } from "./workflow-format.mjs";
+import { hasTagTrigger } from "./workflow-triggers.mjs";
+import { jobValue } from "./workflow-job-rules.mjs";
 
 export function validateGhcrPublicationWorkflow(fs) {
   const publishPath = ".github/workflows/publish.yaml";

@@ -1,4 +1,5 @@
-import { jobValue, parseJobs, parseWorkflow } from "../../repository/metadata/workflow-format.mjs";
+import { parseJobs, parseWorkflow } from "../../repository/metadata/workflow-format.mjs";
+import { jobValue } from "../../repository/metadata/workflow-job-rules.mjs";
 
 export function parseWorkflowRunnerLabels(workflowText) {
   const sections = parseWorkflow(workflowText);

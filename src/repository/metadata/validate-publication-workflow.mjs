@@ -1,11 +1,7 @@
-import {
-  hasTagTrigger,
-  jobHasCommand,
-  jobHasUse,
-  jobValue,
-  parseJobs,
-  parseWorkflow,
-} from "./workflow-format.mjs";
+import { hasTagTrigger } from "./workflow-triggers.mjs";
+import { jobHasUse, jobValue } from "./workflow-job-rules.mjs";
+import { parseJobs, parseWorkflow } from "./workflow-format.mjs";
+import { validateNpmPublicationJob } from "./validate-npm-publication-workflow.mjs";
 
 export function validatePublicationWorkflow(fs) {
   const publishPath = ".github/workflows/publish.yaml";
@@ -24,16 +20,6 @@ export function validatePublicationWorkflow(fs) {
     failures.push("BLOCKED: publication job must check out the release commit.");
   if (!jobHasUse(publish, "actions/setup-node@v7"))
     failures.push("BLOCKED: publication job must use actions/setup-node@v7.");
-  if (!jobHasCommand(publish, "npm -g install npm@latest"))
-    failures.push("BLOCKED: publication job must install npm@latest before npm ci.");
-  if (!jobHasCommand(publish, "npm ci")) failures.push("BLOCKED: publication job must run npm ci.");
-  if (!jobHasCommand(publish, "npm publish --provenance"))
-    failures.push("BLOCKED: publication job must publish with npm provenance.");
-  if (publish.some((line) => /NPM_TOKEN|NODE_AUTH_TOKEN/.test(line)))
-    failures.push(
-      "BLOCKED: publication workflow must use Trusted Publishing without static npm tokens.",
-    );
-  if (!publish.some((line) => line.trim() === "id-token: write"))
-    failures.push("BLOCKED: publication job must grant id-token: write.");
+  failures.push(...validateNpmPublicationJob(publish));
   return failures;
 }
