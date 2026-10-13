@@ -1,6 +1,7 @@
 import { jobHasCommand } from "./workflow-job-rules.mjs";
+import { parseJobs, parseWorkflow } from "./workflow-format.mjs";
 
-export function validateNpmPublicationJob(publish) {
+function validateNpmPublicationJob(publish) {
   const failures = [];
   if (!jobHasCommand(publish, "npm -g install npm@latest"))
     failures.push("BLOCKED: publication job must install npm@latest before npm ci.");
@@ -14,4 +15,12 @@ export function validateNpmPublicationJob(publish) {
   if (!publish.some((line) => line.trim() === "id-token: write"))
     failures.push("BLOCKED: publication job must grant id-token: write.");
   return failures;
+}
+
+export function validateNpmPublicationWorkflow(fs) {
+  const publishPath = ".github/workflows/publish.yaml";
+  if (!fs.existsSync(publishPath)) return [];
+  const sections = parseWorkflow(fs.readFileSync(publishPath, "utf8"));
+  const jobs = parseJobs(sections.get("jobs") ?? []);
+  return validateNpmPublicationJob(jobs.get("publish") ?? []);
 }

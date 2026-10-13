@@ -50,14 +50,13 @@ function execFile(_command, args, _options, callback) {
   return callback(null, JSON.stringify("1.0.0"), "");
 }
 
-test("rejects invalid release input before external inspection", async () => {
-  await expect(
-    verifyRelease(jest.fn(), fs, log, { version: "next", release: { commitSha: "abc" } }),
-  ).rejects.toThrow("must be valid");
-});
-
-test("rejects omitted release options through the default boundary", async () => {
-  await expect(verifyRelease(jest.fn(), fs, log)).rejects.toThrow();
+test.each([
+  ["invalid release input", { version: "next", release: { commitSha: "abc" } }],
+  ["omitted release options", undefined],
+])("rejects %s before external inspection", async (_case, options) => {
+  const inspect = jest.fn();
+  await expect(verifyRelease(inspect, fs, log, options)).rejects.toThrow();
+  expect(inspect).not.toHaveBeenCalled();
 });
 
 test("returns links-only CI evidence without registry verification", async () => {

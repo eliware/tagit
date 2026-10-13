@@ -13,16 +13,13 @@ test("accepts a canonical publication workflow with a quoted trigger key", () =>
   expect(validatePublishWorkflow(publication.replace("on:", '"on":'))).toEqual([]);
 });
 
-test("reports every missing publication safeguard", () => {
+test("reports missing shared publication safeguards", () => {
   const failures = validatePublishWorkflow(
     "on:\n  push:\n    branches: [main]\njobs:\n  validate:\n    steps: []\n  publish:\n    steps:\n      - run: npm publish\n      - run: echo NODE_AUTH_TOKEN",
   );
-  expect(failures).toHaveLength(9);
+  expect(failures).toHaveLength(4);
   expect(failures).toContain(
     "BLOCKED: publication workflow must trigger for numeric version tags.",
-  );
-  expect(failures).toContain(
-    "BLOCKED: publication workflow must use Trusted Publishing without static npm tokens.",
   );
 });
 

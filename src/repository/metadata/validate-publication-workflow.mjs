@@ -1,7 +1,6 @@
 import { hasTagTrigger } from "./tag-trigger.mjs";
 import { jobHasUse, jobValue } from "./workflow-job-rules.mjs";
 import { parseJobs, parseWorkflow } from "./workflow-format.mjs";
-import { validateNpmPublicationJob } from "./validate-npm-publication-workflow.mjs";
 
 export function validatePublicationWorkflow(fs) {
   const publishPath = ".github/workflows/publish.yaml";
@@ -20,6 +19,5 @@ export function validatePublicationWorkflow(fs) {
     failures.push("BLOCKED: publication job must check out the release commit.");
   if (!jobHasUse(publish, "actions/setup-node@v7"))
     failures.push("BLOCKED: publication job must use actions/setup-node@v7.");
-  failures.push(...validateNpmPublicationJob(publish));
   return failures;
 }

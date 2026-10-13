@@ -2,10 +2,8 @@ import { execFile as defaultExecFile } from "node:child_process";
 import { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
 import { pollReleaseCi } from "./release-ci-status.mjs";
 import { verifyReleasePublication } from "./release-publication-status.mjs";
-import { validateReleaseInput } from "./validate-release-input.mjs";
-import { resolveReleaseContext } from "./resolve-release-context.mjs";
 import { reportCiResult } from "./report-ci-result.mjs";
-import { readWorkflowRunnerLabelsFromGit } from "../../github/runs/read-workflow-runner-labels.mjs";
+import { prepareReleaseContext } from "./prepare-release-context.mjs";
 export { npmExecutable } from "../../process/commands/npm-executable.mjs";
 export { waitSync } from "../../process/timing/wait-sync.mjs";
 export { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
@@ -27,12 +25,14 @@ export async function verifyRelease(
     execFile = defaultExecFile,
   } = {},
 ) {
-  validateReleaseInput(version, release, maxPolls, npmRetries, pollMs, npmRetryMs);
-  const { repo, tag, headSha } = resolveReleaseContext(execFileSync, version, release);
-  const runnerLabelsByJobName = readWorkflowRunnerLabelsFromGit(execFileSync, headSha, [
-    ".github/workflows/ci.yaml",
-    ".github/workflows/publish.yaml",
-  ]);
+  const { repo, tag, headSha, runnerLabelsByJobName } = prepareReleaseContext(execFileSync, {
+    version,
+    release,
+    maxPolls,
+    npmRetries,
+    pollMs,
+    npmRetryMs,
+  });
   const run = await pollReleaseCi({
     execFile,
     repo,

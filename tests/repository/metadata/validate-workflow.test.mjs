@@ -25,6 +25,16 @@ test("applies npm workflow checks to npm-published packages", () => {
   ).toEqual([]);
 });
 
+test("applies npm publication policy to npm-published packages", () => {
+  const incomplete = publish.replace(/      - run: npm[^\n]*\n/g, "");
+  expect(
+    validateFiles(
+      { ".github/workflows/ci.yaml": valid, ".github/workflows/publish.yaml": incomplete },
+      { eliware: { apply: ["npm-published"] } },
+    ),
+  ).toContain("BLOCKED: publication job must publish with npm provenance.");
+});
+
 test("reports missing publication workflow requirements", () => {
   expect(
     validateFiles(
