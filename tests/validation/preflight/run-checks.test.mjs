@@ -41,23 +41,10 @@ test("preflight rejects dirty trees before running package commands", () => {
 });
 
 test("strict preflight delegates repository validation", () => {
-  const workflow =
-    "on:\n  push:\n    branches:\n      - main\n  pull_request:\njobs:\n  test:\n    steps:\n      - uses: actions/checkout@v6\n      - uses: actions/setup-node@v7\n      - run: npm -g install npm@latest\n      - run: npm ci\n      - run: npm test";
   const pkg = {
-    name: "demo",
-    version: "1.0.0",
-    description: "demo",
-    keywords: ["demo"],
-    author: "Eli",
     repository: { url: "https://github.com/eliware/demo" },
-    homepage: "https://github.com/eliware/demo",
-    license: "MIT",
-    engines: { node: ">=26" },
     devDependencies: { "@eliware/test": "^3.0.0" },
     scripts: { test: "eliware-test", lint: "eliware-test --lint" },
-    exports: { ".": "./index.mjs" },
-    files: ["README.md", "LICENSE", "RELEASE_NOTES.md"],
-    publishConfig: { access: "public", provenance: true },
   };
   const exec = jest.fn((command, args) =>
     args[0] === "status"
@@ -70,20 +57,10 @@ test("strict preflight delegates repository validation", () => {
   );
   const fs = {
     existsSync: () => true,
-    lstatSync: (file) => ({
-      isDirectory: () => ["docs/", "specs/"].includes(file),
-      isSymbolicLink: () => false,
-    }),
     readFileSync: (file) =>
       file === "node_modules/@eliware/test/package.json"
         ? JSON.stringify({ name: "@eliware/test", version: "3.3.0" })
-        : file === ".tagit-exceptions.json"
-          ? '{"inapplicable":{}}'
-          : file === "RELEASE_NOTES.md"
-            ? "## 1.0.0"
-            : file === ".github/workflows/ci.yaml"
-              ? workflow
-              : JSON.stringify(pkg),
+        : JSON.stringify(pkg),
   };
   expect(runPreflight(exec, fs, { info: jest.fn() }, { strictRepository: true })).toHaveProperty(
     "test.passed",
