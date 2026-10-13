@@ -4,7 +4,7 @@ import { jobValue } from "../../repository/metadata/workflow-job-rules.mjs";
 export function parseWorkflowRunnerLabels(workflowText) {
   const sections = parseWorkflow(workflowText);
   const jobs = parseJobs(sections.get("jobs") ?? []);
-  const labelsByName = {};
+  const labelsByName = Object.create(null);
   for (const [jobId, jobLines] of jobs) {
     const runnerValue = jobValue(jobLines, "runs-on");
     if (runnerValue === null) continue;
@@ -23,7 +23,7 @@ export function readWorkflowRunnerLabels(fs, workflowPath) {
 }
 
 export function readWorkflowRunnerLabelsFromGit(execFileSync, revision, workflowPaths) {
-  const labelsByName = {};
+  const labelsByName = Object.create(null);
   for (const workflowPath of workflowPaths) {
     try {
       const content = execFileSync("git", ["show", `${revision}:${workflowPath}`], {

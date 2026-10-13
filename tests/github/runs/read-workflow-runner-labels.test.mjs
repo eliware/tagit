@@ -13,6 +13,12 @@ test("maps workflow job ids and display names to runner platforms", () => {
   ).toEqual({ validate: ["ubuntu"], win: ["windows"], "Windows checks": ["windows"] });
 });
 
+test("records runner labels for prototype-named jobs", () => {
+  const labels = parseWorkflowRunnerLabels("jobs:\n  __proto__:\n    runs-on: ubuntu-latest\n");
+  expect(Object.hasOwn(labels, "__proto__")).toBe(true);
+  expect(labels["__proto__"]).toEqual(["ubuntu"]);
+});
+
 test("handles missing jobs, missing runners, unknown runners, and unnamed jobs", () => {
   expect(parseWorkflowRunnerLabels("name: no jobs")).toEqual({});
   expect(

@@ -19,6 +19,16 @@ test("classifies neutral validation job names from the release workflow runner",
   expect(result.windowsJobs).toEqual([]);
 });
 
+test("classifies a prototype-named job from its workflow runner", () => {
+  const runnerLabels = Object.create(null);
+  runnerLabels["__proto__"] = ["ubuntu"];
+  const result = verifyReleaseJobs(
+    [{ name: "__proto__", status: "completed", conclusion: "success" }],
+    runnerLabels,
+  );
+  expect(result.windowsJobs).toEqual([]);
+});
+
 test("rejects platform classification based on job names", () => {
   expect(() =>
     verifyReleaseJobs([{ name: "ubuntu", status: "completed", conclusion: "success" }]),
