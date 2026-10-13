@@ -28,7 +28,7 @@ Run `tagit --help` or `tagit -h` to show command help. Run `tagit --version` or 
 tagit notes
 ```
 
-This command reports commits and changed files since the latest Git tag. It suggests a release level. It does not change files or release state.
+This command reports commits and changed files since the latest Git tag. Set the package version before release work. This command does not suggest a version or change files.
 
 ## Check release readiness
 

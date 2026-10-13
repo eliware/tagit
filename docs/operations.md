@@ -5,7 +5,7 @@ TagIt coordinates release checks. It does not deploy applications or edit GitOps
 ## Prepare an owner handoff
 
 1. Update code, documentation, package data, and release notes.
-2. Run `tagit notes`. Review its change list and release suggestion.
+2. Set the package version for the release. Run `tagit notes` and review its change list.
 3. Commit the intended changes.
 4. Run `tagit push`.
 5. Wait for CI on the exact commit.

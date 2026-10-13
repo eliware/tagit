@@ -28,14 +28,13 @@ test("runs the notes entry point with injected dependencies", async () => {
       output,
       buildNotesReport,
       gitOperations,
-      suggestVersion: noop,
       log,
       registerHandlersFn: noop,
       registerSignalsFn: noop,
     },
     ["notes"],
   );
-  expect(buildNotesReport).toHaveBeenCalledWith(expect.anything(), expect.anything());
+  expect(buildNotesReport).toHaveBeenCalledWith(expect.any(Function));
   expect(gitOperations).not.toHaveBeenCalled();
   expect(output).toHaveBeenCalledWith("TAGIT NOTES REPORT");
 });
@@ -46,7 +45,6 @@ test("uses console output for default version and preflight responses", async ()
   await runTagit(
     {
       runPreflight: jest.fn(() => ({ test: { passed: true } })),
-      suggestVersion: noop,
       log,
       registerHandlersFn: noop,
       registerSignalsFn: noop,
@@ -65,7 +63,6 @@ test("preflight runs without release side effects", async () => {
       output,
       runPreflight,
       updateVersionFiles,
-      suggestVersion: noop,
       log,
       registerHandlersFn: noop,
       registerSignalsFn: noop,
@@ -96,7 +93,6 @@ test("notes uses console output when no output override is supplied", async () =
   await runTagit(
     {
       buildNotesReport: jest.fn(() => "report"),
-      suggestVersion: noop,
       log,
       registerHandlersFn: noop,
       registerSignalsFn: noop,

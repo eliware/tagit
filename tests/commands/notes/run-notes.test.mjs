@@ -5,7 +5,6 @@ test("builds and prints the notes report", () => {
   const output = jest.fn();
   expect(
     runNotesCommand({
-      fs: {},
       execFileSync: jest.fn(),
       buildNotesReport: jest.fn(() => "report"),
       output,

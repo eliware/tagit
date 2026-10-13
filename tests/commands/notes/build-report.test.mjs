@@ -1,11 +1,10 @@
 import { buildNotesReport } from "../../../src/commands/notes/build-report.mjs";
 
-test("composes the notes suggestion, change collection, and formatter", () => {
+test("composes the tag range, change collection, and formatter", () => {
   const exec = (_command, args) =>
-    args[0] === "describe" ? "v1.0.0" : args[0] === "log" ? "" : "";
-  const report = buildNotesReport(
-    { readFileSync: () => JSON.stringify({ version: "1.0.0" }) },
-    exec,
-  );
+    args[0] === "describe" ? "v1.0.0\n" : args[0] === "log" ? "" : "";
+  const report = buildNotesReport(exec);
   expect(report).toContain("TAGIT NOTES REPORT");
+  expect(report).toContain("Range: v1.0.0..HEAD");
+  expect(report).not.toContain("Suggested release:");
 });
