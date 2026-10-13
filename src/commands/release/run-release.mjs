@@ -10,17 +10,17 @@ export async function runReleaseCommand({
   gitOperations,
   verifyRelease,
 }) {
+  if (isTemplateRepository(fs)) {
+    log.info(".notag detected: template release validated; tagging and publishing skipped.");
+    return;
+  }
+  validatePackageReleaseVersion(fs, options.version);
   if (options.dryRun) {
     log.info(
       "Dry run passed: release versioning, commit, tag, push, and publication were skipped.",
     );
     return;
   }
-  if (isTemplateRepository(fs)) {
-    log.info(".notag detected: template release validated; tagging and publishing skipped.");
-    return;
-  }
-  validatePackageReleaseVersion(fs, options.version);
   const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
   await verifyRelease(execFileSync, fs, log, {
     version: options.version,

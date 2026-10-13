@@ -9,6 +9,7 @@ export async function verifyRegistries({
   repo,
   version,
   release,
+  applicable,
   packageName,
   isPrivate,
   maxPolls,
@@ -17,7 +18,7 @@ export async function verifyRegistries({
   npmRetryMs,
   sleep,
 }) {
-  const npm = Boolean(packageName && !isPrivate);
+  const npm = Boolean(applicable && packageName && !isPrivate);
   if (npm) {
     log.info(`Checking npm publication for ${packageName}@${version}.`);
     await verifyNpmPublication(execFile, log, {

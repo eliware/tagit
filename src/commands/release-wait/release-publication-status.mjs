@@ -18,7 +18,7 @@ export async function verifyReleasePublication({
   npmRetryMs,
   sleep,
 }) {
-  const { packageName, isPrivate } = verifyReleaseCi(
+  const { applicable, packageName, isPrivate } = verifyReleaseCi(
     fs,
     log,
     repo,
@@ -33,6 +33,7 @@ export async function verifyReleasePublication({
     repo,
     version,
     release,
+    applicable,
     packageName,
     isPrivate,
     maxPolls,

@@ -25,6 +25,7 @@ const verify = (overrides = {}) =>
     repo: "eliware/demo",
     version: "1.0.0",
     release: { imageDigest: "sha256:expected" },
+    applicable: true,
     packageName: null,
     isPrivate: true,
     maxPolls: 2,
@@ -38,6 +39,13 @@ const verify = (overrides = {}) =>
 beforeEach(() => {
   jest.clearAllMocks();
   publishesGhcr.mockReturnValue(false);
+});
+
+test("skips npm verification when the npm profile does not apply", async () => {
+  await expect(
+    verify({ applicable: false, packageName: "@eliware/demo", isPrivate: false }),
+  ).resolves.toEqual({ npm: false, ghcr: false });
+  expect(verifyNpmPublication).not.toHaveBeenCalled();
 });
 
 test("skips both registries when neither publication applies", async () => {

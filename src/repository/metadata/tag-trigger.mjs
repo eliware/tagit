@@ -4,13 +4,24 @@ function valueAfter(line, key) {
 }
 
 export function hasTagTrigger(lines) {
-  const tags = lines.findIndex((line) => valueAfter(line, "tags") !== null);
-  return (
-    tags >= 0 &&
-    lines
-      .slice(tags + 1)
-      .some((line) =>
-        ["- v[0-9]*.[0-9]*.[0-9]*"].includes(line.trim().replaceAll("'", "").replaceAll('"', "")),
-      )
+  const push = lines.findIndex(
+    (line) => line.length - line.trimStart().length === 2 && valueAfter(line, "push") !== null,
   );
+  if (push < 0) return false;
+  const nextEvent = lines.findIndex(
+    (line, index) =>
+      index > push &&
+      line.length - line.trimStart().length === 2 &&
+      valueAfter(line, line.trim().slice(0, -1)) !== null,
+  );
+  const pushLines = lines.slice(push + 1, nextEvent < 0 ? undefined : nextEvent);
+  const tags = pushLines.findIndex(
+    (line) => line.length - line.trimStart().length === 4 && valueAfter(line, "tags") !== null,
+  );
+  if (tags < 0) return false;
+  return pushLines.slice(tags + 1).some((line) => {
+    const indent = line.length - line.trimStart().length;
+    const value = line.trim().replaceAll("'", "").replaceAll('"', "");
+    return indent === 6 && value === "- v[0-9]*.[0-9]*.[0-9]*";
+  });
 }

@@ -19,6 +19,11 @@ test("requires a publish job for public packages", () => {
     [],
   );
 });
+test("does not require npm publish jobs when the profile does not apply", () => {
+  expect(
+    verifyPublishJob([], { applicable: false, packageName: "demo", isPrivate: false }),
+  ).toEqual([]);
+});
 test("does not accept publish-adjacent job names", () => {
   expect(() =>
     verifyPublishJob([{ name: "publish image", status: "completed", conclusion: "success" }], {

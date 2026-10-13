@@ -77,3 +77,11 @@ test("keeps dry-run and template releases non-mutating", async () => {
   await runReleaseCommand(template);
   expect(template.gitOperations).not.toHaveBeenCalled();
 });
+test("validates package version before a release dry-run", async () => {
+  const dry = base();
+  dry.options.dryRun = true;
+  dry.fs.existsSync = (file) => file === "package.json";
+  dry.fs.readFileSync = () => JSON.stringify({ version: "1.2.2" });
+  await expect(runReleaseCommand(dry)).rejects.toThrow("does not match");
+  expect(dry.gitOperations).not.toHaveBeenCalled();
+});
