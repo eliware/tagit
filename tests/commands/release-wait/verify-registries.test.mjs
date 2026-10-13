@@ -1,105 +1,90 @@
 import { jest } from "@jest/globals";
-import { verifyRegistries } from "../../../src/commands/release-wait/verify-registries.mjs";
-test("skips npm and GHCR when not applicable", async () => {
-  await expect(
-    verifyRegistries({
-      fs: { existsSync: () => false },
-      execFile: jest.fn(),
-      log: { info: jest.fn() },
-      repo: "eliware/tagit",
-      version: "1.0.0",
-      release: {},
-      packageName: null,
-      isPrivate: true,
-      maxPolls: 1,
-      npmRetries: 1,
-      pollMs: 1,
-      npmRetryMs: 1,
-      sleep: jest.fn(),
-    }),
-  ).resolves.toEqual({ npm: false, ghcr: false });
+
+const verifyNpmPublication = jest.fn(async () => {});
+const verifyGhcrPublication = jest.fn(async () => ({ imageDigest: "sha256:release" }));
+const publishesGhcr = jest.fn(() => false);
+
+jest.unstable_mockModule("../../../src/registries/npm/verify-publication.mjs", () => ({
+  verifyNpmPublication,
+}));
+jest.unstable_mockModule("../../../src/registries/ghcr/verify-publication.mjs", () => ({
+  verifyGhcrPublication,
+}));
+jest.unstable_mockModule("../../../src/registries/ghcr/discover-publication.mjs", () => ({
+  publishesGhcr,
+}));
+
+const { verifyRegistries } =
+  await import("../../../src/commands/release-wait/verify-registries.mjs");
+
+const verify = (overrides = {}) =>
+  verifyRegistries({
+    fs: {},
+    execFile: jest.fn(),
+    log: { info: jest.fn() },
+    repo: "eliware/demo",
+    version: "1.0.0",
+    release: { imageDigest: "sha256:expected" },
+    packageName: null,
+    isPrivate: true,
+    maxPolls: 2,
+    npmRetries: 2,
+    pollMs: 5,
+    npmRetryMs: 10,
+    sleep: jest.fn(),
+    ...overrides,
+  });
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  publishesGhcr.mockReturnValue(false);
 });
 
-test("verifies a public npm package when it is visible", async () => {
-  const execFile = jest.fn((command, args, options, callback) =>
-    callback(null, JSON.stringify("1.0.0"), ""),
-  );
-  await expect(
-    verifyRegistries({
-      fs: { existsSync: () => false },
-      execFile,
-      log: { info: jest.fn(), debug: jest.fn() },
-      repo: "eliware/tagit",
-      version: "1.0.0",
-      release: {},
-      packageName: "@eliware/demo",
-      isPrivate: false,
-      maxPolls: 1,
-      npmRetries: 1,
-      pollMs: 1,
-      npmRetryMs: 1,
-      sleep: jest.fn(),
-    }),
-  ).resolves.toEqual({ npm: true, ghcr: false });
+test("skips both registries when neither publication applies", async () => {
+  await expect(verify()).resolves.toEqual({ npm: false, ghcr: false });
+  expect(verifyNpmPublication).not.toHaveBeenCalled();
+  expect(verifyGhcrPublication).not.toHaveBeenCalled();
 });
 
-test("verifies GHCR when the workflow publishes an image", async () => {
-  const digest = `sha256:${"a".repeat(64)}`;
-  const execFile = jest.fn((command, args, options, callback) =>
-    callback(
-      null,
-      JSON.stringify([{ name: digest, metadata: { container: { tags: ["v1.0.0"] } } }]),
-      "",
-    ),
-  );
-  const fs = {
-    existsSync: () => true,
-    readdirSync: () => ["ci.yaml"],
-    readFileSync: () => "image: ghcr.io/eliware/demo",
-  };
-  await expect(
-    verifyRegistries({
-      fs,
-      execFile,
-      log: { info: jest.fn(), debug: jest.fn() },
-      repo: "eliware/demo",
-      version: "1.0.0",
-      release: { imageDigest: digest },
-      packageName: null,
-      isPrivate: true,
-      maxPolls: 1,
-      npmRetries: 1,
-      pollMs: 1,
-      npmRetryMs: 1,
-      sleep: jest.fn(),
-    }),
-  ).resolves.toEqual({ npm: false, ghcr: true, imageDigest: digest });
+test("runs npm verification for a public npm package only", async () => {
+  await expect(verify({ packageName: "@eliware/demo", isPrivate: false })).resolves.toEqual({
+    npm: true,
+    ghcr: false,
+  });
+  expect(verifyNpmPublication).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), {
+    packageName: "@eliware/demo",
+    version: "1.0.0",
+    retries: 2,
+    retryMs: 10,
+    sleep: expect.any(Function),
+  });
+  expect(verifyGhcrPublication).not.toHaveBeenCalled();
 });
 
-test("verifies GHCR without an expected digest", async () => {
-  const execFile = jest.fn((command, args, options, callback) =>
-    callback(null, JSON.stringify([{ metadata: { container: { tags: ["v1.0.0"] } } }]), ""),
+test("runs GHCR verification for a published image only", async () => {
+  publishesGhcr.mockReturnValue(true);
+  await expect(verify()).resolves.toEqual({
+    npm: false,
+    ghcr: true,
+    imageDigest: "sha256:release",
+  });
+  expect(verifyNpmPublication).not.toHaveBeenCalled();
+  expect(verifyGhcrPublication).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), {
+    repository: "eliware/demo",
+    version: "1.0.0",
+    expectedDigest: "sha256:expected",
+    retries: 2,
+    retryMs: 5,
+    sleep: expect.any(Function),
+  });
+});
+
+test("passes a null expected digest when release metadata has no image digest", async () => {
+  publishesGhcr.mockReturnValue(true);
+  await verify({ release: {} });
+  expect(verifyGhcrPublication).toHaveBeenCalledWith(
+    expect.any(Function),
+    expect.any(Object),
+    expect.objectContaining({ expectedDigest: null }),
   );
-  const fs = {
-    existsSync: () => true,
-    readdirSync: () => ["ci.yaml"],
-    readFileSync: () => "image: ghcr.io/eliware/demo",
-  };
-  await expect(
-    verifyRegistries({
-      fs,
-      execFile,
-      log: { info: jest.fn(), debug: jest.fn() },
-      repo: "eliware/demo",
-      version: "1.0.0",
-      release: {},
-      packageName: null,
-      isPrivate: true,
-      maxPolls: 1,
-      npmRetries: 1,
-      pollMs: 1,
-      npmRetryMs: 1,
-      sleep: jest.fn(),
-    }),
-  ).resolves.toEqual({ npm: false, ghcr: true, imageDigest: null });
 });

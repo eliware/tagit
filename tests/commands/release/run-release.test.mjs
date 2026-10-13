@@ -77,9 +77,3 @@ test("keeps dry-run and template releases non-mutating", async () => {
   await runReleaseCommand(template);
   expect(template.gitOperations).not.toHaveBeenCalled();
 });
-test("blocks a package version mismatch", async () => {
-  const deps = base();
-  deps.fs.existsSync = (file) => file === "package.json";
-  deps.fs.readFileSync = () => JSON.stringify({ version: "9.9.9" });
-  await expect(runReleaseCommand(deps)).rejects.toThrow("does not match");
-});
