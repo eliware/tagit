@@ -1,4 +1,4 @@
-import { hasTagTrigger } from "./workflow-triggers.mjs";
+import { hasTagTrigger } from "./tag-trigger.mjs";
 import { jobHasUse, jobValue } from "./workflow-job-rules.mjs";
 import { parseJobs, parseWorkflow } from "./workflow-format.mjs";
 import { validateNpmPublicationJob } from "./validate-npm-publication-workflow.mjs";

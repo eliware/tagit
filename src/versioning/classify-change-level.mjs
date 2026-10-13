@@ -1,13 +1,10 @@
+import { hasBreakingChange } from "./has-breaking-change.mjs";
+import { isSubstantialChange } from "./is-substantial-change.mjs";
+
 export function classifyChangeLevel(files, diff) {
-  if (
-    /(BREAKING CHANGE|\bBREAKING\b|^[+].*(export|exports)|^[+].*"exports"|^[+].*"bin")/im.test(diff)
-  )
+  if (hasBreakingChange(diff))
     return { level: "major", reason: "possible breaking public API or command change" };
-  if (
-    files.length >= 5 ||
-    (diff.match(/^\+/gm) ?? []).length > 200 ||
-    /(^|\/)(src|bin)\//i.test(files.join("\n"))
-  )
+  if (isSubstantialChange(files, diff))
     return { level: "minor", reason: "substantial implementation or public feature changes" };
   return { level: "patch", reason: "small or non-public changes" };
 }

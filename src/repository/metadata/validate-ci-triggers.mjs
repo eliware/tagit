@@ -1,4 +1,4 @@
-import { hasMainPushTrigger } from "./workflow-triggers.mjs";
+import { hasMainPushTrigger } from "./main-push-trigger.mjs";
 import { jobValue } from "./workflow-job-rules.mjs";
 
 export function validateCiTriggers(trigger) {
