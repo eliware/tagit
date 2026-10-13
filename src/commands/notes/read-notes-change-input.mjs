@@ -11,6 +11,8 @@ export function readNotesChangeInput(execFileSync) {
     ":!package-lock.json",
     ":!coverage",
     ":!node_modules",
+    ":!**/.jest-result",
+    ":!**/.jest.result",
   ]);
   return { latestTag, changedFiles, diff };
 }

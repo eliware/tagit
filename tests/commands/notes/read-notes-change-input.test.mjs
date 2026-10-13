@@ -35,6 +35,8 @@ test("reads the latest tag, changed files, and diff through injected Git", () =>
       ":!package-lock.json",
       ":!coverage",
       ":!node_modules",
+      ":!**/.jest-result",
+      ":!**/.jest.result",
     ],
     expect.any(Object),
   );

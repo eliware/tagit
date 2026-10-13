@@ -5,6 +5,11 @@ test("resolves and confirms the latest semantic release tag", () => {
   const exec = jest.fn((command, args) => (args[0] === "describe" ? "v1.2.3\n" : "abc\n"));
   expect(resolveLatestReleaseTag(exec)).toEqual({ version: "1.2.3", commitSha: "abc" });
 });
+test("resolves the exact tag selected by Git describe", () => {
+  const exec = jest.fn((command, args) => (args[0] === "describe" ? "1.2.3\n" : "abc\n"));
+  expect(resolveLatestReleaseTag(exec)).toEqual({ version: "1.2.3", commitSha: "abc" });
+  expect(exec).toHaveBeenNthCalledWith(2, "git", ["rev-parse", "refs/tags/1.2.3^{}"]);
+});
 
 test("rejects invalid or changing latest tags", () => {
   expect(() => resolveLatestReleaseTag(jest.fn(() => "v-next"))).toThrow("not a semantic");

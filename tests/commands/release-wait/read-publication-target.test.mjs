@@ -19,6 +19,15 @@ test("returns no npm target when package metadata is absent", () => {
     isPrivate: null,
   });
 });
+test("skips npm publication checks for a GHCR-only profile", () => {
+  expect(
+    readPublicationTarget({
+      existsSync: () => true,
+      readFileSync: () =>
+        JSON.stringify({ name: "demo", eliware: { apply: ["general", "ghcr-published"] } }),
+    }),
+  ).toEqual({ applicable: false, packageName: "demo", isPrivate: false });
+});
 test("classifies a private package without a name as applicable but non-publishing", () => {
   expect(
     readPublicationTarget({
