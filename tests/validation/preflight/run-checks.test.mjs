@@ -1,8 +1,21 @@
 import { jest } from "@jest/globals";
 import { runPreflight } from "../../../src/validation/preflight/run-checks.mjs";
-const packageFs = (packageJson = { scripts: { test: "eliware-test" } }) => ({
-  existsSync: jest.fn((file) => file === "package.json"),
-  readFileSync: jest.fn(() => JSON.stringify(packageJson)),
+const packageFs = (
+  packageJson = {
+    name: "demo",
+    scripts: { test: "eliware-test" },
+    devDependencies: { "@eliware/test": "^4.0.0" },
+  },
+) => ({
+  lstatSync: () => ({ isSymbolicLink: () => false }),
+  existsSync: jest.fn(
+    (file) => file === "package.json" || file === "node_modules/@eliware/test/package.json",
+  ),
+  readFileSync: jest.fn((file) =>
+    file === "node_modules/@eliware/test/package.json"
+      ? JSON.stringify({ name: "@eliware/test", version: "4.1.0" })
+      : JSON.stringify(packageJson),
+  ),
 });
 
 const isNodeNpm = (executable, args = []) =>
@@ -16,9 +29,18 @@ test("preflight delegates local validation to the project test script", () => {
     return "";
   });
   const fs = {
-    existsSync: jest.fn((file) => file === "package.json"),
-    readFileSync: jest.fn(() =>
-      JSON.stringify({ scripts: { test: "eliware-test", audit: "audit" } }),
+    lstatSync: () => ({ isSymbolicLink: () => false }),
+    existsSync: jest.fn(
+      (file) => file === "package.json" || file === "node_modules/@eliware/test/package.json",
+    ),
+    readFileSync: jest.fn((file) =>
+      file === "node_modules/@eliware/test/package.json"
+        ? JSON.stringify({ name: "@eliware/test", version: "4.1.0" })
+        : JSON.stringify({
+            name: "demo",
+            scripts: { test: "eliware-test", audit: "audit" },
+            devDependencies: { "@eliware/test": "^4.0.0" },
+          }),
     ),
   };
   const log = { info: jest.fn() };
@@ -57,6 +79,7 @@ test("strict preflight delegates repository validation", () => {
   );
   const fs = {
     existsSync: () => true,
+    lstatSync: () => ({ isSymbolicLink: () => false }),
     readFileSync: (file) =>
       file === "node_modules/@eliware/test/package.json"
         ? JSON.stringify({ name: "@eliware/test", version: "3.3.0" })

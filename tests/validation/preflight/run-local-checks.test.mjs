@@ -53,13 +53,16 @@ test.each([
   expect(runLocalChecks(run, fs).failures.join("\n")).toContain(expected);
 });
 
-test("blocks packages without a test script", () => {
+test("blocks targets without a package file or test script", () => {
+  expect(runLocalChecks(jest.fn(), { existsSync: () => false }).failures.join("\n")).toContain(
+    "package.json and scripts.test are required",
+  );
   const packageFs = {
     existsSync: (file) => file === "package.json",
     readFileSync: () => JSON.stringify({ scripts: {} }),
   };
   expect(runLocalChecks(jest.fn(), packageFs).failures.join("\n")).toContain(
-    "does not declare scripts.test",
+    "package.json and scripts.test are required",
   );
 });
 
@@ -70,6 +73,6 @@ test("blocks named packages without an installed shared harness", () => {
     readFileSync: () => JSON.stringify({ name: "demo", scripts: { test: "eliware-test" } }),
   };
   expect(runLocalChecks(jest.fn(), packageFs).failures.join("\n")).toContain(
-    "installed, non-linked @eliware/test",
+    "install @eliware/test as a dev dependency",
   );
 });

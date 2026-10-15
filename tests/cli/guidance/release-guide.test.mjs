@@ -1,5 +1,5 @@
 import { releaseGuide } from "../../../src/cli/guidance/release-guide.mjs";
-test("documents tag-only release behavior", () => {
-  expect(releaseGuide()).toContain("does not rewrite files or create commits");
-  expect(releaseGuide()).toContain("pushes only the tag");
+test("documents the empty release commit and atomic push", () => {
+  expect(releaseGuide()).toContain("creates an empty release commit");
+  expect(releaseGuide()).toContain("pushes both refs atomically");
 });

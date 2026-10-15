@@ -1,9 +1,10 @@
 import { execFile as defaultExecFile } from "node:child_process";
 import { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
-import { pollReleaseCi } from "./release-ci-status.mjs";
-import { verifyReleasePublication } from "./release-publication-status.mjs";
-import { reportCiResult } from "./report-ci-result.mjs";
 import { prepareReleaseContext } from "./prepare-release-context.mjs";
+import { readPublicationTarget } from "./read-publication-target.mjs";
+import { publishesGhcr } from "../../registries/ghcr/discover-publication.mjs";
+import { reportReleaseStart } from "./report-release-start.mjs";
+import { verifyReleaseCompletion } from "./verify-release-completion.mjs";
 export { npmExecutable } from "../../process/commands/npm-executable.mjs";
 export { waitSync } from "../../process/timing/wait-sync.mjs";
 export { sleep as sleepDefault } from "../../process/timing/sleep.mjs";
@@ -33,20 +34,31 @@ export async function verifyRelease(
     pollMs,
     npmRetryMs,
   });
-  const run = await pollReleaseCi({
-    execFile,
-    repo,
-    headSha,
-    tag,
-    pollMs,
-    maxPolls,
-    sleep,
-    linksOnly,
-    log,
-  });
-  const reported = reportCiResult({ log, repo, tag, headSha, run, linksOnly });
-  if (reported) return reported;
-  return verifyReleasePublication({
+  const publication = readPublicationTarget(fs);
+  const ghcrApplicable = publishesGhcr(fs);
+  const checkPublish = publication.publishWorkflow && (publication.applicable || ghcrApplicable);
+  if (linksOnly) {
+    const { ciRunId, publishRunId } = await reportReleaseStart({
+      execFile,
+      repo,
+      headSha,
+      tag,
+      pollMs,
+      maxPolls,
+      sleep,
+      log,
+      checkPublish,
+    });
+    return {
+      repo,
+      tag,
+      headSha,
+      ciRunId,
+      publishRunId,
+      linksOnly: true,
+    };
+  }
+  return verifyReleaseCompletion({
     fs,
     runnerLabelsByJobName,
     execFile,
@@ -55,11 +67,11 @@ export async function verifyRelease(
     tag,
     headSha,
     version,
-    run,
     release,
+    checkPublish,
+    pollMs,
     maxPolls,
     npmRetries,
-    pollMs,
     npmRetryMs,
     sleep,
   });

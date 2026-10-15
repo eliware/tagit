@@ -34,11 +34,11 @@ test("reports bounded npm visibility failures", async () => {
   ).rejects.toThrow("after 2 attempts");
   expect(sleep).toHaveBeenCalledTimes(1);
 });
-test("includes bounded command diagnostics in retry logging", async () => {
+test("logs short npm errors instead of command diagnostics", async () => {
   for (const error of [
-    { stderr: "stderr detail" },
-    { stdout: "stdout detail" },
-    { message: "message detail" },
+    { stderr: "npm error code E404\nnpm error 404 Not Found" },
+    { stdout: "npm ERR! 404 Not Found" },
+    { message: "registry unavailable", code: "EAI_AGAIN" },
     {},
   ]) {
     const exec = jest.fn((_command, _args, _options, callback) =>
@@ -52,7 +52,9 @@ test("includes bounded command diagnostics in retry logging", async () => {
         { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
       ),
     ).rejects.toThrow("after 1 attempts");
-    const detail = error.stderr ?? error.stdout ?? error.message ?? "unknown error";
+    const detail = /404|E404|Not Found/i.test(error.stderr ?? error.stdout ?? error.message ?? "")
+      ? "404 not found"
+      : (error.code ?? "request failed");
     expect(info).toHaveBeenCalledTimes(2);
     expect(info).toHaveBeenNthCalledWith(1, `npm view demo@1.0.0 (1/1): failed (${detail}).`);
     expect(info).toHaveBeenNthCalledWith(2, "npm did not expose demo@1.0.0 after 1 attempts.");

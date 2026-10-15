@@ -4,17 +4,24 @@ directives:
   - id: E-1100.0
     dos:
       - Provide deterministic release preflight, owner handoff, and post-release verification for Eliware repositories.
-      - Keep TagIt validation read-only apart from documented local test outputs; target implementation and external release state remain owned by their respective projects and operators.
+      - Keep validation read-only apart from documented test outputs. The release command may add an empty commit and push the main branch and release tag.
       - Require CI evidence for the exact commit and classify runner platforms from configured runner labels.
     donts:
-      - Do not stage, commit, deploy, publish, or authorize releases on behalf of a target repository.
+      - Do not stage files, change tracked file contents, deploy, publish, or authorize releases.
       - Do not infer a job's operating system from its display name.
     children:
       - id: E-1100.0.0
         dos:
           - Accept the v12 ci.yaml and publish.yaml workflow names and validate release gates by publication profile.
           - Apply npm workflow checks only when npm-published applies.
+          - Require package.json in every target repository.
+          - Require @eliware/test as a development dependency and eliware-test as scripts.test for each target except @eliware/test.
+          - Require scripts.test to equal node bin/eliware-test.mjs in the @eliware/test repository.
           - Require a numeric tag trigger, ghcr-publish environment, and Docker image push with push set to true when ghcr-published applies.
+          - Require release to create an empty versioned commit after preflight and push main and the tag atomically.
+          - Require release to report workflow links after CI and applicable publication workflows start.
+          - Require release-wait to verify CI for the tagged commit and publication only when a matching profile and publish.yaml exist.
+          - Require npm visibility checks to report one concise status line for each attempt.
           - Require environment example files only when the target declares supported runtime environment configuration.
         donts:
           - Do not require .env.example for every target repository.

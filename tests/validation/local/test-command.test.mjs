@@ -33,8 +33,8 @@ test("builds the shared npm test command with coverage waivers", () => {
   ]);
 });
 
-test("reports a missing package or test script", () => {
-  expect(buildTestCheck({ existsSync: () => false })).toEqual({ missing: false, check: null });
+test("requires a package file and test script", () => {
+  expect(buildTestCheck({ existsSync: () => false })).toEqual({ missing: true, check: null });
   expect(
     buildTestCheck({ existsSync: () => true, readFileSync: () => JSON.stringify({ scripts: {} }) }),
   ).toEqual({ missing: true, check: null });

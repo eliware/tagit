@@ -11,7 +11,7 @@ const input = {
   npmRetryMs: 0,
 };
 const fs = {
-  existsSync: jest.fn((file) => file === "package.json" || file === ".github/workflows"),
+  existsSync: jest.fn((file) => file === "package.json"),
   readFileSync: jest.fn((file) =>
     file === "package.json" ? JSON.stringify({ name: "demo", private: false }) : "publish",
   ),
@@ -25,7 +25,7 @@ function execFileSync(command, args) {
   return args[0] === "describe" ? "v1.0.0" : "abc";
 }
 
-function execFile(_command, args, _options, callback) {
+const execFile = jest.fn((_command, args, _options, callback) => {
   if (args[1] === "list")
     return callback(
       null,
@@ -48,7 +48,9 @@ function execFile(_command, args, _options, callback) {
       "",
     );
   return callback(null, JSON.stringify("1.0.0"), "");
-}
+});
+
+beforeEach(() => execFile.mockClear());
 
 test.each([
   ["invalid release input", { version: "next", release: { commitSha: "abc" } }],
@@ -63,12 +65,60 @@ test("returns links-only CI evidence without registry verification", async () =>
   await expect(
     verifyRelease(execFileSync, fs, log, { ...input, linksOnly: true, execFile }),
   ).resolves.toMatchObject({
-    runId: 1,
+    ciRunId: 1,
+    publishRunId: null,
   });
 });
 
-test("runs publication verification after successful CI", async () => {
+test("ends after successful CI when no publish workflow applies", async () => {
   await expect(verifyRelease(execFileSync, fs, log, { ...input, execFile })).resolves.toBeDefined();
+});
+
+test("checks the publish workflow and npm when the profile and workflow exist", async () => {
+  const publishFs = {
+    ...fs,
+    existsSync: (file) => file === "package.json" || file === ".github/workflows/publish.yaml",
+    readFileSync: (file) =>
+      file === "package.json"
+        ? JSON.stringify({ name: "demo", private: false, eliware: { apply: ["npm-published"] } })
+        : "publish",
+  };
+  const info = jest.fn();
+  const result = await verifyRelease(execFileSync, publishFs, { info }, { ...input, execFile });
+  expect(result).toMatchObject({ ci: true, npm: true, ghcr: false });
+  expect(
+    execFile.mock.calls.some(([, args]) => args.includes(".github/workflows/publish.yaml")),
+  ).toBe(true);
+  expect(info).toHaveBeenCalledWith("npm verified: demo@1.0.0.");
+});
+
+test("checks GHCR publication from a GHCR profile and publish workflow", async () => {
+  const ghcrFs = {
+    ...fs,
+    existsSync: (file) => file === "package.json" || file === ".github/workflows/publish.yaml",
+    readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
+  };
+  const result = await verifyRelease(execFileSync, ghcrFs, log, {
+    ...input,
+    linksOnly: true,
+    execFile,
+  });
+  expect(result).toMatchObject({ ciRunId: 1, publishRunId: 1 });
+  expect(
+    execFile.mock.calls.some(([, args]) => args.includes(".github/workflows/publish.yaml")),
+  ).toBe(true);
+});
+
+test("ignores publish.yaml when no publication profile applies", async () => {
+  const optionalFs = {
+    ...fs,
+    existsSync: (file) => file === "package.json" || file === ".github/workflows/publish.yaml",
+    readFileSync: () => JSON.stringify({ name: "demo", eliware: { apply: ["general"] } }),
+  };
+  await verifyRelease(execFileSync, optionalFs, log, { ...input, execFile });
+  expect(
+    execFile.mock.calls.some(([, args]) => args.includes(".github/workflows/publish.yaml")),
+  ).toBe(false);
 });
 
 test("rejects when CI details are invalid or the release identity is unavailable", async () => {

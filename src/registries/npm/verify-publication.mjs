@@ -6,6 +6,13 @@ function readNpmView(output, version) {
   return Array.isArray(value) ? value.length === 1 && value[0] === version : value === version;
 }
 
+function npmErrorSummary(error) {
+  const detail = String(error.stderr ?? error.stdout ?? error.message ?? "");
+  if (/\b404\b|E404|Not Found/i.test(detail)) return "404 not found";
+  if (error.code && /^[A-Z0-9_-]+$/i.test(String(error.code))) return String(error.code);
+  return "request failed";
+}
+
 export async function verifyNpmPublication(
   execFile,
   log,
@@ -20,11 +27,7 @@ export async function verifyNpmPublication(
       log.info?.(`${status}: ${visible ? "visible" : "not visible"}.`);
       if (visible) return;
     } catch (error) {
-      const detail = String(error.stderr ?? error.stdout ?? error.message ?? "unknown error")
-        .trim()
-        .replace(/\s+/g, " ")
-        .slice(0, 300);
-      log.info?.(`${status}: failed (${detail}).`);
+      log.info?.(`${status}: failed (${npmErrorSummary(error)}).`);
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }

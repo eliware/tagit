@@ -43,11 +43,11 @@ test("rejects an installed version outside the declared range", () => {
   expect(hasInstalledSharedHarness(fs, target("^4.0.0"))).toBe(false);
 });
 
-test("allows the harness package itself and unnamed package data", () => {
+test("allows the harness package itself but requires a dependency for unnamed packages", () => {
   expect(hasInstalledSharedHarness({ existsSync: () => false }, { name: "@eliware/test" })).toBe(
     true,
   );
-  expect(hasInstalledSharedHarness({ existsSync: () => false }, {})).toBe(true);
+  expect(hasInstalledSharedHarness({ existsSync: () => false }, {})).toBe(false);
   expect(hasInstalledSharedHarness(fileSystem(null), target("^4.0.0"))).toBe(false);
 });
 

@@ -28,5 +28,7 @@ export async function runReleaseCommand({
     linksOnly: true,
     execFile,
   });
-  log.info(`Run tagit release-wait to monitor v${options.version} CI and confirm publication.`);
+  log.info(
+    `Run tagit release-wait to confirm CI and any applicable publication for v${options.version}.`,
+  );
 }

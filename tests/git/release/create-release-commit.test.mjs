@@ -1,0 +1,37 @@
+import { jest } from "@jest/globals";
+import { createReleaseCommit } from "../../../src/git/release/create-release-commit.mjs";
+
+test("creates a dated empty release commit", () => {
+  const runGit = jest.fn((args) => (args[0] === "rev-parse" ? "abc123\n" : ""));
+  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3", new Date("2026-10-15T12:00:00Z"))).toBe(
+    "abc123",
+  );
+  expect(runGit).toHaveBeenCalledWith(
+    ["commit", "--allow-empty", "-m", "Release v1.2.3 - 2026-10-15"],
+    { stdio: "inherit" },
+  );
+});
+
+test("reuses an existing tag at HEAD without another commit", () => {
+  const runGit = jest.fn((_args) => "abc123\n");
+  runGit.mockImplementation((args) => {
+    if (args[0] === "tag") return "v1.2.3\n";
+    return "abc123\n";
+  });
+  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toBe("abc123");
+  expect(runGit).not.toHaveBeenCalledWith(expect.arrayContaining(["commit"]), expect.anything());
+});
+
+test("rejects an existing tag that points away from HEAD", () => {
+  const runGit = jest.fn((args) => {
+    if (args[0] === "tag") return "v1.2.3\n";
+    return args[1] === "HEAD" ? "abc123\n" : "def456\n";
+  });
+  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("already points to def456");
+});
+
+test("rejects invalid HEAD before creating a release commit", () => {
+  const runGit = jest.fn(() => "");
+  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current HEAD");
+  expect(runGit).toHaveBeenCalledTimes(1);
+});

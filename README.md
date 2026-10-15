@@ -24,11 +24,11 @@ Deterministic release preflight and publication verification for Eliware package
 
 ## Features
 
-TagIt checks release readiness, CI, and package publication. It provides commands for notes, preflight, push, release, and post-release checks.
+TagIt checks release readiness and CI. It checks npm or GHCR publication when the repository declares a matching profile and publish workflow.
 
 ## Requirements
 
-Use Node.js 26 or later. Install Git and GitHub CLI (`gh`). Target repositories must use the shared `@eliware/test` harness.
+Use Node.js 26 or later. Install Git and GitHub CLI (`gh`). Target repositories need `@eliware/test` as a dev dependency and must set `scripts.test` to `eliware-test`. The `@eliware/test` repository uses `node bin/eliware-test.mjs` and does not need itself as a dev dependency.
 
 ## Setup
 
@@ -69,8 +69,8 @@ Follow the [owner and DevOps handoff](docs/operations.md). TagIt does not deploy
 - `tagit notes` reports changes since the latest Git tag. It accepts no arguments.
 - `tagit preflight [--ignore-100x4] [--ignore-monolith-limits]` checks local gates and CI for the current commit. It needs a clean `main` branch. Ubuntu CI must pass. Each Windows job must pass when present.
 - `tagit push [--dry-run]` pushes existing commits from the current branch. It does not stage files or create commits. Dry run skips the push and CI lookup.
-- `tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-limits]` runs a release for the exact version in `package.json`. It has no default version.
-- `tagit release-wait` checks CI and required registry publication for the latest release tag. Do not pass `--version`.
+- `tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-limits]` runs preflight, creates an empty release commit, pushes its tag and `main` atomically, and reports workflow links.
+- `tagit release-wait` checks CI for the latest release tag. It checks publication only when `publish.yaml` and a matching profile exist. Do not pass `--version`.
 - `push [--dry-run]` runs the same action as `tagit push`.
 - `upstream [--dry-run] [merge-message...]` merges and pushes the configured upstream branch. It uses `upstream/HEAD`, or `upstream/main` when no default exists. The default message uses the current UTC time.
 - `tagit --help` or `tagit -h` shows help. `tagit --version` or `tagit -v` shows the installed version.

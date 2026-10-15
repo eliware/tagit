@@ -9,8 +9,7 @@ export function prepareReleaseTag(execFileSync, log, releaseTag) {
     null,
   );
   const existing = resolveExistingTag(runFile, releaseTag, currentHead);
-  if (existing.reuse)
-    log.info(`Tag ${releaseTag} already points to HEAD; reusing existing release CI.`);
+  if (existing.reuse) log.info(`Tag ${releaseTag} already points to HEAD; reusing the tag.`);
   else {
     if (existing.existingTagHead)
       throw new Error(

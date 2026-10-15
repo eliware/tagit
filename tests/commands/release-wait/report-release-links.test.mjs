@@ -6,7 +6,7 @@ test("reports workflow and available job links", () => {
     url: "workflow",
     jobs: [{ name: "Ubuntu", url: "job" }],
   });
-  expect(log.info).toHaveBeenCalledWith("Workflow: [workflow](workflow)");
+  expect(log.info).toHaveBeenCalledWith("CI: [workflow](workflow)");
   expect(log.info).toHaveBeenCalledWith("Ubuntu: [job](job)");
 });
 test("handles a run without optional job links", () => {

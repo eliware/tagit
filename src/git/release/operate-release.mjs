@@ -1,11 +1,12 @@
 /**
- * Release operates on an already prepared and preflighted HEAD. Its only
- * repository mutation is creating/reusing and pushing the release tag.
+ * Release operates on preflighted HEAD. It adds an empty commit and pushes
+ * the release commit and tag to main in one atomic operation.
  */
 import { releaseTag as releaseTagForVersion } from "../../policy/tag-policy.mjs";
 import { runReleaseTagTransaction } from "./run-release-tag-transaction.mjs";
 import { runGit } from "../commands/run-git.mjs";
-import { pushTag } from "../tags/push-tag.mjs";
+import { createReleaseCommit } from "./create-release-commit.mjs";
+import { pushReleaseRefs } from "./push-release-refs.mjs";
 import { prepareReleaseTag } from "./prepare-release-tag.mjs";
 import { verifyRemoteTag } from "../tags/verify-remote-tag.mjs";
 
@@ -21,8 +22,10 @@ export function gitOperations(execFileSync, _fs, log, newVersion, { dryRun = fal
     execFileSync,
     log,
     releaseTag,
+    version: newVersion,
+    createReleaseCommit,
     prepareReleaseTag,
-    pushTag,
+    pushReleaseRefs,
     runGit,
     verifyRemoteTag,
   });

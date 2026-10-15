@@ -1,7 +1,7 @@
 export function reportReleaseFailure(log, error, remoteSideEffects) {
   log.error(
     remoteSideEffects
-      ? "Tag push failed after remote side effects; local files were preserved for reconciliation."
+      ? "Atomic release push failed; check the remote branch and tag before retrying."
       : "Release tag operation failed before remote side effects.",
   );
   return error;

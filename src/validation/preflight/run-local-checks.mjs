@@ -10,11 +10,11 @@ export function runLocalChecks(
   const testCheck = validateLocalTestCheck(fs, { ignore100x4, ignoreMonolithLimits });
   if (testCheck.missing)
     failures.push(
-      "BLOCKED: package.json does not declare scripts.test.\nAction: add the shared npm test harness before running preflight.",
+      "BLOCKED: package.json and scripts.test are required.\nAction: add package.json with the required test command, then rerun tagit preflight.",
     );
   else if (testCheck.invalid)
     failures.push(
-      "BLOCKED: package.json must use an installed, non-linked @eliware/test dev dependency and scripts.test must invoke eliware-test.\nAction: install @eliware/test as a dev dependency, remove any local link, set scripts.test to eliware-test, then rerun tagit preflight.",
+      "BLOCKED: scripts.test or the installed @eliware/test dev dependency is invalid. For @eliware/test, scripts.test must be node bin/eliware-test.mjs.\nAction: fix package.json and install @eliware/test as a dev dependency when this is not @eliware/test, then rerun tagit preflight.",
     );
   if (!testCheck.check) return { failures, results: {} };
   const results = {};

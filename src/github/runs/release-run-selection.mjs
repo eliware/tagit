@@ -1,4 +1,4 @@
-export function selectReleaseRun(runs, headSha, tag) {
+export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/workflows/ci.yaml") {
   if (!Array.isArray(runs))
     throw new Error(`Release CI evidence is malformed for ${tag}: run list is not an array.`);
   if (
@@ -19,10 +19,12 @@ export function selectReleaseRun(runs, headSha, tag) {
     )
   )
     throw new Error(`Release CI evidence is malformed for ${tag}: creation timestamp is invalid.`);
+  const branches =
+    workflowPath === ".github/workflows/publish.yaml"
+      ? [tag, `refs/tags/${tag}`]
+      : ["main", tag, `refs/tags/${tag}`];
   const eligible = runs
-    .filter(
-      (item) => item.headSha === headSha && [tag, `refs/tags/${tag}`].includes(item.headBranch),
-    )
+    .filter((item) => item.headSha === headSha && branches.includes(item.headBranch))
     .sort((a, b) => {
       const createdDifference =
         new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime();

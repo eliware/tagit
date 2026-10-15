@@ -2,7 +2,7 @@ import { testWaiverArguments } from "./test-waiver-arguments.mjs";
 import { validateTestCommand } from "./test-command-policy.mjs";
 
 export function buildTestCheck(fs, { ignore100x4 = false, ignoreMonolithLimits = false } = {}) {
-  if (!fs.existsSync("package.json")) return { missing: false, check: null };
+  if (!fs.existsSync("package.json")) return { missing: true, check: null };
   const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
   const status = validateTestCommand(packageData, fs);
   if (status === "missing") return { missing: true, check: null };

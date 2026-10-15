@@ -60,7 +60,7 @@ tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-li
 
 Replace `X.Y.Z` with the version in `package.json`. The version has three numbers and no suffix. The command has no default version.
 
-The command runs preflight. If preflight passes, it creates or reuses the matching `vX.Y.Z` tag and pushes that tag. It does not edit package files or create a release commit.
+The command runs preflight on the current commit. If preflight passes, it creates an empty release commit. Its message includes the version and date. It adds `vX.Y.Z` to that commit and pushes the branch and tag atomically. It then polls for CI and any applicable publish workflow to start. It reports the workflow links and exits.
 
 Use `--dry-run` to check the release path without a version change, commit, tag, push, or publish action. The waiver options have the same limits as preflight.
 
@@ -70,7 +70,7 @@ Use `--dry-run` to check the release path without a version change, commit, tag,
 tagit release-wait
 ```
 
-The command uses the latest release tag. Do not pass `--version`. The command checks exact-commit CI and any applicable npm or GHCR publication. It reports progress before CI and registry checks. It retries registry checks within a fixed limit. It returns an error if required evidence is missing, incomplete, or failed.
+The command uses the latest release tag. Do not pass `--version`. It waits for CI on the tagged commit and checks its result. When `publish.yaml` and a matching publication profile exist, it also waits for publication and verifies npm or GHCR. It retries registry checks within a fixed limit. It returns an error if required evidence is missing, incomplete, or failed.
 
 ## Merge from upstream
 

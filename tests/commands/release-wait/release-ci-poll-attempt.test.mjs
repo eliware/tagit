@@ -30,3 +30,18 @@ test("returns pending state for an in-progress workflow", async () => {
     }),
   ).resolves.toEqual({ pending: true });
 });
+
+test("reports a failed workflow when completion is required", async () => {
+  const run = { databaseId: 2, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
+  await expect(
+    runReleaseCiPollAttempt({
+      ...base,
+      execFile: executor([run], {
+        ...run,
+        status: "completed",
+        conclusion: "failure",
+        jobs: [{ name: "test", status: "completed", conclusion: "failure" }],
+      }),
+    }),
+  ).rejects.toThrow("Release CI failed");
+});

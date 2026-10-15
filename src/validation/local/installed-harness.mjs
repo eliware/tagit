@@ -1,7 +1,7 @@
 import { satisfiesDeclaredRange } from "./satisfies-declared-range.mjs";
 
 export function hasInstalledSharedHarness(fs, packageData) {
-  if (packageData.name === "@eliware/test" || !packageData.name) return true;
+  if (packageData.name === "@eliware/test") return true;
   const declaredRange = packageData.devDependencies?.["@eliware/test"];
   if (!declaredRange) return false;
   const installedPath = "node_modules/@eliware/test/package.json";

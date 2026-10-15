@@ -12,6 +12,22 @@ test("selects the newest exact release tag and commit", () => {
     ).databaseId,
   ).toBe(2);
 });
+test("selects the main CI run for the tagged commit", () => {
+  expect(
+    selectReleaseRun([{ databaseId: 4, headSha: "abc", headBranch: "main" }], "abc", "v1.0.0")
+      .databaseId,
+  ).toBe(4);
+});
+test("does not select a main branch run for the publish workflow", () => {
+  expect(
+    selectReleaseRun(
+      [{ databaseId: 4, headSha: "abc", headBranch: "main" }],
+      "abc",
+      "v1.0.0",
+      ".github/workflows/publish.yaml",
+    ),
+  ).toBeUndefined();
+});
 test("rejects a malformed provider response before filtering", () => {
   expect(() => selectReleaseRun(null, "abc", "v1.0.0")).toThrow("not an array");
 });

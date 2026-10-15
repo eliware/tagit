@@ -11,10 +11,12 @@ export async function pollReleaseCi({
   sleep,
   linksOnly,
   log,
+  workflowPath = ".github/workflows/ci.yaml",
+  workflowLabel = "CI",
 }) {
   for (let poll = 0; poll < maxPolls; poll += 1) {
     try {
-      log.info(`Release CI check ${poll + 1}/${maxPolls} for ${repo}@${tag}.`);
+      log.info(`Release ${workflowLabel} check ${poll + 1}/${maxPolls} for ${repo}@${tag}.`);
       const result = await runReleaseCiPollAttempt({
         execFile,
         repo,
@@ -22,6 +24,8 @@ export async function pollReleaseCi({
         tag,
         linksOnly,
         log,
+        workflowPath,
+        workflowLabel,
       });
       if (result && !result.pending) return result;
     } catch (error) {
@@ -31,5 +35,5 @@ export async function pollReleaseCi({
     }
     if (poll + 1 < maxPolls) await sleep(pollMs);
   }
-  throw new Error(`Release CI did not complete for ${repo}@${tag} (${headSha})`);
+  throw new Error(`Release ${workflowLabel} did not complete for ${repo}@${tag} (${headSha})`);
 }

@@ -23,6 +23,8 @@ test("reads and selects the release workflow candidate", async () => {
     "eliware/demo",
     "--commit",
     "abc",
+    "--workflow",
+    ".github/workflows/ci.yaml",
     "--limit",
     "1000",
     "--json",

@@ -8,7 +8,7 @@ Install TagIt with `npm install --global @eliware/tagit`. Run `tagit --help` to 
 
 ## Target repository
 
-Preflight requires the target repository to provide these files:
+Preflight requires every target repository to provide these files:
 
 - `package.json`
 - `README.md`
@@ -19,11 +19,17 @@ Preflight requires the target repository to provide these files:
 - `.github/workflows/ci.yaml`
 
 If the target declares supported runtime environment configuration, it must include `.env.example`.
-Public npm packages also need `.github/workflows/publish.yaml`. The package needs a valid name, version, and repository URL. Its test script must run the shared `@eliware/test` harness through `npm test`.
+Every target package must declare `@eliware/test` as a development dependency. Set `scripts.test` to `eliware-test`.
+
+For the `@eliware/test` repository, do not add itself as a development dependency. Set `scripts.test` to `node bin/eliware-test.mjs`.
+
+Publication is optional. Check npm or GHCR only when `package.json` declares the matching `eliware.apply` profile and `.github/workflows/publish.yaml` exists. npm publication also needs a valid package name, version, and repository URL.
 
 The test package must be an installed package. Do not use a local link or junction for `@eliware/test`.
 
 Preflight requires a clean `main` branch and successful Ubuntu CI for the current commit. It requires each Windows job to pass when one exists. It does not report a Windows check when the workflow has no Windows job.
+
+Release runs preflight, then adds an empty commit with the release version and date. TagIt pushes the new commit and version tag to `main` in one atomic operation. It reports CI and applicable publication links after those workflows start.
 
 ## Supported systems
 

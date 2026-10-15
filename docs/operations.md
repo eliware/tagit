@@ -22,19 +22,19 @@ DevOps uses the owner handoff and the approved release process. Run:
 tagit release --version X.Y.Z
 ```
 
-Use the exact version from `package.json`. TagIt runs preflight again. If it passes, TagIt creates or reuses `vX.Y.Z` and pushes that tag. The GitHub publish workflow runs for the tag. That workflow validates the package before it publishes.
+Use the exact version from `package.json`. TagIt runs preflight on the current commit. If it passes, TagIt adds an empty release commit. TagIt creates `vX.Y.Z` on that commit. TagIt pushes the branch and tag in one atomic operation. TagIt then waits for the CI workflow and any applicable publish workflow to start. It reports their links.
 
-TagIt does not change package versions or create a release commit. It does not publish from a dirty worktree. It pushes only the requested release tag.
+The release commit does not change files. Its message includes the release version and date. The commit gives CI a new commit to check. The tag points to that commit.
 
 ## Check the release
 
-After the publish workflow completes, run:
+After TagIt reports the workflow links, run:
 
 ```text
 tagit release-wait
 ```
 
-TagIt checks CI for the release commit. It checks npm or GHCR when the target package uses that registry. The command reports progress before each CI or registry check. It reports success only after each required check passes.
+TagIt checks the CI run for the tagged commit. When `publish.yaml` and a matching publication profile exist, TagIt checks that workflow and verifies npm or GHCR. Without an applicable publish workflow, the command ends after CI passes.
 
 ## Understand command roles
 
