@@ -1,56 +1,31 @@
-import { jest } from "@jest/globals";
 import { validateRepository } from "../../src/repository/validate-repository.mjs";
 
-test("accepts the main branch, matching origin, and safe tracked paths", () => {
-  const pkg = {
-    repository: { url: "https://github.com/eliware/demo" },
-  };
-  const exec = (command, args) =>
-    args[0] === "branch"
-      ? "main"
-      : args[0] === "remote"
-        ? "https://github.com/eliware/demo.git"
-        : "src/index.mjs\n";
-  const fs = {
-    readFileSync: () => JSON.stringify(pkg),
-  };
+test("accepts the main branch", () => {
+  const exec = (_command, args) => (args[0] === "branch" ? "main" : "");
   const failures = [];
-  validateRepository(exec, fs, failures);
+  validateRepository(exec, failures);
   expect(failures).toEqual([]);
 });
 
-test("reports branch and tracked secret path failures", () => {
-  const exec = (command, args) => (args[0] === "branch" ? "feature" : ".env\ncredentials.json");
-  const fs = {
-    readFileSync: () => JSON.stringify({}),
-  };
+test("reports a non-main branch", () => {
+  const exec = (_command, args) => (args[0] === "branch" ? "feature" : "");
   const failures = [];
-  validateRepository(exec, fs, failures);
-  expect(failures.join("\n")).toMatch(/main|secret-looking/);
+  validateRepository(exec, failures);
+  expect(failures.join("\n")).toContain("main");
 });
 
-test("reports inspection failures from Git and malformed metadata", () => {
-  const exec = jest.fn((command, args) => {
-    if (args[0] !== "status") throw new Error("inspection failed");
+test("reports branch inspection errors", () => {
+  const exec = (_command, args) => {
+    if (args[0] === "branch") throw new Error("inspection failed");
     return "";
-  });
-  const fs = { readFileSync: jest.fn(() => "{bad") };
+  };
   const failures = [];
-  validateRepository(exec, fs, failures);
-  expect(failures.join("\n")).toMatch(
-    /branch validation|release safety validation|tracked-file validation/,
-  );
+  validateRepository(exec, failures);
+  expect(failures.join("\n")).toContain("branch validation failed");
 });
 
 test("reports a detached worktree explicitly", () => {
   const failures = [];
-  validateRepository(
-    (command, args) => (args[0] === "branch" ? "" : ""),
-    {
-      readFileSync: () =>
-        JSON.stringify({ repository: { url: "https://github.com/eliware/demo" } }),
-    },
-    failures,
-  );
+  validateRepository((_command, args) => (args[0] === "branch" ? "" : ""), failures);
   expect(failures.join("\n")).toContain("detached");
 });

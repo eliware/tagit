@@ -18,7 +18,7 @@ export function runPreflight(
 ) {
   const { status, dirtyFailure } = collectPreflightContext(execFileSync);
   const failures = [];
-  if (strictRepository) validateRepository(execFileSync, fs, failures);
+  if (strictRepository) validateRepository(execFileSync, failures);
   if (dirtyFailure) failures.push(dirtyFailure);
   const local = runLocalChecks(execFileSync, fs, {
     ignore100x4,
