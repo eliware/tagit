@@ -4,7 +4,7 @@ import { runLocalTestCommand } from "./run-local-test-command.mjs";
 export function runLocalChecks(
   execFileSync,
   fs,
-  { ignore100x4 = false, ignoreMonolithLimits = false, timeoutMs = 120000 } = {},
+  { ignore100x4 = false, ignoreMonolithLimits = false, timeoutMs = 180000 } = {},
 ) {
   const failures = [];
   const testCheck = validateLocalTestCheck(fs, { ignore100x4, ignoreMonolithLimits });

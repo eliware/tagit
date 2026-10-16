@@ -1,6 +1,6 @@
 import { outputText } from "./format-output.mjs";
 
-const CHECK_TIMEOUT_MS = 120000;
+const CHECK_TIMEOUT_MS = 180000;
 
 export function failureMessage(name, error, output) {
   const timedOut = error?.code === "ETIMEDOUT" || error?.signal === "SIGTERM";

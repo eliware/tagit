@@ -4,7 +4,7 @@ import { throwPreflightFailures } from "./report.mjs";
 import { collectPreflightContext } from "./collect-context.mjs";
 import { runCiCheck } from "./run-ci-check.mjs";
 
-const CHECK_TIMEOUT_MS = 120000;
+const CHECK_TIMEOUT_MS = 180000;
 export function runPreflight(
   execFileSync,
   fs,

@@ -28,7 +28,7 @@ test("uses the shell-free npm runner", () => {
   runLocalChecks(run, fs);
   expect(run).toHaveBeenCalledWith(...processCommand("npm", ["test"]), {
     stdio: "pipe",
-    timeout: 120000,
+    timeout: 180000,
     ...(processCommand("npm", ["test"])[0] === "cmd.exe" ? { windowsVerbatimArguments: true } : {}),
   });
 });
@@ -45,7 +45,7 @@ test("reports a failed local command with captured output", () => {
 test.each([
   [new Error("silent failure"), "no output captured"],
   [{ stdout: "x".repeat(5000), stderr: "" }, "output truncated"],
-  [Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }), "exceeded the 120-second limit"],
+  [Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }), "exceeded the 180-second limit"],
 ])("formats local test failure details", (error, expected) => {
   const run = jest.fn(() => {
     throw error;
