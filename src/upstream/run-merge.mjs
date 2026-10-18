@@ -1,7 +1,7 @@
-import { mergeMessage } from "./merge-message.mjs";
+import { mergeMessage } from "./merge/message.mjs";
 import { resolveUpstreamBranch } from "./branch.mjs";
 import { parseUpstreamArguments } from "./parse-upstream-arguments.mjs";
-import { mergeUpstream } from "./merge-upstream.mjs";
+import { mergeUpstream } from "./merge/upstream.mjs";
 
 export function runUpstream(args, execFileSync, now, log) {
   const parsedArguments = parseUpstreamArguments(args);
@@ -13,7 +13,7 @@ export function runUpstream(args, execFileSync, now, log) {
   if (dryRun) {
     const upstreamBranch = resolveUpstreamBranch(execFileSync);
     log.log(
-      `Dry run: would fetch upstream, merge ${upstreamBranch} with message "${message}", then push.`,
+      `Dry run: can fetch upstream, merge ${upstreamBranch} with message "${message}", then push.`,
     );
     return true;
   }

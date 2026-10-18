@@ -9,6 +9,6 @@ test("reads the owner and repository from the origin remote", () => {
 
 test("rejects an origin that is not a GitHub repository", () => {
   expect(() => readRepositoryName(jest.fn(() => "https://example.com/demo.git"))).toThrow(
-    "Cannot determine GitHub repository",
+    "Cannot determine the GitHub repository",
   );
 });

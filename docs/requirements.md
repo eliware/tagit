@@ -23,11 +23,11 @@ Every target package must declare `@eliware/test` as a development dependency. S
 
 For the `@eliware/test` repository, do not add itself as a development dependency. Set `scripts.test` to `node bin/eliware-test.mjs`.
 
-Publication is optional. Check npm or GHCR only when `package.json` declares the matching `eliware.apply` profile and `.github/workflows/publish.yaml` exists. npm publication also needs a valid package name, version, and repository URL.
+Publication is optional. Check npm only when `package.json` declares the `npm-published` profile and `.github/workflows/npm.yaml` exists. Check GHCR only when it declares `ghcr-published` and `.github/workflows/ghcr.yaml` exists. npm publication requires a valid package name, version, and repository URL.
 
 The test package must be an installed package. Do not use a local link or junction for `@eliware/test`.
 
-Preflight requires a clean `main` branch and successful Ubuntu CI for the current commit. It requires each Windows job to pass when one exists. It does not report a Windows check when the workflow has no Windows job.
+Preflight requires a clean `main` branch and passing Ubuntu CI for the current commit. It requires each Windows job to pass when one exists. It does not report a Windows check when the workflow has no Windows job.
 
 Release runs preflight, then adds an empty commit with the release version and date. TagIt pushes the new commit and version tag to `main` in one atomic operation. It reports CI and applicable publication links after those workflows start.
 
@@ -37,7 +37,7 @@ GitHub Actions CI directly checks Ubuntu. Tests cover Windows-specific behavior.
 
 ## Settings
 
-TagIt needs no configuration file. The optional `LOG_LEVEL` environment variable sets the shared logger level. TagIt starts no service and uses no service port, database, or secret store.
+TagIt needs no configuration file. The optional `LOG_LEVEL` environment variable sets the shared logger level. TagIt runs as a command and does not stay active. It stores no database or secret data.
 
 ## npm package contents
 

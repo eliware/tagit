@@ -1,3 +1,29 @@
 export function helpText() {
-  return `Usage: tagit <command> [options]\n\nTAGIT RELEASE WORKFLOW\n\nCommands:\n  notes                     Report changes since the latest tag; read-only.\n  preflight                 Verify local gates and exact-HEAD Ubuntu CI; Windows is optional but must pass when present; read-only.\n  push                      Push existing commits only; ignore untracked files and print CI links.\n  release --version X.Y.Z  DevOps-only release workflow.\n  release-wait              DevOps-only post-release verification.\n\nOwnership:\n  Project owners may run only notes, push, and preflight.\n  DevOps runs release and release-wait only after preflight passes.\n\nOptions:\n  -h, --help                Show this overview\n  -v, --version             Show the installed tagit version\n      --dry-run             Check readiness without side effects\n      --ignore-100x4        DevOps-only documented coverage waiver\n      --ignore-monolith-limits\n                              DevOps-only documented monolith waiver`;
+  return [
+    "Usage: tagit <command> [options]",
+    "",
+    "TAGIT RELEASE WORKFLOW",
+    "",
+    "Commands:",
+    "  notes                     Report changes since the latest tag. Read-only.",
+    "  preflight                 Check local rules and CI for the current commit.",
+    "                            Windows CI is optional.",
+    "                            Require each Windows job to pass when one exists.",
+    "  push                      Push existing commits. Do not stage untracked files.",
+    "                            Show CI links.",
+    "  release --version X.Y.Z  Run the DevOps release workflow.",
+    "  release-wait              Check the release after it starts.",
+    "",
+    "Ownership:",
+    "  Project owners can run notes, push, and preflight.",
+    "  DevOps can run release and release-wait after preflight passes.",
+    "",
+    "Options:",
+    "  -h, --help                Show this overview",
+    "  -v, --version             Show the installed TagIt version",
+    "      --dry-run             Check readiness without side effects",
+    "      --ignore-100x4        Use an approved coverage waiver",
+    "      --ignore-monolith-limits",
+    "                            Use an approved module-size waiver",
+  ].join("\n");
 }

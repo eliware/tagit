@@ -2,7 +2,7 @@ import { publishesGhcr } from "../../../src/registries/ghcr/discover-publication
 
 test("detects the declared GHCR publication profile", () => {
   const fs = {
-    existsSync: (file) => file === "package.json" || file === ".github/workflows/publish.yaml",
+    existsSync: (file) => file === "package.json" || file === ".github/workflows/ghcr.yaml",
     readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
   };
   expect(publishesGhcr(fs)).toBe(true);
@@ -16,7 +16,7 @@ test("ignores GHCR text unless the package declares the profile", () => {
     }),
   ).toBe(false);
 });
-test("requires the publish workflow for the GHCR profile", () => {
+test("requires ghcr.yaml for the GHCR profile", () => {
   expect(
     publishesGhcr({
       existsSync: (file) => file === "package.json",

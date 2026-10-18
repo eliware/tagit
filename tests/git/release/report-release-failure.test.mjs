@@ -12,6 +12,6 @@ test("reports failures before and after remote side effects", () => {
   );
   expect(log.error).toHaveBeenNthCalledWith(
     2,
-    "Atomic release push failed; check the remote branch and tag before retrying.",
+    "Atomic release push failed. Check the remote branch and tag before retrying.",
   );
 });

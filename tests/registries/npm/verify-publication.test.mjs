@@ -17,8 +17,8 @@ test("waits for npm visibility and succeeds at the expected version", async () =
   ).resolves.toBeUndefined();
   expect(sleep).toHaveBeenCalledWith(10);
   expect(info).toHaveBeenCalledTimes(2);
-  expect(info).toHaveBeenNthCalledWith(1, "npm view @eliware/demo@2.1.0 (1/2): not visible.");
-  expect(info).toHaveBeenNthCalledWith(2, "npm view @eliware/demo@2.1.0 (2/2): visible.");
+  expect(info).toHaveBeenNthCalledWith(1, "npm view @eliware/demo@2.1.0 (1/2): not found.");
+  expect(info).toHaveBeenNthCalledWith(2, "npm view @eliware/demo@2.1.0 (2/2): available.");
 });
 test("reports bounded npm visibility failures", async () => {
   const exec = jest.fn((_command, _args, _options, callback) =>
@@ -31,7 +31,7 @@ test("reports bounded npm visibility failures", async () => {
       { debug: jest.fn() },
       { packageName: "demo", version: "1.0.0", retries: 2, retryMs: 10, sleep },
     ),
-  ).rejects.toThrow("after 2 attempts");
+  ).rejects.toThrow("after 2 checks");
   expect(sleep).toHaveBeenCalledTimes(1);
 });
 test("logs short npm errors instead of command diagnostics", async () => {
@@ -51,13 +51,13 @@ test("logs short npm errors instead of command diagnostics", async () => {
         { info },
         { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
       ),
-    ).rejects.toThrow("after 1 attempts");
+    ).rejects.toThrow("after 1 checks");
     const detail = /404|E404|Not Found/i.test(error.stderr ?? error.stdout ?? error.message ?? "")
       ? "404 not found"
       : (error.code ?? "request failed");
     expect(info).toHaveBeenCalledTimes(2);
     expect(info).toHaveBeenNthCalledWith(1, `npm view demo@1.0.0 (1/1): failed (${detail}).`);
-    expect(info).toHaveBeenNthCalledWith(2, "npm did not expose demo@1.0.0 after 1 attempts.");
+    expect(info).toHaveBeenNthCalledWith(2, "npm did not expose demo@1.0.0 after 1 checks.");
   }
 });
 test("accepts npm view array output", async () => {
@@ -82,8 +82,8 @@ test("rejects npm view arrays with extra versions", async () => {
       { info },
       { packageName: "demo", version: "1.0.0", retries: 1, sleep: jest.fn() },
     ),
-  ).rejects.toThrow("after 1 attempts");
-  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not visible.");
+  ).rejects.toThrow("after 1 checks");
+  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not found.");
 });
 
 test("logs invisible registry output and the final visibility failure", async () => {
@@ -100,9 +100,9 @@ test("logs invisible registry output and the final visibility failure", async ()
         sleep: jest.fn(),
       },
     ),
-  ).rejects.toThrow("after 1 attempts");
-  expect(info).toHaveBeenNthCalledWith(1, "npm view demo@1.0.0 (1/1): not visible.");
-  expect(info).toHaveBeenCalledWith("npm did not expose demo@1.0.0 after 1 attempts.");
+  ).rejects.toThrow("after 1 checks");
+  expect(info).toHaveBeenNthCalledWith(1, "npm view demo@1.0.0 (1/1): not found.");
+  expect(info).toHaveBeenCalledWith("npm did not expose demo@1.0.0 after 1 checks.");
 });
 
 test("handles an empty JSON response separately from an invalid response", async () => {
@@ -119,6 +119,6 @@ test("handles an empty JSON response separately from an invalid response", async
         sleep: jest.fn(),
       },
     ),
-  ).rejects.toThrow("after 1 attempts");
-  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not visible.");
+  ).rejects.toThrow("after 1 checks");
+  expect(info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): not found.");
 });

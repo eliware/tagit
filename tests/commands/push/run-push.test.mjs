@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import { runPushCommand } from "../../../src/commands/push/run-push.mjs";
-import { runTagit } from "../../../src/cli/application/run-tagit.mjs";
+import { runTagit } from "../../../src/cli/application/run/tagit.mjs";
 
 test("pushes the existing HEAD and reports its CI links", () => {
   const execFileSync = jest.fn((command, args) => (args[0] === "rev-parse" ? "abc\n" : undefined));

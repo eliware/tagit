@@ -1,5 +1,5 @@
 import { execFileCommand } from "../../process/async/exec-file.mjs";
-import { hasVersionTag } from "./verify-version-tag.mjs";
+import { hasVersionTag } from "./verify/version-tag.mjs";
 
 export async function pollGhcrVisibility(
   execFile,
@@ -8,9 +8,7 @@ export async function pollGhcrVisibility(
 ) {
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
-      log.info(
-        `GHCR visibility check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`,
-      );
+      log.info(`GHCR check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`);
       let versions = JSON.parse(
         await execFileCommand(execFile, "gh", [
           "api",
@@ -24,9 +22,7 @@ export async function pollGhcrVisibility(
       const image = versions.find((item) => hasVersionTag(item, `v${version}`));
       if (image) return image;
     } catch (error) {
-      log.debug?.(
-        `GHCR visibility attempt ${attempt + 1}/${retries} failed: ${String(error).slice(0, 300)}`,
-      );
+      log.debug?.(`GHCR check ${attempt + 1}/${retries} failed: ${String(error).slice(0, 300)}`);
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }

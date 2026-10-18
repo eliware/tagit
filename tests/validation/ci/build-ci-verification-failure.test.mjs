@@ -12,7 +12,7 @@ test("formats observed run details", () => {
     ),
   ).toContain("run 1 [completed/failure]");
   expect(buildCiVerificationFailure([], "abc")).toBe(
-    "No successful GitHub Actions run exists for abc.",
+    "No passing GitHub Actions run exists for abc.",
   );
 });
 

@@ -1,5 +1,5 @@
-import { parseJobs, parseWorkflow } from "../../repository/metadata/workflow-format.mjs";
-import { jobValue } from "../../repository/metadata/workflow-job-rules.mjs";
+import { parseJobs, parseWorkflow } from "../../repository/metadata/workflow/format.mjs";
+import { jobValue } from "../../repository/metadata/workflow/job-rules.mjs";
 
 function runnerValues(jobLines) {
   const index = jobLines.findIndex((line) => /^\s*runs-on\s*:/.test(line));

@@ -6,11 +6,11 @@ export function buildCiVerificationFailure(candidates, headSha) {
     .map((run) => `run ${run.databaseId} [${run.status}/${run.conclusion}]`)
     .join(", ");
   return details
-    ? `No successful GitHub Actions run exists for ${headSha}. Observed: ${details}`
-    : `No successful GitHub Actions run exists for ${headSha}.`;
+    ? `No passing GitHub Actions run exists for ${headSha}. Observed: ${details}`
+    : `No passing GitHub Actions run exists for ${headSha}.`;
 }
 
 export function buildPlatformVerificationFailure(execFileSync, candidates, headSha) {
   const jobSummary = summarizeCiJobs(execFileSync, candidates);
-  return `Successful GitHub Actions run for ${headSha} lacks a passing Ubuntu job. Jobs: ${jobSummary}`;
+  return `Passing GitHub Actions run for ${headSha} lacks a passing Ubuntu job. Jobs: ${jobSummary}`;
 }

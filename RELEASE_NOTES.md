@@ -1,24 +1,38 @@
 # Release Notes
 
+## 13.0.0 — 2026-10-17
+
+### Changed
+
+- Align package metadata, workflows, Knit settings, and source paths with Convention v13.0.
+- Use the canonical npm.yaml workflow for npm publication.
+- Set the local test timeout to three minutes.
+- Add an empty release commit after preflight, then push the branch and tag together.
+
+### Fixed
+
+- Check npm and GHCR publication through their matching workflow files.
+- Report timeout errors with the three-minute limit.
+
 ## 12.0.1 — 2026-10-12
 
 ### Changed
 
-- Validate CI and publication workflows by the declared publication profiles.
+- Check CI and publication workflows by their declared publication profiles.
 - Check numeric release tag triggers and required npm or GHCR workflow steps.
-- Select CI evidence for the exact commit and classify jobs from runner labels.
-- Exclude generated Jest result files from version notes and limit diff excerpts.
+- Select CI results for the exact commit and classify jobs from runner labels.
+- Exclude generated Jest results from version notes and limit diff excerpts.
 - Split CLI, workflow, registry, preflight, and version checks into focused modules.
 
 ### Fixed
 
 - Skip npm job and registry checks when the npm-published profile does not apply.
 - Require npm setup, install, and publish commands in the required order.
-- Require the exact npm version and successful publication job for release checks.
+- Require the exact npm version and a passing publication job for release checks.
 - Resolve the exact release tag selected by Git and reject changed tag references.
 - Check the package version before a release dry run.
 - Recognize the tagit, push, and upstream command entrypoints.
-- Handle workflow job names that match object prototype properties.
+- Support workflow job names that match object prototype properties.
 
 ## 12.0.0 — 2026-10-12
 
@@ -28,7 +42,7 @@
 - Check exact-commit CI before release actions. Require Ubuntu CI and each Windows job that exists.
 - Keep Windows CI optional when the workflow has no Windows job.
 - Check release CI and required registry publication for the exact commit and version.
-- Add `tagit push` for existing commits and bounded CI lookup after push.
+- Add `tagit push` for existing commits and fixed-time CI lookup after push.
 - Add `release` and `release-wait` commands for split owner and DevOps release work.
 - Add package exports, package file rules, public publish data, cross-platform checks, and GitOps pin checks.
 - Add explicit release waivers and a safe dry-run option.
@@ -36,10 +50,9 @@
 ### Changed
 
 - Use Eliware Test v12 for aggregate validation and the required Jest and Istanbul profile.
-- Use `redactText` from `@eliware/common`; remove the direct `@eliware/redact` dependency.
-- Report release-wait progress before each CI and registry check. Report one line per npm visibility attempt.
+- Use `redactText` from `@eliware/common`. Remove the direct `@eliware/redact` dependency.
+- Report release-wait progress before each CI and registry check. Report one line for each npm visibility check.
 - Keep package publication in the GitHub workflow. Use npm Trusted Publishing and provenance.
-- Push only the requested release tag. Do not change package files or create a release commit.
 - Use numeric SemVer tags and the required `.yaml` workflow paths.
 - Keep GitOps checks read-only. Do not deploy applications or change deployment pins.
 - Update CI and Knit workflows to v11 and v12 conventions.
@@ -47,7 +60,7 @@
 ### Fixed
 
 - Return a nonzero exit code when release CI or publication fails.
-- Handle Windows npm command shims with shell-free process arguments.
+- Support Windows npm command shims with shell-free process arguments.
 - Keep preflight quiet when the target has no Windows CI job.
 - Keep release actions out of template repositories that contain `.notag`.
 
@@ -55,12 +68,12 @@
 
 ### Added
 
-- Validate release versions, GitOps pin values, image references, and malformed CI or GHCR data.
+- Check release versions, GitOps pin values, image references, and malformed CI or GHCR data.
 - Support explicit exceptions for standard repository paths that do not apply.
 
 ### Changed
 
-- Improve exact-commit CI selection, release checks, bounded polling, read-only GitOps checks, and upstream error handling.
+- Strengthen exact-commit CI selection, release checks, fixed polling, read-only GitOps checks, and upstream error handling.
 - Check repository metadata, package files, release notes, and publication workflow rules.
 
 ## 2.4.1 — 2026-08-30
@@ -96,7 +109,7 @@
 
 ### Added
 
-- Add `tagit push` for existing commits and bounded CI discovery after push.
+- Add `tagit push` for existing commits and fixed-time CI discovery after push.
 - Expand the owner-to-DevOps handoff help.
 
 ## 2.1.0 — 2026-08-24
@@ -104,11 +117,11 @@
 ### Added
 
 - Split release work into `release` and `release-wait` commands.
-- Add read-only notes, post-release CI and registry checks, and bounded polling.
+- Add read-only notes, post-release CI and registry checks, and fixed polling.
 
 ### Changed
 
-- Report all preflight failures and block CI checks for dirty worktrees.
+- Report all preflight failures and stop CI checks for dirty worktrees.
 - Keep template validation active while TagIt skips release actions.
 
 ## 1.1.24 — 2026-08-23
@@ -128,34 +141,16 @@
 
 ### Fixed
 
-- Make Git commit messages safe for Windows shells and test GitOps paths on Windows.
+- Make Git commit messages safe for Windows shells and check GitOps paths on Windows.
 
 ## 1.1.21 — 2026-08-21
 
 ### Fixed
 
-- Restore package versions after dependency updates and block release when metadata differs.
+- Restore package versions after dependency updates and stop release when metadata differs.
 
 ## 1.1.19 — 2026-08-13
 
 ### Changed
 
 - Use `v<version>` tags, such as `v1.1.19`.
-
-## 1.1.18 — 2026-08-12
-
-### Added
-
-- Add a read-only release preview, help and version options, confirmation, and target version input.
-
-## 1.1.17 — 2026-08-06
-
-### Added
-
-- Add `tagit --version` and `tagit -v` without a release action.
-
-## 1.1.16 — 2026-08-06
-
-### Changed
-
-- Install dependencies and check for outdated packages in the release workflow.

@@ -1,28 +1,41 @@
-version: "12.0"
-description: Specification for the @eliware/tagit release CLI and repository validation behavior.
+version: "13.0"
+description: Specification for TagIt release commands and repository checks.
 directives:
   - id: E-1100.0
     dos:
-      - Provide deterministic release preflight, owner handoff, and post-release verification for Eliware repositories.
-      - Keep validation read-only apart from documented test outputs. The release command may add an empty commit and push the main branch and release tag.
-      - Require CI evidence for the exact commit and classify runner platforms from configured runner labels.
+      - Check release readiness, owner handoff, and post-release results for Eliware repositories.
+      - Allow documented test output during validation.
+      - Let release add an empty commit, then push main and its release tag.
+      - >-
+        Require CI results for the exact commit and classify runner platforms from configured
+        labels.
     donts:
-      - Do not stage files, change tracked file contents, deploy, publish, or authorize releases.
-      - Do not infer a job's operating system from its display name.
+      - Do not stage files, edit tracked content, deploy, publish, or make release decisions.
+      - Do not infer a job operating system from its name.
     children:
       - id: E-1100.0.0
         dos:
-          - Accept the v12 ci.yaml and publish.yaml workflow names and validate release gates by publication profile.
-          - Apply npm workflow checks only when npm-published applies.
+          - Accept v13 ci.yaml and npm.yaml workflows and check gates by publication profile.
+          - Check npm.yaml only when npm-published applies.
           - Require package.json in every target repository.
-          - Require @eliware/test as a development dependency and eliware-test as scripts.test for each target except @eliware/test.
-          - Require scripts.test to equal node bin/eliware-test.mjs in the @eliware/test repository.
-          - Require a numeric tag trigger, ghcr-publish environment, and Docker image push with push set to true when ghcr-published applies.
-          - Require release to create an empty versioned commit after preflight and push main and the tag atomically.
-          - Require release to report workflow links after CI and applicable publication workflows start.
-          - Require release-wait to verify CI for the tagged commit and publication only when a matching profile and publish.yaml exist.
-          - Require npm visibility checks to report one concise status line for each attempt.
-          - Require environment example files only when the target declares supported runtime environment configuration.
+          - >-
+            Require @eliware/test as a dev dependency and eliware-test as scripts.test in target
+            repositories.
+          - In @eliware/test, require scripts.test to equal node bin/eliware-test.mjs.
+          - >-
+            For ghcr-published, require a numeric tag trigger, ghcr-publish environment, and image
+            push.
+          - >-
+            Require release to add an empty versioned commit after preflight and push main with its
+            tag.
+          - Require release to report workflow links after applicable workflows start.
+          - >-
+            Require release-wait to check tagged commit CI and applicable npm.yaml or ghcr.yaml
+            publication.
+          - Require each npm visibility check to report one concise status line.
+          - >-
+            Require environment example files only when a repository declares runtime environment
+            settings.
         donts:
-          - Do not require .env.example for every target repository.
-          - Do not classify GitHub jobs by job name when runner labels are available.
+          - Do not require .env.example in every target repository.
+          - Do not classify GitHub jobs by job name when runner labels exist.

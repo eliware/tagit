@@ -27,11 +27,11 @@ test("rejects an existing tag that points away from HEAD", () => {
     if (args[0] === "tag") return "v1.2.3\n";
     return args[1] === "HEAD" ? "abc123\n" : "def456\n";
   });
-  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("already points to def456");
+  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("points to def456");
 });
 
 test("rejects invalid HEAD before creating a release commit", () => {
   const runGit = jest.fn(() => "");
-  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current HEAD");
+  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current commit");
   expect(runGit).toHaveBeenCalledTimes(1);
 });

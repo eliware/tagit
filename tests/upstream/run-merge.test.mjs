@@ -5,7 +5,7 @@ test("merges upstream and pushes", () => {
   const exec = jest.fn((command, args) =>
     args[0] === "symbolic-ref" ? "refs/remotes/upstream/main\n" : "",
   );
-  expect(runUpstream(["merge"], exec)).toBe(true);
+  expect(runUpstream(["merge"], exec, new Date("2026-07-29T18:07:59Z"))).toBe(true);
   expect(exec).toHaveBeenCalledWith("git", ["push"], { stdio: "inherit" });
 });
 
@@ -15,7 +15,7 @@ test("reports merge conflicts without pushing", () => {
     return "";
   });
   const log = { log: jest.fn() };
-  expect(runUpstream(["merge"], exec, new Date(), log)).toBe(false);
+  expect(runUpstream(["merge"], exec, new Date("2026-07-29T18:07:59Z"), log)).toBe(false);
   expect(exec).not.toHaveBeenCalledWith("git", ["push"], expect.anything());
 });
 test("runs with explicit time and logger dependencies", () => {
@@ -28,7 +28,9 @@ test("runs with explicit time and logger dependencies", () => {
 test("dry run reports the merge plan without changing remote or worktree state", () => {
   const exec = jest.fn(() => "refs/remotes/upstream/main\n");
   const log = { log: jest.fn() };
-  expect(runUpstream(["--dry-run", "sync"], exec, new Date(), log)).toBe(true);
+  expect(runUpstream(["--dry-run", "sync"], exec, new Date("2026-07-29T18:07:59Z"), log)).toBe(
+    true,
+  );
   expect(exec).toHaveBeenCalledTimes(1);
   expect(exec).toHaveBeenCalledWith(
     "git",
@@ -38,5 +40,5 @@ test("dry run reports the merge plan without changing remote or worktree state",
       stdio: ["ignore", "pipe", "ignore"],
     },
   );
-  expect(log.log).toHaveBeenCalledWith(expect.stringContaining("would fetch upstream"));
+  expect(log.log).toHaveBeenCalledWith(expect.stringContaining("can fetch upstream"));
 });

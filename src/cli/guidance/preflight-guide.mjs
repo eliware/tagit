@@ -1,10 +1,17 @@
 export function preflightGuide() {
-  return `Preflight checklist (all required):
-- Run from the repository root on a clean main worktree.
-- Confirm .notag is absent and no secrets or unexplained changes exist.
-- Confirm package metadata, README, release notes, and CI workflow are current.
-- Run npm test: the shared harness owns tests, lint, typecheck, audit, packaging, and 100×4 coverage. Consumer scripts.test must equal eliware-test. The @eliware/test package must use node bin/eliware-test.mjs.
-- Confirm gh reports a successful Ubuntu CI run for this exact HEAD; Windows CI is optional but must pass when present.
-- Confirm required smoke, integration, regression, and E2E checks pass when applicable.
-Any missing, stale, pending, cancelled, failed, or mismatched check blocks handoff.`;
+  return [
+    "Preflight checklist:",
+    "- Run from the repository root on a clean main worktree.",
+    "- Confirm .notag does not exist and no secrets or unexplained changes exist.",
+    "- Check package data, README, release notes, and CI workflow.",
+    "- Run npm test.",
+    "- The shared harness checks tests, lint, type checks, audit, packaging, and coverage.",
+    "- Set scripts.test to eliware-test in each target package.",
+    "- In @eliware/test, set scripts.test to node bin/eliware-test.mjs.",
+    "- Confirm gh reports a passing Ubuntu CI run for the exact commit.",
+    "- Windows CI is optional.",
+    "- Require each Windows job to pass when one exists.",
+    "- Run required smoke, integration, regression, and E2E checks when they apply.",
+    "A missing, expired, pending, cancelled, failed, or mismatched check blocks handoff.",
+  ].join("\n");
 }

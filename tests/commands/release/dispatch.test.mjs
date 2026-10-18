@@ -13,7 +13,7 @@ const base = () => ({
 
 test("requires an explicit release version", async () => {
   await expect(runReleaseCommand({ command: "release", version: null }, base())).rejects.toThrow(
-    "specific release version",
+    "exact release version",
   );
 });
 

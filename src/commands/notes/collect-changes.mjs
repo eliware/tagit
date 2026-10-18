@@ -1,4 +1,4 @@
-import { formatDiffExcerpt } from "./format-diff-excerpt.mjs";
+import { formatDiffExcerpt } from "./format/diff-excerpt.mjs";
 
 export function collectNotesChanges(execFileSync, tag) {
   // codescope ignore: separate Git queries keep the notes report fields independently bounded and readable.

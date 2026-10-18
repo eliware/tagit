@@ -6,6 +6,6 @@ test("classifies supported and absent commands", () => {
 });
 
 test("rejects misplaced and unknown commands", () => {
-  expect(() => classifyCommand(["--help", "release"])).toThrow("command must precede");
+  expect(() => classifyCommand(["--help", "release"])).toThrow("Put the command before");
   expect(() => classifyCommand(["nope"])).toThrow("Unknown command");
 });

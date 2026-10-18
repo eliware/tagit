@@ -2,7 +2,7 @@ import { requireExplicitReleaseVersion } from "../../src/policy/release-version-
 
 test("requires release commands to carry a version", () => {
   expect(() => requireExplicitReleaseVersion({ command: "release", version: null })).toThrow(
-    "specific release version",
+    "exact release version",
   );
   expect(() =>
     requireExplicitReleaseVersion({ command: "release", version: "1.2.3" }),

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runTagit } from "../src/cli/application/run-tagit.mjs";
+import { runTagit } from "../src/cli/application/run/tagit.mjs";
 
 const args = process.argv.slice(2);
 await runTagit(

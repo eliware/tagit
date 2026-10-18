@@ -23,15 +23,15 @@ export async function verifyNpmPublication(
     const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
     try {
       const output = await execFileCommand(execFile, executable, args, options);
-      const visible = readNpmView(output, version);
-      log.info?.(`${status}: ${visible ? "visible" : "not visible"}.`);
-      if (visible) return;
+      const exists = readNpmView(output, version);
+      log.info?.(`${status}: ${exists ? "available" : "not found"}.`);
+      if (exists) return;
     } catch (error) {
       log.info?.(`${status}: failed (${npmErrorSummary(error)}).`);
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }
-  const message = `npm did not expose ${packageName}@${version} after ${retries} attempts.`;
+  const message = `npm did not expose ${packageName}@${version} after ${retries} checks.`;
   log.info?.(message);
   throw new Error(message);
 }

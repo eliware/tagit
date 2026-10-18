@@ -1,9 +1,7 @@
 export function pollPendingRun(execFileSync, log, pending, repoArg, attempt) {
   if (!pending || attempt >= 30) return false;
   if (pending.url)
-    log.info(
-      `CI in progress; waiting for completion: [workflow run ${pending.databaseId}](${pending.url})`,
-    );
+    log.info(`CI is running. Status: [workflow run ${pending.databaseId}](${pending.url})`);
   try {
     execFileSync(
       "gh",
@@ -14,7 +12,7 @@ export function pollPendingRun(execFileSync, log, pending, repoArg, attempt) {
       },
     );
   } catch {
-    /* Re-read completed state; watch can time out while CI continues. */
+    /* Read the run state again. The monitor can time out while CI continues. */
   }
   return true;
 }

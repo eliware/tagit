@@ -2,7 +2,7 @@ const commands = ["notes", "preflight", "push", "release", "release-wait"];
 
 export function classifyCommand(argv) {
   if (argv[0]?.startsWith("-") && argv.some((argument) => commands.includes(argument))) {
-    throw new Error("The command must precede options.");
+    throw new Error("Put the command before its options.");
   }
   const command =
     argv[0] && !["--help", "-h", "--version", "-v"].includes(argv[0]) ? argv[0] : undefined;

@@ -61,7 +61,7 @@ test("rejects a tag that points at another commit", () => {
     return "";
   });
   const logger = log();
-  expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("already points to def456");
+  expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("points to def456");
   expect(logger.error).toHaveBeenCalledWith(
     "Release tag operation failed before remote side effects.",
   );
@@ -90,7 +90,7 @@ test("reports tag push failures after the remote operation begins", () => {
   const logger = log();
   expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("push failed");
   expect(logger.error).toHaveBeenCalledWith(
-    "Atomic release push failed; check the remote branch and tag before retrying.",
+    "Atomic release push failed. Check the remote branch and tag before retrying.",
   );
 });
 
@@ -102,7 +102,9 @@ test("rejects a remote tag that resolves to another commit", () => {
     if (executable === "git" && args[0] === "ls-remote") return "def456\trefs/tags/v1.0.0\n";
     return "";
   });
-  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("does not resolve to HEAD");
+  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow(
+    "does not resolve to the current commit",
+  );
 });
 
 test("rejects an empty remote tag resolution", () => {
@@ -113,7 +115,9 @@ test("rejects an empty remote tag resolution", () => {
     if (executable === "git" && args[0] === "ls-remote") return "";
     return "";
   });
-  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("does not resolve to HEAD");
+  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow(
+    "does not resolve to the current commit",
+  );
 });
 
 test("rejects an undefined remote tag resolution", () => {
@@ -124,7 +128,9 @@ test("rejects an undefined remote tag resolution", () => {
     if (executable === "git" && args[0] === "ls-remote") return undefined;
     return "";
   });
-  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("does not resolve to HEAD");
+  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow(
+    "does not resolve to the current commit",
+  );
 });
 
 test("uses the peeled commit for annotated remote tags", () => {
@@ -149,7 +155,7 @@ test("rejects an empty HEAD without creating or pushing a tag", () => {
     return "";
   });
   const logger = log();
-  expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("valid current HEAD");
+  expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("valid current commit");
   expect(exec.mock.calls.some(([, args]) => args?.[0] === "tag" || args?.[0] === "push")).toBe(
     false,
   );
@@ -160,5 +166,5 @@ test("rejects undefined HEAD output without creating or pushing a tag", () => {
     if (executable === "git" && args[0] === "rev-parse") return undefined;
     return undefined;
   });
-  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("valid current HEAD");
+  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("valid current commit");
 });

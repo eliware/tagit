@@ -1,4 +1,4 @@
 export function ciFailureMessage(error) {
   if (!error) return null;
-  return `BLOCKED: GitHub CI verification failed or was not completed. ${error.message}\nAction: provide a successful Ubuntu run for the exact HEAD; Windows is optional but must pass when present.`;
+  return `BLOCKED: GitHub CI check failed or did not complete. ${error.message}\nAction: provide a passing Ubuntu run for the exact commit. Windows CI is optional. Each Windows job must pass when one exists.`;
 }

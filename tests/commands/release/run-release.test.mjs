@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import { runReleaseCommand } from "../../../src/commands/release/run-release.mjs";
-import { runTagit } from "../../../src/cli/application/run-tagit.mjs";
+import { runTagit } from "../../../src/cli/application/run/tagit.mjs";
 import packageData from "../../../package.json" with { type: "json" };
 
 const base = () => ({

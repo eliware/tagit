@@ -1,5 +1,5 @@
 /**
- * Release operates on preflighted HEAD. It adds an empty commit and pushes
+ * Release operates on the commit that passed preflight. It adds an empty commit and pushes
  * the release commit and tag to main in one atomic operation.
  */
 import { releaseTag as releaseTagForVersion } from "../../policy/tag-policy.mjs";

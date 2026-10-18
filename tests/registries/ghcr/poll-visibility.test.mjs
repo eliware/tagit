@@ -22,7 +22,7 @@ test("finds the version-tagged image", async () => {
       },
     ),
   ).resolves.toMatchObject({ name: "image" });
-  expect(info).toHaveBeenCalledWith("GHCR visibility check 1/1 for eliware/tagit:2.0.0.");
+  expect(info).toHaveBeenCalledWith("GHCR check 1/1 for eliware/tagit:2.0.0.");
 });
 
 test("reports unavailable images after the retry budget", async () => {

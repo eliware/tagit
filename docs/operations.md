@@ -5,7 +5,7 @@ TagIt coordinates release checks. It does not deploy applications or edit GitOps
 ## Prepare an owner handoff
 
 1. Update code, documentation, package data, and release notes.
-2. Set the package version for the release. Run `tagit notes` and review its change list.
+2. Set the package version for the release. Run `tagit notes` and inspect its change list.
 3. Commit the intended changes.
 4. Run `tagit push`.
 5. Wait for CI on the exact commit.
@@ -22,7 +22,7 @@ DevOps uses the owner handoff and the approved release process. Run:
 tagit release --version X.Y.Z
 ```
 
-Use the exact version from `package.json`. TagIt runs preflight on the current commit. If it passes, TagIt adds an empty release commit. TagIt creates `vX.Y.Z` on that commit. TagIt pushes the branch and tag in one atomic operation. TagIt then waits for the CI workflow and any applicable publish workflow to start. It reports their links.
+Use the exact version from `package.json`. TagIt runs preflight on the current commit and stops if it fails. If preflight passes, TagIt adds an empty release commit and creates `vX.Y.Z` on that commit. It pushes the branch and tag in one atomic operation. It waits for CI and each applicable publication workflow to start, then reports their links.
 
 The release commit does not change files. Its message includes the release version and date. The commit gives CI a new commit to check. The tag points to that commit.
 
@@ -34,7 +34,7 @@ After TagIt reports the workflow links, run:
 tagit release-wait
 ```
 
-TagIt checks the CI run for the tagged commit. When `publish.yaml` and a matching publication profile exist, TagIt checks that workflow and verifies npm or GHCR. Without an applicable publish workflow, the command ends after CI passes.
+TagIt checks CI for the tagged commit. When `npm.yaml` or `ghcr.yaml` matches a publication profile, TagIt checks that workflow and verifies the registry. Without an applicable publication workflow, the command ends after CI passes.
 
 ## Understand command roles
 
@@ -42,12 +42,12 @@ Project owners prepare changes and run `notes`, `push`, and `preflight`. DevOps 
 
 These role rules describe the organization workflow. TagIt does not authenticate operators or enforce job titles.
 
-## Handle a failure
+## Resolve a failure
 
-1. Read the error and its next step.
+1. Read the error and its required action.
 2. Check the target commit and linked GitHub Actions run.
-3. Fix the reported cause in the owning repository.
-4. Commit and push the fix.
+3. Repair the reported cause in the owning repository.
+4. Commit and push the repair.
 5. Wait for CI on the new commit.
 6. Run preflight again.
 

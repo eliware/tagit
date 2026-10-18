@@ -36,11 +36,11 @@ This command reports commits and changed files since the latest Git tag. Set the
 tagit preflight [--ignore-100x4] [--ignore-monolith-limits]
 ```
 
-Preflight checks the worktree, branch, package data, required files, workflows, local test command, and exact-commit CI. It reports all local blockers. It requires successful Ubuntu CI for the current commit. It also requires each Windows job to pass when one exists.
+Preflight checks the worktree, branch, package data, required files, workflows, local test command, and exact-commit CI. It reports all local blockers. It requires passing Ubuntu CI for the current commit. It also requires each Windows job to pass when one exists.
 
 Preflight does not accept `--dry-run`. It does not change files, commits, tags, or registry data.
 
-The `--ignore-100x4` option forwards the coverage waiver to `npm test`. The `--ignore-monolith-limits` option forwards the monolith waiver. Use either option only with an approved waiver. These options apply only to `preflight` and `release`.
+The `--ignore-100x4` option forwards the coverage waiver to `npm test`. The `--ignore-monolith-limits` option forwards the monolith waiver. Use one option only with an approved waiver. These options apply only to `preflight` and `release`.
 
 ## Push existing commits
 
@@ -60,7 +60,7 @@ tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-li
 
 Replace `X.Y.Z` with the version in `package.json`. The version has three numbers and no suffix. The command has no default version.
 
-The command runs preflight on the current commit. If preflight passes, it creates an empty release commit. Its message includes the version and date. It adds `vX.Y.Z` to that commit and pushes the branch and tag atomically. It then polls for CI and any applicable publish workflow to start. It reports the workflow links and exits.
+The command runs preflight on the current commit. If preflight passes, it creates an empty release commit. Its message includes the version and date. It adds `vX.Y.Z` to that commit and pushes the branch and tag atomically. It then polls for CI and one applicable publication workflow. It reports the workflow links and exits.
 
 Use `--dry-run` to check the release path without a version change, commit, tag, push, or publish action. The waiver options have the same limits as preflight.
 
@@ -70,7 +70,7 @@ Use `--dry-run` to check the release path without a version change, commit, tag,
 tagit release-wait
 ```
 
-The command uses the latest release tag. Do not pass `--version`. It waits for CI on the tagged commit and checks its result. When `publish.yaml` and a matching publication profile exist, it also waits for publication and verifies npm or GHCR. It retries registry checks within a fixed limit. It returns an error if required evidence is missing, incomplete, or failed.
+The command uses the latest release tag. Do not pass `--version`. It waits for CI on the tagged commit and checks its result. When `npm.yaml` or `ghcr.yaml` matches a publication profile, it also checks publication. It retries registry checks until a fixed time limit. It returns an error if required CI or publication data is missing, incomplete, or failed.
 
 ## Merge from upstream
 
@@ -78,14 +78,14 @@ The command uses the latest release tag. Do not pass `--version`. It waits for C
 upstream [--dry-run] [merge-message...]
 ```
 
-The command fetches the configured `upstream` remote, merges its default branch, and pushes the merge. It uses `upstream/HEAD` when Git defines it. Otherwise, it uses `upstream/main`.
+The command fetches the configured `upstream` remote, merges its default branch, and pushes the merge. It uses `upstream/HEAD` when Git defines it. If Git does not define that reference, it uses `upstream/main`.
 
-Pass a merge message after the options. If you omit the message, TagIt uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. The message cannot exceed 500 characters or contain control characters.
+Pass a merge message after the options. If you omit the message, TagIt uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. The message must not contain more than 500 characters or control characters.
 
 Use `--dry-run` to show the branch and message without fetch, merge, or push actions.
 
 ## Errors and exit codes
 
-Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. Error output has a size limit. TagIt redacts recognized credentials.
+Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. TagIt cuts off long error output. TagIt redacts recognized credentials.
 
-An unknown option, repeated option, extra argument, or missing version value returns `1`. `--version` needs a value for `release`. The version query accepts no value. `release-wait` always uses the latest tag.
+A bad option, repeated option, unknown argument, or missing version value returns `1`. `--version` needs a value for `release`. The version query accepts no value. `release-wait` always uses the latest tag.

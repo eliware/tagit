@@ -12,7 +12,9 @@ export function createReleaseCommit(runGit, version, tag, date = new Date()) {
       runGit(["rev-parse", tag], { encoding: "utf8" }),
     );
     if (taggedHead !== head)
-      throw new Error(`Release tag ${tag} already points to ${taggedHead}, not HEAD ${head}.`);
+      throw new Error(
+        `Release tag ${tag} points to ${taggedHead}, not the current commit ${head}.`,
+      );
     return head;
   }
   const releaseDate = date.toISOString().slice(0, 10);

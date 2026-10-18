@@ -12,7 +12,5 @@ test("rejects a release tag that points to another commit", () => {
     if (args.join(" ") === "rev-parse v1.2.3") return "def";
     return "";
   });
-  expect(() => prepareReleaseTag(exec, { info: jest.fn() }, "v1.2.3")).toThrow(
-    "already points to def",
-  );
+  expect(() => prepareReleaseTag(exec, { info: jest.fn() }, "v1.2.3")).toThrow("points to def");
 });

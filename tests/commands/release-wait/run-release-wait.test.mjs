@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { PassThrough } from "node:stream";
 import { runReleaseWaitCommand } from "../../../src/commands/release-wait/run-release-wait.mjs";
-import { runTagit } from "../../../src/cli/application/run-tagit.mjs";
+import { runTagit } from "../../../src/cli/application/run/tagit.mjs";
 import packageData from "../../../package.json" with { type: "json" };
 
 test("verifies the latest release tag", async () => {
@@ -38,7 +38,7 @@ test("writes a status line before release-wait finishes", async () => {
     verifyRelease,
     execFile: jest.fn(),
   });
-  await new Promise((resolve) => setImmediate(resolve));
+  await Promise.resolve();
   expect(received).toContain("Starting release-wait checks.");
   finishVerification();
   await command;
