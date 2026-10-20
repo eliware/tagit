@@ -1,18 +1,25 @@
 # Release Notes
 
-## 13.0.0 — 2026-10-17
+## 14.0.0 — 2026-10-20
+
+### Added
+
+- Add release marker commits so CI checks the tagged release commit.
+- Report links after release CI and applicable publication workflows start.
 
 ### Changed
 
-- Align package metadata, workflows, Knit settings, and source paths with Convention v13.0.
-- Use the canonical npm.yaml workflow for npm publication.
-- Set the local test timeout to three minutes.
-- Add an empty release commit after preflight, then push the branch and tag together.
+- Use Eliware Test for repository convention and package checks.
+- Check publication only when the repository profile and matching workflow apply.
+- Push the release commit and version tag in one atomic operation.
+- Remove version suggestions from `tagit notes`.
+- Align GitHub Actions, Knit, package metadata, and repository specifications with Convention v14.
 
 ### Fixed
 
-- Check npm and GHCR publication through their matching workflow files.
-- Report timeout errors with the three-minute limit.
+- Check release CI and publication results for the tagged commit.
+- Preserve full Git history in CI for tag-based validation.
+- Extend the local validation timeout to three minutes.
 
 ## 12.0.1 — 2026-10-12
 
