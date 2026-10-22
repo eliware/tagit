@@ -1,13 +1,14 @@
+import { pushExistingCommits } from "./existing-commits.mjs";
+import { reportPushResult } from "./report-result.mjs";
+
 export function runPushCommand({ execFileSync, reportCiLinks, log, exit, dryRun }) {
   if (dryRun) {
     log.info("Dry run: no commits were pushed and no CI lookup was performed.");
     return;
   }
   try {
-    execFileSync("git", ["push"], { stdio: "inherit" });
-    const headSha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-    reportCiLinks(execFileSync, log, headSha, { attempts: 10, delayMs: 2000 });
-    log.info("Push completed. The tagit command did not stage untracked files.");
+    pushExistingCommits(execFileSync);
+    reportPushResult(execFileSync, reportCiLinks, log);
   } catch (error) {
     log.error(error);
     exit(1);

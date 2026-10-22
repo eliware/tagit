@@ -10,7 +10,7 @@ const base = () => ({
   execFile: jest.fn(),
   log: { info: jest.fn() },
   gitOperations: jest.fn(() => ({ commitSha: "abc" })),
-  verifyRelease: jest.fn(),
+  startReleaseVerification: jest.fn(),
 });
 
 test("CLI release boundary forwards explicit version and waiver", async () => {
@@ -20,7 +20,7 @@ test("CLI release boundary forwards explicit version and waiver", async () => {
     {
       gitOperations,
       runPreflight,
-      verifyRelease: jest.fn(),
+      startReleaseVerification: jest.fn(),
       log: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
       registerHandlersFn: jest.fn(),
       registerSignalsFn: jest.fn(),
@@ -60,11 +60,11 @@ test("runs the tag operation and release verification", async () => {
   expect(deps.gitOperations).toHaveBeenCalledWith(expect.anything(), deps.fs, deps.log, "1.2.3", {
     dryRun: false,
   });
-  expect(deps.verifyRelease).toHaveBeenCalledWith(
+  expect(deps.startReleaseVerification).toHaveBeenCalledWith(
     expect.anything(),
     deps.fs,
     deps.log,
-    expect.objectContaining({ version: "1.2.3", linksOnly: true }),
+    expect.objectContaining({ version: "1.2.3" }),
   );
 });
 test("keeps dry-run and template releases non-mutating", async () => {

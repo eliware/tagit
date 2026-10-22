@@ -8,7 +8,7 @@ export async function runReleaseCommand({
   execFile,
   log,
   gitOperations,
-  verifyRelease,
+  startReleaseVerification,
 }) {
   if (isTemplateRepository(fs)) {
     log.info(
@@ -24,10 +24,9 @@ export async function runReleaseCommand({
     return;
   }
   const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
-  await verifyRelease(execFileSync, fs, log, {
+  await startReleaseVerification(execFileSync, fs, log, {
     version: options.version,
     release,
-    linksOnly: true,
     execFile,
   });
   log.info(

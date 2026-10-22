@@ -9,6 +9,7 @@ const base = () => ({
   gitOperations: jest.fn(),
   runPreflight: jest.fn(() => ({ test: { passed: true } })),
   verifyRelease: jest.fn(),
+  startReleaseVerification: jest.fn(),
 });
 
 test("requires an explicit release version", async () => {
@@ -56,11 +57,11 @@ test("runs the prepared release transaction and verifies its tag", async () => {
       dryRun: undefined,
     },
   );
-  expect(deps.verifyRelease).toHaveBeenCalledWith(
+  expect(deps.startReleaseVerification).toHaveBeenCalledWith(
     expect.anything(),
     expect.anything(),
     expect.anything(),
-    expect.objectContaining({ version: "1.2.3", linksOnly: true }),
+    expect.objectContaining({ version: "1.2.3" }),
   );
 });
 

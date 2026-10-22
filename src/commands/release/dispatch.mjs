@@ -13,6 +13,7 @@ export async function runReleaseCommand(
     gitOperations,
     runPreflight,
     verifyRelease,
+    startReleaseVerification,
     output = console.log,
   },
 ) {
@@ -32,6 +33,6 @@ export async function runReleaseCommand(
     execFile,
     log,
     gitOperations,
-    verifyRelease,
+    startReleaseVerification,
   });
 }

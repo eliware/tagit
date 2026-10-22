@@ -1,5 +1,12 @@
 import { jest } from "@jest/globals";
-import { verifyRelease } from "../../../../src/commands/release-wait/verify/release.mjs";
+
+const verifyReleaseCompletion = jest.fn(async () => ({ ci: true }));
+jest.unstable_mockModule(
+  "../../../../src/commands/release-wait/verify/release/completion.mjs",
+  () => ({ verifyReleaseCompletion }),
+);
+
+const { verifyRelease } = await import("../../../../src/commands/release-wait/verify/release.mjs");
 
 const log = { info: jest.fn() };
 const input = {
@@ -11,46 +18,21 @@ const input = {
   npmRetryMs: 0,
 };
 const fs = {
-  existsSync: jest.fn((file) => file === "package.json"),
-  readFileSync: jest.fn((file) =>
+  existsSync: (file) => file === "package.json",
+  readFileSync: (file) =>
     file === "package.json" ? JSON.stringify({ name: "demo", private: false }) : "publish",
-  ),
-  readdirSync: jest.fn(() => ["ci.yaml"]),
 };
 
-function execFileSync(command, args) {
+function execFileSync(_command, args) {
   if (args[0] === "remote") return "git@github.com:eliware/demo.git";
-  if (args[0] === "show")
-    return "jobs:\n  validate:\n    runs-on: ubuntu-latest\n  publish:\n    runs-on: ubuntu-latest\n";
-  return args[0] === "describe" ? "v1.0.0" : "abc";
+  if (args[0] === "show") return "jobs:\n  validate:\n    runs-on: ubuntu-latest\n";
+  return "abc";
 }
 
-const execFile = jest.fn((_command, args, _options, callback) => {
-  if (args[1] === "list")
-    return callback(
-      null,
-      JSON.stringify([{ databaseId: 1, headSha: "abc", headBranch: "v1.0.0" }]),
-      "",
-    );
-  if (args[1] === "view")
-    return callback(
-      null,
-      JSON.stringify({
-        databaseId: 1,
-        status: "completed",
-        conclusion: "success",
-        headSha: "abc",
-        jobs: [
-          { name: "validate", status: "completed", conclusion: "success" },
-          { name: "publish", status: "completed", conclusion: "success" },
-        ],
-      }),
-      "",
-    );
-  return callback(null, JSON.stringify("1.0.0"), "");
+beforeEach(() => {
+  jest.clearAllMocks();
+  verifyReleaseCompletion.mockResolvedValue({ ci: true });
 });
-
-beforeEach(() => execFile.mockClear());
 
 test.each([
   ["invalid release input", { version: "next", release: { commitSha: "abc" } }],
@@ -59,37 +41,28 @@ test.each([
   const inspect = jest.fn();
   await expect(verifyRelease(inspect, fs, log, options)).rejects.toThrow();
   expect(inspect).not.toHaveBeenCalled();
+  expect(verifyReleaseCompletion).not.toHaveBeenCalled();
 });
 
-test("selects the links-only report path when requested", async () => {
-  const result = await verifyRelease(execFileSync, fs, log, {
-    ...input,
-    linksOnly: true,
-    execFile,
+test("coordinates complete release verification", async () => {
+  const execFile = jest.fn();
+  await expect(verifyRelease(execFileSync, fs, log, { ...input, execFile })).resolves.toEqual({
+    ci: true,
   });
-  expect(result).toMatchObject({ linksOnly: true });
-  expect(result).not.toHaveProperty("ci");
+  expect(verifyReleaseCompletion).toHaveBeenCalledWith(
+    expect.objectContaining({
+      repo: "eliware/demo",
+      tag: "v1.0.0",
+      headSha: "abc",
+      version: "1.0.0",
+      checkPublish: false,
+      publicationWorkflows: [],
+      execFile,
+    }),
+  );
 });
 
-test("rejects when CI details are invalid or the release identity is unavailable", async () => {
-  const bad = jest.fn((_command, args, _options, callback) => {
-    if (args[1] === "list")
-      return callback(
-        null,
-        JSON.stringify([{ databaseId: 2, headSha: "abc", headBranch: "v1.0.0" }]),
-        "",
-      );
-    return callback(
-      null,
-      JSON.stringify({
-        databaseId: 2,
-        status: "completed",
-        conclusion: "failure",
-        headSha: "abc",
-        jobs: [],
-      }),
-      "",
-    );
-  });
-  await expect(verifyRelease(execFileSync, fs, log, { ...input, execFile: bad })).rejects.toThrow();
+test("propagates full verification failures", async () => {
+  verifyReleaseCompletion.mockRejectedValue(new Error("release check failed"));
+  await expect(verifyRelease(execFileSync, fs, log, input)).rejects.toThrow("release check failed");
 });

@@ -1,6 +1,6 @@
 import { mergeMessage } from "./merge/message/build.mjs";
 import { resolveUpstreamBranch } from "./branch.mjs";
-import { parseUpstreamArguments } from "./parse-upstream-arguments.mjs";
+import { parseUpstreamArguments } from "./merge/parse-arguments.mjs";
 import { mergeUpstream } from "./merge/upstream.mjs";
 import { reportUpstreamDryRun } from "./merge/dry-run.mjs";
 

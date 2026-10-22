@@ -15,6 +15,7 @@ const deps = () => ({
   runPreflight: jest.fn(),
   gitOperations: jest.fn(),
   verifyRelease: jest.fn(),
+  startReleaseVerification: jest.fn(),
   execFile: jest.fn(),
 });
 test("handles version and help at the command boundary", async () => {

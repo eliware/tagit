@@ -1,4 +1,4 @@
-import { parseUpstreamArguments } from "../../src/upstream/parse-upstream-arguments.mjs";
+import { parseUpstreamArguments } from "../../../src/upstream/merge/parse-arguments.mjs";
 
 test("separates dry-run mode from merge-message arguments", () => {
   const args = ["--dry-run", "sync", "mainline"];

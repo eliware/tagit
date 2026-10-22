@@ -38,6 +38,36 @@ test("ends after CI when no publication profile applies", async () => {
   expect(poll.mock.calls[0][0].workflowPath).toBe(".github/workflows/ci.yaml");
 });
 
+test("uses the default CI poller when no poll override is supplied", async () => {
+  const execFile = jest.fn((_command, args, _options, callback) => {
+    if (args[1] === "list")
+      return callback(
+        null,
+        JSON.stringify([{ databaseId: 4, headSha: "abc", headBranch: "v1.0.0" }]),
+        "",
+      );
+    return callback(
+      null,
+      JSON.stringify({
+        databaseId: 4,
+        status: "completed",
+        conclusion: "success",
+        headSha: "abc",
+        jobs: [{ name: "validate", status: "completed", conclusion: "success" }],
+        url: "ci-url",
+      }),
+      "",
+    );
+  });
+  await expect(
+    verifyReleaseCompletion({
+      ...base,
+      execFile,
+      checkPublish: false,
+    }),
+  ).resolves.toMatchObject({ ci: true, npm: false, ghcr: false });
+});
+
 test("checks publication and registry after CI when the profile applies", async () => {
   const fs = {
     existsSync: (file) => file === "package.json" || file === ".github/workflows/npm.yaml",
