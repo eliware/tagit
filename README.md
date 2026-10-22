@@ -24,25 +24,25 @@ Deterministic release preflight and publication verification for Eliware package
 
 ## Features
 
-Use `tagit` to check release readiness and CI. The command checks npm or GHCR publication when a matching profile and workflow exist.
+Use tagit to check release readiness, CI, and applicable npm or GHCR publication.
 
 ## Requirements
 
-Use Node.js 26 or later. Install Git and GitHub CLI (`gh`). Target repositories require `@eliware/test` as a dev dependency and must set `scripts.test` to `eliware-test`. The `@eliware/test` repository uses `node bin/eliware-test.mjs` and does not require itself as a dev dependency.
+Use Node.js 26 or later, npm, Git, and GitHub CLI (`gh`). Read [requirements](docs/requirements.md) for target repository requirements.
 
 ## Setup
 
-Install tagit with `npm install --global @eliware/tagit`. Or run `npx --yes @eliware/tagit --help`.
+Install tagit with `npm install --global @eliware/tagit` or run `npx --yes @eliware/tagit --help`.
 
-The package provides `tagit`, `push`, and `upstream`. Its public entrypoints are `bin/tagit-cli.mjs`, `bin/push-cli.mjs`, and `bin/upstream-cli.mjs`. The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. It excludes tests, fixtures, workflow files, lockfiles, and runtime secrets. Use a supported release version. Do not depend on internal source modules.
+The package provides `tagit`, `push`, and `upstream`. Its public entrypoints are `bin/tagit-cli.mjs`, `bin/push-cli.mjs`, and `bin/upstream-cli.mjs`. The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. It excludes tests, fixtures, workflow files, lockfiles, and runtime secrets. Read [requirements](docs/requirements.md) for version rules and publication limits.
 
 ## Usage
 
-Run each command from the target repository root. Project owners run `notes`, `preflight`, and `push`. DevOps runs `release` and `release-wait` after handoff. Read the [operations guide](docs/operations.md) and [command guide](docs/commands.md). See [release notes](RELEASE_NOTES.md) for version changes.
+Run commands from the target repository root. Project owners prepare changes and run `notes`, `push`, and `preflight`. DevOps runs `release` and `release-wait` after handoff. Read [operations](docs/operations.md) and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
-Read the [documentation index](docs/README.md) for user guides. Read the [specification index](specs/README.md) for repository rules.
+Read [AGENTS.md](AGENTS.md) for contributor instructions. Read [docs/README.md](docs/README.md) for user guides and [specs/README.md](specs/README.md) for repository rules.
 
 ## Testing
 
@@ -50,39 +50,27 @@ Run `npm test` for aggregate validation. CI runs `npm ci` and `npm test` on Ubun
 
 ## Troubleshooting
 
-Run `tagit preflight` to find release blockers. Repair each reported cause. Confirm CI passed for the exact commit. Run preflight again.
+Run `tagit preflight` to find release blockers. Repair each cause, wait for CI on the new commit, and run preflight again.
 
 ## Security
 
-Keep credentials and `.env` files out of Git. The `tagit` command redacts recognized secrets from error output. It does not verify operator roles.
+Keep credentials, secrets, private data, and runtime state out of Git. Tagit redacts recognized credentials from error output.
 
 ## Configuration
 
-The `tagit` command has no required configuration files. Set `LOG_LEVEL` to change the shared logger level. Each command starts, completes its checks or actions, and exits. The command does not start a process that stays active.
+Tagit has no configuration file. Set `LOG_LEVEL` to change the shared logger level.
 
 ## Operations
 
-Follow the [owner and DevOps handoff](docs/operations.md). The `tagit` command does not deploy applications or edit GitOps repositories.
+Follow the [owner and DevOps handoff](docs/operations.md). Tagit does not deploy applications.
 
 ## Commands
 
-- `tagit notes` reports changes since the latest Git tag. It accepts no arguments.
-- `tagit preflight [--ignore-100x4] [--ignore-monolith-limits]` checks local gates and CI for the current commit. It requires a clean `main` branch. Ubuntu CI must pass. Each Windows job must pass when one exists.
-- `tagit push [--dry-run]` pushes existing commits from the current branch. It does not stage files or create commits. Dry run skips the push and CI lookup.
-- `tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-limits]` runs preflight, creates an empty release commit, pushes its tag and `main` atomically, and reports workflow links.
-- `tagit release-wait` checks CI for the latest release tag. It checks publication only when `npm.yaml` or `ghcr.yaml` and a matching profile exist. Do not pass `--version`.
-- `push [--dry-run]` runs the same action as `tagit push`.
-- `upstream [--dry-run] [merge-message...]` merges and pushes the configured upstream branch. It uses `upstream/HEAD`, or `upstream/main` when no default exists. The default message uses the current UTC time.
-- `tagit --help` or `tagit -h` shows help. `tagit --version` or `tagit -v` shows the installed version.
-- Use `--dry-run` only with `push`, `release`, or `upstream`. It skips release actions where applicable.
-- Commands return `0` on success and `1` for invalid input, failed checks, or operating errors.
-- DevOps can use `--ignore-100x4` or `--ignore-monolith-limits` only with an approved waiver.
-
-Read the [full command guide](docs/commands.md) for options, defaults, errors, and examples.
+Use `notes` to inspect changes, `preflight` to check readiness, and `push` to push commits. Use `release` to create a release tag, `release-wait` to verify a release, and `upstream` to merge the upstream branch. Read the [command guide](docs/commands.md) for syntax and options.
 
 ## Exit codes
 
-Commands return `0` on success. They return `1` for invalid input, failed checks, or operational errors.
+Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors.
 
 ## Support
 
