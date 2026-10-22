@@ -1,6 +1,6 @@
 import { selectLatestRun } from "../select/run.mjs";
 import { verifyCompletedRun } from "./completed-run.mjs";
-import { pollPendingRun } from "../poll-pending-run.mjs";
+import { retryPendingRun } from "./pending-run.mjs";
 import { readExactHeadRuns } from "../read/exact-head-runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
 import { selectCiCandidate } from "../select/ci-candidate.mjs";
@@ -27,14 +27,18 @@ export function verifyLatestCi(
     const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
     if (result) return result;
   }
-  if (waitForCompletion && pollPendingRun(execFileSync, log, pending, repoArg, pollAttempt))
-    return verifyLatestCi(
-      execFileSync,
-      log,
-      { headSha, repository: repo, waitForCompletion: true, runnerLabelsByJobName },
-      pollAttempt + 1,
-      null,
+  if (waitForCompletion) {
+    const retried = retryPendingRun(execFileSync, log, pending, repoArg, pollAttempt, () =>
+      verifyLatestCi(
+        execFileSync,
+        log,
+        { headSha, repository: repo, waitForCompletion: true, runnerLabelsByJobName },
+        pollAttempt + 1,
+        null,
+      ),
     );
+    if (retried) return retried;
+  }
   if (!candidates.length) throw new Error(buildCiVerificationFailure(runs, headSha));
   throw new Error(buildPlatformVerificationFailure(execFileSync, candidates, headSha));
 }

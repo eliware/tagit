@@ -62,6 +62,24 @@ test("polls an in-progress exact-head run and rechecks it", () => {
   ).toMatchObject({ runId: 2 });
 });
 
+test("does not poll an in-progress run when completion waiting is disabled", () => {
+  const exec = jest.fn((command, args) =>
+    args[0] === "remote"
+      ? "https://github.com/eliware/demo.git"
+      : args[1] === "list"
+        ? JSON.stringify([{ databaseId: 2, status: "in_progress", conclusion: "", headSha: "abc" }])
+        : "",
+  );
+  expect(() =>
+    verifyLatestCi(exec, log, {
+      headSha: "abc",
+      waitForCompletion: false,
+      runnerLabelsByJobName: { "ubuntu-latest": ["ubuntu"] },
+    }),
+  ).toThrow("No passing");
+  expect(exec.mock.calls.some(([, args]) => args[1] === "watch")).toBe(false);
+});
+
 test("rejects missing or stale exact-head evidence", () => {
   expect(() => verifyLatestCi(jest.fn(), log)).toThrow("commit SHA is required");
   expect(() =>
