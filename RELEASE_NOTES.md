@@ -1,6 +1,6 @@
 # Release Notes
 
-## 14.0.0 — 2026-10-20
+## 15.0.0 — 2026-10-22
 
 ### Added
 
@@ -9,11 +9,11 @@
 
 ### Changed
 
-- Use Eliware Test for repository convention and package checks.
+- Use Eliware Test 15 for repository convention and package checks.
 - Check publication only when the repository profile and matching workflow apply.
 - Push the release commit and version tag in one atomic operation.
 - Remove version suggestions from `tagit notes`.
-- Align GitHub Actions, Knit, package metadata, and repository specifications with Convention v14.
+- Align GitHub Actions, Knit, package metadata, and repository specifications with Convention v15.
 
 ### Fixed
 

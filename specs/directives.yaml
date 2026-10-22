@@ -1,4 +1,4 @@
-version: "14.0"
+version: "15.0"
 description: Specification for TagIt release commands and repository checks.
 directives:
   - id: E-1100.0
@@ -15,7 +15,7 @@ directives:
     children:
       - id: E-1100.0.0
         dos:
-          - Accept v14 ci.yaml and npm.yaml workflows and check gates by publication profile.
+          - Accept v15 ci.yaml and npm.yaml workflows and check gates by publication profile.
           - Check npm.yaml only when npm-published applies.
           - Require package.json in every target repository.
           - >-

@@ -23,8 +23,8 @@ test("reports command failures through the exit boundary", async () => {
 test("reports version queries through the CLI boundary", async () => {
   const output = jest.fn();
   await runCliBoundary(
-    { log: { error: jest.fn() }, exit: jest.fn(), packageVersion: "12.0.1", output },
+    { log: { error: jest.fn() }, exit: jest.fn(), packageVersion: "15.0.0", output },
     ["--version"],
   );
-  expect(output).toHaveBeenCalledWith("12.0.1");
+  expect(output).toHaveBeenCalledWith("15.0.0");
 });
