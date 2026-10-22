@@ -1,13 +1,8 @@
-import {
-  getReleaseVersion,
-  isHelp,
-  parseOptions,
-} from "../../../../src/cli/arguments/parse/options.mjs";
+import { isHelp, parseOptions } from "../../../../src/cli/arguments/parse/options.mjs";
 
 test("parses supported command and version results", () => {
   expect(isHelp(["--help"])).toBe(true);
   expect(isHelp(["preflight"])).toBe(false);
-  expect(getReleaseVersion(["release", "--version", "1.2.3"])).toBe("1.2.3");
   expect(parseOptions(["release", "--version", "1.2.3"])).toMatchObject({
     command: "release",
     version: "1.2.3",

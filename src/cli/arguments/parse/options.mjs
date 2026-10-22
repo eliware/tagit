@@ -5,9 +5,6 @@ import { validateOptions } from "../validate-options.mjs";
 export function isHelp(argv) {
   return argv.includes("--help") || argv.includes("-h");
 }
-export function getReleaseVersion(argv, options = {}) {
-  return parseVersionOption(argv, options);
-}
 export function parseOptions(argv) {
   const command = classifyCommand(argv);
   validateOptions(argv, command);

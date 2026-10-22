@@ -1,3 +1,5 @@
+import { classifyRunnerPlatforms } from "../platforms.mjs";
+
 export function readRunnerValues(jobLines) {
   const index = jobLines.findIndex((line) => /^\s*runs-on\s*:/.test(line));
   if (index < 0) return null;
@@ -17,4 +19,9 @@ export function readRunnerValues(jobLines) {
     values.push(item[1].trim().replace(/^['"]|['"]$/g, ""));
   }
   return values;
+}
+
+export function readWorkflowRunnerLabels(jobLines) {
+  const values = readRunnerValues(jobLines);
+  return values === null ? null : classifyRunnerPlatforms(values);
 }
