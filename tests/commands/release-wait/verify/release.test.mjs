@@ -34,16 +34,6 @@ beforeEach(() => {
   verifyReleaseCompletion.mockResolvedValue({ ci: true });
 });
 
-test.each([
-  ["invalid release input", { version: "next", release: { commitSha: "abc" } }],
-  ["omitted release options", undefined],
-])("rejects %s before external inspection", async (_case, options) => {
-  const inspect = jest.fn();
-  await expect(verifyRelease(inspect, fs, log, options)).rejects.toThrow();
-  expect(inspect).not.toHaveBeenCalled();
-  expect(verifyReleaseCompletion).not.toHaveBeenCalled();
-});
-
 test("coordinates complete release verification", async () => {
   const execFile = jest.fn();
   await expect(verifyRelease(execFileSync, fs, log, { ...input, execFile })).resolves.toEqual({

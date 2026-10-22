@@ -1,7 +1,7 @@
 import { readPublicationTarget } from "./read/publication-target.mjs";
 import { readReleaseRunnerLabels } from "./read/runner-labels.mjs";
 import { resolveReleaseContext } from "./resolve/release-context.mjs";
-import { validateReleaseInput } from "./validate-release/input.mjs";
+import { validateReleaseInput } from "./validate/input.mjs";
 
 export function prepareReleaseContext(execFileSync, fs, options) {
   const { version, release, maxPolls, npmRetries, pollMs, npmRetryMs } = options;
