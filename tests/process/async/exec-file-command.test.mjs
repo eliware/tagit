@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { execFileCommand } from "../../../src/process/async/exec-file.mjs";
+import { execFileCommand } from "../../../src/process/async/exec-file-command.mjs";
 
 const okExec = jest.fn((_executable, _args, _options, callback) => callback(null, "ok", ""));
 

@@ -1,4 +1,4 @@
-import { execFileCommand } from "../../process/async/exec-file.mjs";
+import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { hasVersionTag } from "./verify/version-tag.mjs";
 
 export async function pollGhcrVisibility(

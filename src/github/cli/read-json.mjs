@@ -1,4 +1,4 @@
-import { execFileCommand as releaseCommand } from "../../process/async/exec-file.mjs";
+import { execFileCommand as releaseCommand } from "../../process/async/exec-file-command.mjs";
 
 export async function readGithubJson(execFile, executable, args) {
   return JSON.parse(

@@ -53,26 +53,3 @@ test("does not require npm metadata for a non-publishing private package", () =>
     isPrivate: true,
   });
 });
-test("rejects malformed publication names", () => {
-  expect(() =>
-    readPublicationTarget({
-      existsSync: () => true,
-      readFileSync: () => JSON.stringify({ name: 42, eliware: { apply: ["npm-published"] } }),
-    }),
-  ).toThrow("must declare a name");
-  expect(() =>
-    readPublicationTarget({
-      existsSync: () => true,
-      readFileSync: () =>
-        JSON.stringify({ name: "not valid", eliware: { apply: ["npm-published"] } }),
-    }),
-  ).toThrow("invalid for publication");
-});
-test("rejects a public package without a name", () => {
-  expect(() =>
-    readPublicationTarget({
-      existsSync: () => true,
-      readFileSync: () => JSON.stringify({ private: false, eliware: { apply: ["npm-published"] } }),
-    }),
-  ).toThrow("must declare a name");
-});

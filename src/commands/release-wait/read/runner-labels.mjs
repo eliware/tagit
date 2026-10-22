@@ -1,4 +1,4 @@
-import { readWorkflowRunnerLabelsFromGit } from "../../../github/runs/read-workflow-runner-labels.mjs";
+import { readWorkflowRunnerLabelsFromGit } from "../../../github/runs/runner-label-reader.mjs";
 
 export function readReleaseRunnerLabels(execFileSync, headSha, publication) {
   const workflowPaths = [

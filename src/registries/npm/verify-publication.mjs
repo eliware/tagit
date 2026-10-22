@@ -1,4 +1,4 @@
-import { execFileCommand } from "../../process/async/exec-file.mjs";
+import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
 import { npmErrorSummary } from "./error-summary.mjs";
 import { npmViewHasVersion } from "./view-response.mjs";
