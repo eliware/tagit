@@ -1,6 +1,5 @@
-import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
 import { verifyNpmRegistry } from "./registries/npm.mjs";
-import { verifyGhcrRegistry } from "./registries/ghcr.mjs";
+import { verifyGhcrRegistryIfApplicable } from "./ghcr-registry.mjs";
 
 export async function verifyRegistries({
   fs,
@@ -30,19 +29,16 @@ export async function verifyRegistries({
       sleep,
     });
   } else log.info("npm verification: not applicable.");
-  if (publishesGhcr(fs)) {
-    const { imageDigest } = await verifyGhcrRegistry({
-      execFile,
-      log,
-      repo,
-      version,
-      retries: maxPolls,
-      retryMs: pollMs,
-      release,
-      sleep,
-    });
-    return { npm, ghcr: true, imageDigest };
-  }
-  log.info("GHCR verification: not applicable.");
-  return { npm, ghcr: false };
+  const ghcr = await verifyGhcrRegistryIfApplicable(fs, {
+    execFile,
+    log,
+    repo,
+    version,
+    retries: maxPolls,
+    retryMs: pollMs,
+    release,
+    sleep,
+  });
+  if (!ghcr.ghcr) log.info("GHCR verification: not applicable.");
+  return { npm, ...ghcr };
 }

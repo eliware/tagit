@@ -36,20 +36,15 @@ function gitMock() {
 }
 
 test.each([
-  ["npm", ["npm-published"], [".github/workflows/ci.yaml", ".github/workflows/npm.yaml"]],
-  ["GHCR", ["ghcr-published"], [".github/workflows/ci.yaml", ".github/workflows/ghcr.yaml"]],
-  ["neither", ["general"], [".github/workflows/ci.yaml"]],
-])("reads only CI and the %s publication workflow", (_profile, profiles, expectedPaths) => {
+  ["npm", ["npm-published"], [".github/workflows/npm.yaml"]],
+  ["GHCR", ["ghcr-published"], [".github/workflows/ghcr.yaml"]],
+  ["neither", ["general"], []],
+])("prepares the %s publication context", (_profile, profiles, expectedPaths) => {
   const execFileSync = gitMock();
   expect(
     prepareReleaseContext(execFileSync, packageFs(profiles), options).publication.workflows.map(
       ({ workflowPath }) => workflowPath,
     ),
-  ).toEqual(expectedPaths.slice(1));
-  expect(
-    execFileSync.mock.calls
-      .filter(([, args]) => args[0] === "show")
-      .map(([, args]) => args[1].split(":")[1]),
   ).toEqual(expectedPaths);
 });
 

@@ -1,5 +1,11 @@
 import { validateBranch } from "../../../src/repository/validate/branch.mjs";
 
+test("accepts the main branch", () => {
+  const failures = [];
+  validateBranch((_command, args) => (args[0] === "branch" ? "main" : ""), failures);
+  expect(failures).toEqual([]);
+});
+
 test("reports a non-main branch", () => {
   const failures = [];
   validateBranch((command, args) => (args[0] === "branch" ? "feature" : ""), failures);

@@ -1,18 +1,13 @@
 import { jest } from "@jest/globals";
 
 const verifyNpmRegistry = jest.fn(async () => {});
-const verifyGhcrRegistry = jest.fn(async () => ({ imageDigest: "sha256:release" }));
-const publishesGhcr = jest.fn(() => false);
+const verifyGhcrRegistryIfApplicable = jest.fn(async () => ({ ghcr: false }));
 
 jest.unstable_mockModule("../../../../src/commands/release-wait/verify/registries/npm.mjs", () => ({
   verifyNpmRegistry,
 }));
-jest.unstable_mockModule(
-  "../../../../src/commands/release-wait/verify/registries/ghcr.mjs",
-  () => ({ verifyGhcrRegistry }),
-);
-jest.unstable_mockModule("../../../../src/registries/ghcr/discover-publication.mjs", () => ({
-  publishesGhcr,
+jest.unstable_mockModule("../../../../src/commands/release-wait/verify/ghcr-registry.mjs", () => ({
+  verifyGhcrRegistryIfApplicable,
 }));
 
 const { verifyRegistries } =
@@ -39,7 +34,7 @@ const verify = (overrides = {}) =>
 
 beforeEach(() => {
   jest.clearAllMocks();
-  publishesGhcr.mockReturnValue(false);
+  verifyGhcrRegistryIfApplicable.mockResolvedValue({ ghcr: false });
 });
 
 test("skips npm verification when the npm profile does not apply", async () => {
@@ -47,7 +42,7 @@ test("skips npm verification when the npm profile does not apply", async () => {
     verify({ applicable: false, packageName: "@eliware/demo", isPrivate: false }),
   ).resolves.toEqual({ npm: false, ghcr: false });
   expect(verifyNpmRegistry).not.toHaveBeenCalled();
-  expect(verifyGhcrRegistry).not.toHaveBeenCalled();
+  expect(verifyGhcrRegistryIfApplicable).toHaveBeenCalledTimes(1);
 });
 
 test("selects npm verification for a public package", async () => {
@@ -56,27 +51,16 @@ test("selects npm verification for a public package", async () => {
     ghcr: false,
   });
   expect(verifyNpmRegistry).toHaveBeenCalledTimes(1);
-  expect(verifyGhcrRegistry).not.toHaveBeenCalled();
+  expect(verifyGhcrRegistryIfApplicable).toHaveBeenCalledTimes(1);
 });
 
-test("selects GHCR verification when its profile applies", async () => {
-  publishesGhcr.mockReturnValue(true);
-  await expect(verify({ applicable: false })).resolves.toEqual({
-    npm: false,
-    ghcr: true,
-    imageDigest: "sha256:release",
-  });
-  expect(verifyNpmRegistry).not.toHaveBeenCalled();
-  expect(verifyGhcrRegistry).toHaveBeenCalledTimes(1);
-});
-
-test("combines results when both publication profiles apply", async () => {
-  publishesGhcr.mockReturnValue(true);
+test("combines npm and GHCR verification results", async () => {
+  verifyGhcrRegistryIfApplicable.mockResolvedValue({ ghcr: true, imageDigest: "sha256:release" });
   await expect(verify({ packageName: "@eliware/demo", isPrivate: false })).resolves.toEqual({
     npm: true,
     ghcr: true,
     imageDigest: "sha256:release",
   });
   expect(verifyNpmRegistry).toHaveBeenCalledTimes(1);
-  expect(verifyGhcrRegistry).toHaveBeenCalledTimes(1);
+  expect(verifyGhcrRegistryIfApplicable).toHaveBeenCalledTimes(1);
 });
