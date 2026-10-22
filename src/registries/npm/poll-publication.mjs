@@ -1,6 +1,7 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
-import { reportNpmViewFailure, reportNpmViewResult } from "./error/report-view-attempt.mjs";
+import { reportNpmViewFailure } from "./error/view/failure.mjs";
+import { reportNpmViewResult } from "./error/view/result.mjs";
 import { npmViewHasVersion } from "./view-response.mjs";
 
 export async function pollNpmPublication(

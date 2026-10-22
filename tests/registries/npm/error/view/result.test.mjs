@@ -1,8 +1,5 @@
 import { jest } from "@jest/globals";
-import {
-  reportNpmViewFailure,
-  reportNpmViewResult,
-} from "../../../../src/registries/npm/error/report-view-attempt.mjs";
+import { reportNpmViewResult } from "../../../../../src/registries/npm/error/view/result.mjs";
 
 test("reports available and missing npm versions", () => {
   const log = { info: jest.fn() };
@@ -12,10 +9,6 @@ test("reports available and missing npm versions", () => {
   expect(log.info).toHaveBeenNthCalledWith(2, "npm view demo@1.0.0 (2/2): not found.");
 });
 
-test("reports concise npm errors and supports loggers without info", () => {
-  const log = { info: jest.fn() };
-  reportNpmViewFailure(log, "npm view demo@1.0.0 (1/1)", { stderr: "404 Not Found" });
-  expect(log.info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): failed (404 not found).");
+test("supports loggers without an info method", () => {
   expect(() => reportNpmViewResult({}, "npm view demo@1.0.0 (1/1)", false)).not.toThrow();
-  expect(() => reportNpmViewFailure({}, "npm view demo@1.0.0 (1/1)", {})).not.toThrow();
 });

@@ -1,6 +1,6 @@
 import { verifyReleaseCi } from "../../verify/release/ci.mjs";
-import { verifyRegistries } from "../../verify/registries.mjs";
 import { verifyPublicationJobs } from "./jobs.mjs";
+import { verifyPublicationRegistries } from "./registries.mjs";
 import { selectReleasePublicationTargets } from "./targets.mjs";
 
 export async function verifyReleasePublication({
@@ -37,7 +37,7 @@ export async function verifyReleasePublication({
   });
   if (!applicable && !ghcrApplicable)
     return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
-  const registries = await verifyRegistries({
+  return verifyPublicationRegistries({
     fs,
     execFile,
     log,
@@ -54,5 +54,4 @@ export async function verifyReleasePublication({
     npmRetryMs,
     sleep,
   });
-  return { repo, tag, headSha, ci: true, ...registries };
 }
