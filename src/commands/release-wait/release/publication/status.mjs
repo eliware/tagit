@@ -32,7 +32,6 @@ export async function verifyReleasePublication({
   verifyPublicationJobs({
     targets,
     publicationRuns,
-    runnerLabelsByJobName,
     applicable,
     isPrivate,
     repo,

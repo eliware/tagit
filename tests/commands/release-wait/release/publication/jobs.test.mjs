@@ -34,20 +34,14 @@ test("validates and reports each applicable publication workflow", () => {
   );
 });
 
-test("accepts stale validation status when the successful publish workflow has passing steps", () => {
+test("checks publication jobs without repeating general CI job policy", () => {
   const publication = {
     profile: "npm",
     run: {
       status: "completed",
       conclusion: "success",
       jobs: [
-        {
-          name: "validate",
-          labels: ["ubuntu-latest"],
-          status: "in_progress",
-          conclusion: null,
-          steps: [{ name: "npm test", status: "completed", conclusion: "success" }],
-        },
+        { name: "validate", status: "completed", conclusion: "failure" },
         { name: "publish", status: "completed", conclusion: "success", url: "publish-url" },
       ],
     },

@@ -1,12 +1,10 @@
-import { mergeMessage } from "./merge/message/build.mjs";
 import { resolveUpstreamBranch } from "./branch.mjs";
-import { parseUpstreamArguments } from "./merge/parse-arguments.mjs";
+import { readUpstreamMergeInput } from "./merge/input.mjs";
 import { mergeUpstream } from "./merge/upstream.mjs";
 import { reportUpstreamDryRun } from "./merge/dry-run.mjs";
 
 export function runUpstream(args, execFileSync, now, log) {
-  const { dryRun, messageArguments } = parseUpstreamArguments(args);
-  const message = mergeMessage(messageArguments, now);
+  const { dryRun, message } = readUpstreamMergeInput(args, now);
   if (dryRun) {
     const upstreamBranch = resolveUpstreamBranch(execFileSync);
     reportUpstreamDryRun(log, upstreamBranch, message);
