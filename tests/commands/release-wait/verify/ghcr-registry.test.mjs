@@ -22,6 +22,12 @@ test("returns not applicable when the repository has no GHCR publication", async
   expect(verifyGhcrRegistry).not.toHaveBeenCalled();
 });
 
+test("uses a known profile decision without rereading package metadata", async () => {
+  await expect(verifyGhcrRegistryIfApplicable({}, {}, false)).resolves.toEqual({ ghcr: false });
+  expect(publishesGhcr).not.toHaveBeenCalled();
+  expect(verifyGhcrRegistry).not.toHaveBeenCalled();
+});
+
 test("verifies a declared GHCR publication and returns its digest", async () => {
   publishesGhcr.mockReturnValue(true);
   verifyGhcrRegistry.mockResolvedValue({ imageDigest: "sha256:release" });

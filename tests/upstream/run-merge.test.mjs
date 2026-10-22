@@ -40,5 +40,8 @@ test("dry run reports the merge plan without changing remote or worktree state",
       stdio: ["ignore", "pipe", "ignore"],
     },
   );
+  expect(log.log).toHaveBeenCalledWith(
+    'Dry run: can fetch upstream, merge refs/remotes/upstream/main with message "sync", then push.',
+  );
   expect(exec).not.toHaveBeenCalledWith("git", ["push"], expect.anything());
 });

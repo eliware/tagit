@@ -1,7 +1,7 @@
 import { verifyReleaseCi } from "../../verify/release/ci.mjs";
 import { verifyRegistries } from "../../verify/registries.mjs";
 import { verifyPublicationJobs } from "./jobs.mjs";
-import { publishesGhcr } from "../../../../registries/ghcr/discover-publication.mjs";
+import { selectReleasePublicationTargets } from "./targets.mjs";
 
 export async function verifyReleasePublication({
   fs,
@@ -22,13 +22,10 @@ export async function verifyReleasePublication({
   npmRetryMs,
   sleep,
 }) {
-  const { applicable, packageName, isPrivate } =
+  const npmTarget =
     verifiedTarget ?? verifyReleaseCi(fs, log, repo, tag, run, runnerLabelsByJobName);
-  const ghcrApplicable = publishesGhcr(fs);
-  const targets = [
-    ...(applicable ? [{ profile: "npm", packageName, isPrivate }] : []),
-    ...(ghcrApplicable ? [{ profile: "ghcr", packageName: "image", isPrivate: false }] : []),
-  ];
+  const { applicable, packageName, isPrivate } = npmTarget;
+  const { targets, ghcrApplicable } = selectReleasePublicationTargets(fs, npmTarget);
   verifyPublicationJobs({
     targets,
     publicationRuns,
@@ -50,6 +47,7 @@ export async function verifyReleasePublication({
     applicable,
     packageName,
     isPrivate,
+    ghcrApplicable,
     maxPolls,
     npmRetries,
     pollMs,

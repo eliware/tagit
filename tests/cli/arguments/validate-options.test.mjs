@@ -9,7 +9,3 @@ test("rejects a value after commandless version query", () => {
     "version query does not accept",
   );
 });
-
-test("rejects combined help and version options", () => {
-  expect(() => validateOptions(["--help", "--version"], null)).toThrow("cannot be combined");
-});

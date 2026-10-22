@@ -12,3 +12,8 @@ test("rejects malformed or missing required versions", () => {
     "required",
   );
 });
+
+test("returns null for missing or option-like optional versions", () => {
+  expect(parseVersionOption(["--version"])).toBeNull();
+  expect(parseVersionOption(["--version", "--dry-run"])).toBeNull();
+});

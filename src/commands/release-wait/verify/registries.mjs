@@ -1,5 +1,6 @@
 import { verifyNpmRegistry } from "./registries/npm.mjs";
 import { verifyGhcrRegistryIfApplicable } from "./ghcr-registry.mjs";
+import { selectRegistryPolicy } from "./registry-policy.mjs";
 
 export async function verifyRegistries({
   fs,
@@ -11,13 +12,19 @@ export async function verifyRegistries({
   applicable,
   packageName,
   isPrivate,
+  ghcrApplicable,
   maxPolls,
   npmRetries,
   pollMs,
   npmRetryMs,
   sleep,
 }) {
-  const npm = Boolean(applicable && packageName && !isPrivate);
+  const { npm, ghcr } = selectRegistryPolicy(
+    fs,
+    log,
+    { applicable, packageName, isPrivate },
+    ghcrApplicable,
+  );
   if (npm) {
     await verifyNpmRegistry({
       execFile,
@@ -28,17 +35,22 @@ export async function verifyRegistries({
       retryMs: npmRetryMs,
       sleep,
     });
-  } else log.info("npm verification: not applicable.");
-  const ghcr = await verifyGhcrRegistryIfApplicable(fs, {
-    execFile,
-    log,
-    repo,
-    version,
-    retries: maxPolls,
-    retryMs: pollMs,
-    release,
-    sleep,
-  });
-  if (!ghcr.ghcr) log.info("GHCR verification: not applicable.");
-  return { npm, ...ghcr };
+  }
+  const ghcrResult = ghcr
+    ? await verifyGhcrRegistryIfApplicable(
+        fs,
+        {
+          execFile,
+          log,
+          repo,
+          version,
+          retries: maxPolls,
+          retryMs: pollMs,
+          release,
+          sleep,
+        },
+        ghcr,
+      )
+    : { ghcr: false };
+  return { npm, ...ghcrResult };
 }
