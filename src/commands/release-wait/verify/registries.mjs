@@ -1,6 +1,6 @@
 import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
-import { verifyNpmPublication } from "../../../registries/npm/verify-publication.mjs";
-import { verifyGhcrPublication } from "../../../registries/ghcr/verify/publication.mjs";
+import { verifyNpmRegistry } from "./registries/npm.mjs";
+import { verifyGhcrRegistry } from "./registries/ghcr.mjs";
 
 export async function verifyRegistries({
   fs,
@@ -20,24 +20,25 @@ export async function verifyRegistries({
 }) {
   const npm = Boolean(applicable && packageName && !isPrivate);
   if (npm) {
-    log.info(`Checking npm publication for ${packageName}@${version}.`);
-    await verifyNpmPublication(execFile, log, {
+    await verifyNpmRegistry({
+      execFile,
+      log,
       packageName,
       version,
       retries: npmRetries,
       retryMs: npmRetryMs,
       sleep,
     });
-    log.info(`npm verified: ${packageName}@${version}.`);
   } else log.info("npm verification: not applicable.");
   if (publishesGhcr(fs)) {
-    log.info(`Checking GHCR publication for ${repo}:${version}.`);
-    const { imageDigest } = await verifyGhcrPublication(execFile, log, {
-      repository: repo,
+    const { imageDigest } = await verifyGhcrRegistry({
+      execFile,
+      log,
+      repo,
       version,
-      expectedDigest: release.imageDigest ?? null,
       retries: maxPolls,
       retryMs: pollMs,
+      release,
       sleep,
     });
     return { npm, ghcr: true, imageDigest };

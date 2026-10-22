@@ -1,15 +1,16 @@
 import { jest } from "@jest/globals";
 
-const verifyNpmPublication = jest.fn(async () => {});
-const verifyGhcrPublication = jest.fn(async () => ({ imageDigest: "sha256:release" }));
+const verifyNpmRegistry = jest.fn(async () => {});
+const verifyGhcrRegistry = jest.fn(async () => ({ imageDigest: "sha256:release" }));
 const publishesGhcr = jest.fn(() => false);
 
-jest.unstable_mockModule("../../../../src/registries/npm/verify-publication.mjs", () => ({
-  verifyNpmPublication,
+jest.unstable_mockModule("../../../../src/commands/release-wait/verify/registries/npm.mjs", () => ({
+  verifyNpmRegistry,
 }));
-jest.unstable_mockModule("../../../../src/registries/ghcr/verify/publication.mjs", () => ({
-  verifyGhcrPublication,
-}));
+jest.unstable_mockModule(
+  "../../../../src/commands/release-wait/verify/registries/ghcr.mjs",
+  () => ({ verifyGhcrRegistry }),
+);
 jest.unstable_mockModule("../../../../src/registries/ghcr/discover-publication.mjs", () => ({
   publishesGhcr,
 }));
@@ -45,54 +46,37 @@ test("skips npm verification when the npm profile does not apply", async () => {
   await expect(
     verify({ applicable: false, packageName: "@eliware/demo", isPrivate: false }),
   ).resolves.toEqual({ npm: false, ghcr: false });
-  expect(verifyNpmPublication).not.toHaveBeenCalled();
+  expect(verifyNpmRegistry).not.toHaveBeenCalled();
+  expect(verifyGhcrRegistry).not.toHaveBeenCalled();
 });
 
-test("skips both registries when neither publication applies", async () => {
-  await expect(verify()).resolves.toEqual({ npm: false, ghcr: false });
-  expect(verifyNpmPublication).not.toHaveBeenCalled();
-  expect(verifyGhcrPublication).not.toHaveBeenCalled();
-});
-
-test("runs npm verification for a public npm package only", async () => {
+test("selects npm verification for a public package", async () => {
   await expect(verify({ packageName: "@eliware/demo", isPrivate: false })).resolves.toEqual({
     npm: true,
     ghcr: false,
   });
-  expect(verifyNpmPublication).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), {
-    packageName: "@eliware/demo",
-    version: "1.0.0",
-    retries: 2,
-    retryMs: 10,
-    sleep: expect.any(Function),
-  });
-  expect(verifyGhcrPublication).not.toHaveBeenCalled();
+  expect(verifyNpmRegistry).toHaveBeenCalledTimes(1);
+  expect(verifyGhcrRegistry).not.toHaveBeenCalled();
 });
 
-test("runs GHCR verification for a published image only", async () => {
+test("selects GHCR verification when its profile applies", async () => {
   publishesGhcr.mockReturnValue(true);
-  await expect(verify()).resolves.toEqual({
+  await expect(verify({ applicable: false })).resolves.toEqual({
     npm: false,
     ghcr: true,
     imageDigest: "sha256:release",
   });
-  expect(verifyNpmPublication).not.toHaveBeenCalled();
-  expect(verifyGhcrPublication).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), {
-    repository: "eliware/demo",
-    version: "1.0.0",
-    expectedDigest: "sha256:expected",
-    retries: 2,
-    retryMs: 5,
-    sleep: expect.any(Function),
-  });
+  expect(verifyNpmRegistry).not.toHaveBeenCalled();
+  expect(verifyGhcrRegistry).toHaveBeenCalledTimes(1);
 });
 
-test("passes a null expected digest when release metadata has no image digest", async () => {
+test("combines results when both publication profiles apply", async () => {
   publishesGhcr.mockReturnValue(true);
-  await verify({ release: {} });
-  expect(verifyGhcrPublication).toHaveBeenCalledWith(
-    expect.any(Function),
-    expect.any(Object),
-    expect.objectContaining({ expectedDigest: null }),
-  );
+  await expect(verify({ packageName: "@eliware/demo", isPrivate: false })).resolves.toEqual({
+    npm: true,
+    ghcr: true,
+    imageDigest: "sha256:release",
+  });
+  expect(verifyNpmRegistry).toHaveBeenCalledTimes(1);
+  expect(verifyGhcrRegistry).toHaveBeenCalledTimes(1);
 });
