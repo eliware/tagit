@@ -9,7 +9,6 @@ jest.unstable_mockModule("../../../../src/commands/release-wait/verify/registrie
 jest.unstable_mockModule("../../../../src/commands/release-wait/verify/ghcr-registry.mjs", () => ({
   verifyGhcrRegistryIfApplicable,
 }));
-
 const { verifyRegistries } =
   await import("../../../../src/commands/release-wait/verify/registries.mjs");
 

@@ -1,7 +1,7 @@
 import {
   imageDigest,
   requireExpectedDigest,
-} from "../../../../src/registries/ghcr/verify/image-digest.mjs";
+} from "../../../../src/registries/ghcr/verify/digest.mjs";
 
 test("reads and validates image digests", () => {
   const digest = `sha256:${"a".repeat(64)}`;

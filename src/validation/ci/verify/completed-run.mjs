@@ -1,37 +1,14 @@
-import { validateJobRecords } from "../validate/job-records.mjs";
-import { evaluateJobPolicy } from "../evaluate-job-policy.mjs";
+import { readCompletedRun } from "../read/completed-run.mjs";
 
 export function verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName = {}) {
-  const data = JSON.parse(
-    execFileSync(
-      "gh",
-      ["run", "view", String(run.databaseId), "--json", "status,conclusion,headSha,jobs"],
-      {
-        encoding: "utf8",
-      },
-    ),
-  );
-  if (!data || typeof data.status !== "string" || typeof data.conclusion !== "string")
-    throw new Error(`GitHub Actions run ${run.databaseId} returned invalid final data.`);
-  const jobs = validateJobRecords(data.jobs, run.databaseId);
-  for (const job of jobs) job.labels = runnerLabelsByJobName[job.name] ?? [];
-  const successful = (job) => job.status === "completed" && job.conclusion === "success";
-  const { failed, ubuntu, windows } = evaluateJobPolicy(jobs, successful);
-  if (
-    !failed &&
-    data.status === "completed" &&
-    data.conclusion === "success" &&
-    data.headSha === headSha &&
-    ubuntu &&
-    windows.passed
-  ) {
-    const platforms = windows.successful ? "Ubuntu and Windows passed" : "Ubuntu passed";
-    log.info(`GitHub Actions CI verified for ${headSha}: ${platforms}.`);
+  const result = readCompletedRun(execFileSync, run.databaseId, headSha, runnerLabelsByJobName);
+  if (result.passed) {
+    log.info(`GitHub Actions CI verified for ${headSha}: ${result.platforms}.`);
     return {
       runId: run.databaseId,
       headSha,
       ubuntu: true,
-      ...(windows.successful ? { windows: true } : {}),
+      ...(result.policy.windows.successful ? { windows: true } : {}),
     };
   }
   return null;
