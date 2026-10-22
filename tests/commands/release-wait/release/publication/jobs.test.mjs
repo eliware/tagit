@@ -34,6 +34,27 @@ test("validates and reports each applicable publication workflow", () => {
   );
 });
 
+test("accepts stale validation status when the successful publish workflow has passing steps", () => {
+  const publication = {
+    profile: "npm",
+    run: {
+      status: "completed",
+      conclusion: "success",
+      jobs: [
+        {
+          name: "validate",
+          labels: ["ubuntu-latest"],
+          status: "in_progress",
+          conclusion: null,
+          steps: [{ name: "npm test", status: "completed", conclusion: "success" }],
+        },
+        { name: "publish", status: "completed", conclusion: "success", url: "publish-url" },
+      ],
+    },
+  };
+  expect(() => verifyPublicationJobs({ ...base, publicationRuns: [publication] })).not.toThrow();
+});
+
 test("requires a completed run for every applicable publication workflow", () => {
   expect(() => verifyPublicationJobs({ ...base, publicationRuns: [] })).toThrow(
     "npm workflow did not complete",

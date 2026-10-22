@@ -8,6 +8,46 @@ test("accepts successful Ubuntu and optional Windows jobs", () => {
   expect(result.windowsJobs).toHaveLength(1);
 });
 
+test("accepts successful steps when a completed workflow has stale job status", () => {
+  const result = verifyReleaseJobs(
+    [
+      {
+        name: "validate",
+        labels: ["ubuntu-latest"],
+        status: "in_progress",
+        conclusion: null,
+        steps: [
+          { name: "checkout", status: "completed", conclusion: "success" },
+          { name: "npm test", status: "completed", conclusion: "success" },
+        ],
+      },
+    ],
+    {},
+    { status: "completed", conclusion: "success" },
+  );
+  expect(result.windowsJobs).toEqual([]);
+});
+
+test("rejects stale jobs when steps fail or the workflow is not successful", () => {
+  const stale = {
+    name: "validate",
+    labels: ["ubuntu-latest"],
+    status: "in_progress",
+    conclusion: null,
+    steps: [{ name: "npm test", status: "completed", conclusion: "failure" }],
+  };
+  expect(() =>
+    verifyReleaseJobs([stale], {}, { status: "completed", conclusion: "success" }),
+  ).toThrow("validate: ");
+  expect(() =>
+    verifyReleaseJobs(
+      [{ ...stale, steps: [{ ...stale.steps[0], conclusion: "success" }] }],
+      {},
+      { status: "in_progress", conclusion: null },
+    ),
+  ).toThrow("validate: ");
+});
+
 test("classifies neutral validation job names from the release workflow runner", () => {
   const result = verifyReleaseJobs(
     [

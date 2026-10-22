@@ -17,7 +17,11 @@ export function verifyPublicationJobs({
     if (!publication) throw new Error(`Release ${target.profile} workflow did not complete.`);
     if (!Array.isArray(publication.run.jobs))
       throw new Error(`Release ${target.profile} workflow returned malformed job records.`);
-    const { windowsJobs } = verifyReleaseJobs(publication.run.jobs, runnerLabelsByJobName);
+    const { windowsJobs } = verifyReleaseJobs(
+      publication.run.jobs,
+      runnerLabelsByJobName,
+      publication.run,
+    );
     const publishJobs = verifyPublishJob(publication.run.jobs, {
       applicable: target.profile === "ghcr" || (applicable && !isPrivate),
       packageName: target.packageName,
