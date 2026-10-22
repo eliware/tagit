@@ -19,7 +19,7 @@ test("prints help from the public CLI application", async () => {
 });
 test("runs the notes entry point with injected dependencies", async () => {
   const output = jest.fn();
-  const buildNotesReport = jest.fn(() => "TAGIT NOTES REPORT");
+  const buildNotesReport = jest.fn(() => "tagit notes report");
   const gitOperations = jest.fn();
   await runTagit(
     {
@@ -34,7 +34,7 @@ test("runs the notes entry point with injected dependencies", async () => {
   );
   expect(buildNotesReport).toHaveBeenCalledWith(expect.any(Function));
   expect(gitOperations).not.toHaveBeenCalled();
-  expect(output).toHaveBeenCalledWith("TAGIT NOTES REPORT");
+  expect(output).toHaveBeenCalledWith("tagit notes report");
 });
 test("uses console output for default version and preflight responses", async () => {
   const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});

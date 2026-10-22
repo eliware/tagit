@@ -24,7 +24,7 @@ Deterministic release preflight and publication verification for Eliware package
 
 ## Features
 
-TagIt checks release readiness and CI. It checks npm or GHCR publication when a matching profile and workflow exist.
+Use `tagit` to check release readiness and CI. The command checks npm or GHCR publication when a matching profile and workflow exist.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Use Node.js 26 or later. Install Git and GitHub CLI (`gh`). Target repositories 
 
 ## Setup
 
-Install TagIt with `npm install --global @eliware/tagit`. Or run `npx --yes @eliware/tagit --help`.
+Install tagit with `npm install --global @eliware/tagit`. Or run `npx --yes @eliware/tagit --help`.
 
 The package provides `tagit`, `push`, and `upstream`. Its public entrypoints are `bin/tagit-cli.mjs`, `bin/push-cli.mjs`, and `bin/upstream-cli.mjs`. The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. It excludes tests, fixtures, workflow files, lockfiles, and runtime secrets. Use a supported release version. Do not depend on internal source modules.
 
@@ -54,15 +54,15 @@ Run `tagit preflight` to find release blockers. Repair each reported cause. Conf
 
 ## Security
 
-Keep credentials and `.env` files out of Git. TagIt redacts recognized secrets from error output. TagIt does not verify operator roles.
+Keep credentials and `.env` files out of Git. The `tagit` command redacts recognized secrets from error output. It does not verify operator roles.
 
 ## Configuration
 
-TagIt has no required configuration files. Set `LOG_LEVEL` to change the shared logger level. Each command starts, completes its checks or actions, and exits. TagIt does not start a process that stays active.
+The `tagit` command has no required configuration files. Set `LOG_LEVEL` to change the shared logger level. Each command starts, completes its checks or actions, and exits. The command does not start a process that stays active.
 
 ## Operations
 
-Follow the [owner and DevOps handoff](docs/operations.md). TagIt does not deploy applications or edit GitOps repositories.
+Follow the [owner and DevOps handoff](docs/operations.md). The `tagit` command does not deploy applications or edit GitOps repositories.
 
 ## Commands
 

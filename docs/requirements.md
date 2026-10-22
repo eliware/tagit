@@ -4,7 +4,7 @@
 
 Install Node.js 26 or later, npm 12 or later, Git, and GitHub CLI (`gh`). Use GitHub CLI for CI and release checks. Set up access to the target GitHub repository.
 
-Install TagIt with `npm install --global @eliware/tagit`. Run `tagit --help` to list commands.
+Install tagit with `npm install --global @eliware/tagit`. Run `tagit --help` to list commands.
 
 ## Target repository
 
@@ -29,15 +29,15 @@ The test package must be an installed package. Do not use a local link or juncti
 
 Preflight requires a clean `main` branch and passing Ubuntu CI for the current commit. It requires each Windows job to pass when one exists. It does not report a Windows check when the workflow has no Windows job.
 
-Release runs preflight, then adds an empty commit with the release version and date. TagIt pushes the new commit and version tag to `main` in one atomic operation. It reports CI and applicable publication links after those workflows start.
+Release runs preflight, then adds an empty commit with the release version and date. The `tagit` command pushes the new commit and version tag to `main` in one atomic operation. It reports CI and applicable publication links after those workflows start.
 
 ## Supported systems
 
-GitHub Actions CI directly checks Ubuntu. Tests cover Windows-specific behavior. TagIt does not directly test macOS. macOS support follows shared Node.js and Git behavior.
+GitHub Actions CI directly checks Ubuntu. Tests cover Windows-specific behavior. The `tagit` command does not directly test macOS. macOS support follows shared Node.js and Git behavior.
 
 ## Settings
 
-TagIt needs no configuration file. The optional `LOG_LEVEL` environment variable sets the shared logger level. TagIt runs as a command and does not stay active. It stores no database or secret data.
+The `tagit` command needs no configuration file. The optional `LOG_LEVEL` environment variable sets the shared logger level. It runs as a command and does not stay active. It stores no database or secret data.
 
 ## npm package contents
 

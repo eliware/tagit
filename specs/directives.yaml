@@ -1,5 +1,5 @@
 version: "15.0"
-description: Specification for TagIt release commands and repository checks.
+description: Specification for tagit release commands and repository checks.
 directives:
   - id: E-1100.0
     dos:

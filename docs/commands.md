@@ -1,8 +1,8 @@
 # Command guide
 
-Run TagIt commands from the root of the target repository. Install TagIt and its required tools first. See the [requirements guide](requirements.md).
+Run tagit commands from the root of the target repository. Install tagit and its required tools first. See the [requirements guide](requirements.md).
 
-## Install TagIt
+## Install tagit
 
 Install the global command:
 
@@ -10,7 +10,7 @@ Install the global command:
 npm install --global @eliware/tagit
 ```
 
-Or run TagIt without a global install:
+Or run tagit without a global install:
 
 ```text
 npx --yes @eliware/tagit --help
@@ -80,12 +80,12 @@ upstream [--dry-run] [merge-message...]
 
 The command fetches the configured `upstream` remote, merges its default branch, and pushes the merge. It uses `upstream/HEAD` when Git defines it. If Git does not define that reference, it uses `upstream/main`.
 
-Pass a merge message after the options. If you omit the message, TagIt uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. The message must not contain more than 500 characters or control characters.
+Pass a merge message after the options. If you omit the message, tagit uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. The message must not contain more than 500 characters or control characters.
 
 Use `--dry-run` to show the branch and message without fetch, merge, or push actions.
 
 ## Errors and exit codes
 
-Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. TagIt cuts off long error output. TagIt redacts recognized credentials.
+Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. The `tagit` command cuts off long error output. It redacts recognized credentials.
 
 A bad option, repeated option, unknown argument, or missing version value returns `1`. `--version` needs a value for `release`. The version query accepts no value. `release-wait` always uses the latest tag.

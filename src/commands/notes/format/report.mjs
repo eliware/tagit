@@ -1,7 +1,7 @@
 export function formatNotesReport(tag, changes) {
   const { commits, files, excerpt } = changes;
   return [
-    "TAGIT NOTES REPORT",
+    "tagit notes report",
     `Range: ${tag}..current commit`,
     "",
     "COMMITS",
@@ -24,6 +24,6 @@ export function formatNotesReport(tag, changes) {
     "   Use regression, integration, smoke, or E2E tests.",
     "5. Run tagit preflight after you update the notes and tests.",
     "",
-    "TagIt reads files and makes no changes. It does not change versions, commit, tag, or publish.",
+    "The tagit command reads files and makes no changes. It does not change versions, commit, tag, or publish.",
   ].join("\n");
 }

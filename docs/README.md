@@ -1,6 +1,6 @@
-# TagIt documentation
+# tagit documentation
 
-Use these guides to install TagIt, run commands, and complete a release handoff.
+Use these guides to install tagit, run commands, and complete a release handoff.
 
 - [Commands](commands.md)
 - [Operations](operations.md)

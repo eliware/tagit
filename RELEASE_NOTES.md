@@ -129,7 +129,7 @@
 ### Changed
 
 - Report all preflight failures and stop CI checks for dirty worktrees.
-- Keep template validation active while TagIt skips release actions.
+- Keep template validation active while tagit skips release actions.
 
 ## 1.1.24 — 2026-08-23
 

@@ -7,7 +7,7 @@ export function runPushCommand({ execFileSync, reportCiLinks, log, exit, dryRun 
     execFileSync("git", ["push"], { stdio: "inherit" });
     const headSha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
     reportCiLinks(execFileSync, log, headSha, { attempts: 10, delayMs: 2000 });
-    log.info("Push completed. TagIt did not stage untracked files.");
+    log.info("Push completed. The tagit command did not stage untracked files.");
   } catch (error) {
     log.error(error);
     exit(1);

@@ -2,7 +2,7 @@ export function helpText() {
   return [
     "Usage: tagit <command> [options]",
     "",
-    "TAGIT RELEASE WORKFLOW",
+    "tagit release workflow",
     "",
     "Commands:",
     "  notes                     Report changes since the latest tag. Read-only.",
@@ -20,7 +20,7 @@ export function helpText() {
     "",
     "Options:",
     "  -h, --help                Show this overview",
-    "  -v, --version             Show the installed TagIt version",
+    "  -v, --version             Show the installed tagit version",
     "      --dry-run             Check readiness without side effects",
     "      --ignore-100x4        Use an approved coverage waiver",
     "      --ignore-monolith-limits",

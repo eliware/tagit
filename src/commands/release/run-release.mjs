@@ -11,7 +11,9 @@ export async function runReleaseCommand({
   verifyRelease,
 }) {
   if (isTemplateRepository(fs)) {
-    log.info(".notag detected. TagIt checked the template and skipped tagging and publication.");
+    log.info(
+      ".notag detected. The tagit command checked the template and skipped tagging and publication.",
+    );
     return;
   }
   validatePackageReleaseVersion(fs, options.version);

@@ -1,3 +1,3 @@
-# TagIt specifications
+# tagit specifications
 
-- [TagIt directives](directives.yaml)
+- [tagit directives](directives.yaml)

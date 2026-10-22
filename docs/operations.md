@@ -1,6 +1,6 @@
 # Operations guide
 
-TagIt coordinates release checks. It does not deploy applications or edit GitOps repositories. Run each command from the target repository root.
+The `tagit` command coordinates release checks. It does not deploy applications or edit GitOps repositories. Run each command from the target repository root.
 
 ## Prepare an owner handoff
 
@@ -22,25 +22,25 @@ DevOps uses the owner handoff and the approved release process. Run:
 tagit release --version X.Y.Z
 ```
 
-Use the exact version from `package.json`. TagIt runs preflight on the current commit and stops if it fails. If preflight passes, TagIt adds an empty release commit and creates `vX.Y.Z` on that commit. It pushes the branch and tag in one atomic operation. It waits for CI and each applicable publication workflow to start, then reports their links.
+Use the exact version from `package.json`. The `tagit` command runs preflight on the current commit and stops if it fails. If preflight passes, it adds an empty release commit and creates `vX.Y.Z` on that commit. It pushes the branch and tag in one atomic operation. It waits for CI and each applicable publication workflow to start, then reports their links.
 
 The release commit does not change files. Its message includes the release version and date. The commit gives CI a new commit to check. The tag points to that commit.
 
 ## Check the release
 
-After TagIt reports the workflow links, run:
+After tagit reports the workflow links, run:
 
 ```text
 tagit release-wait
 ```
 
-TagIt checks CI for the tagged commit. When `npm.yaml` or `ghcr.yaml` matches a publication profile, TagIt checks that workflow and verifies the registry. Without an applicable publication workflow, the command ends after CI passes.
+The `tagit` command checks CI for the tagged commit. When `npm.yaml` or `ghcr.yaml` matches a publication profile, it checks that workflow and verifies the registry. Without an applicable publication workflow, the command ends after CI passes.
 
 ## Understand command roles
 
 Project owners prepare changes and run `notes`, `push`, and `preflight`. DevOps runs `release` and `release-wait` after the owner handoff.
 
-These role rules describe the organization workflow. TagIt does not authenticate operators or enforce job titles.
+These role rules describe the organization workflow. The `tagit` command does not authenticate operators or enforce job titles.
 
 ## Resolve a failure
 
@@ -55,8 +55,8 @@ If a tag operation fails after a remote action, inspect the local and remote tag
 
 ## Use a template repository
 
-If the target contains `.notag`, TagIt runs validation but skips release actions. It does not update versions, commit, tag, push, or check registry publication for that target.
+If the target contains `.notag`, the `tagit` command runs validation but skips release actions. It does not update versions, commit, tag, push, or check registry publication for that target.
 
 ## Keep deployment in GitOps
 
-TagIt does not deploy application workloads or change production state. Use the organization GitOps repository and its pull request flow to update deployment pins. The GitOps owner controls deployment and rollback.
+The `tagit` command does not deploy application workloads or change production state. Use the organization GitOps repository and its pull request flow to update deployment pins. The GitOps owner controls deployment and rollback.
