@@ -35,17 +35,15 @@ function gitMock() {
   return execFileSync;
 }
 
-test.each([
-  ["npm", ["npm-published"], [".github/workflows/npm.yaml"]],
-  ["GHCR", ["ghcr-published"], [".github/workflows/ghcr.yaml"]],
-  ["neither", ["general"], []],
-])("prepares the %s publication context", (_profile, profiles, expectedPaths) => {
+test("prepares the release identity and runner label context", () => {
   const execFileSync = gitMock();
-  expect(
-    prepareReleaseContext(execFileSync, packageFs(profiles), options).publication.workflows.map(
-      ({ workflowPath }) => workflowPath,
-    ),
-  ).toEqual(expectedPaths);
+  expect(prepareReleaseContext(execFileSync, packageFs(), options)).toMatchObject({
+    repo: "eliware/demo",
+    tag: "v1.2.3",
+    headSha: "abc",
+    publication: { applicable: false, workflows: [] },
+    runnerLabelsByJobName: { validate: ["ubuntu"] },
+  });
 });
 
 test("rejects invalid inputs before reading Git context", () => {

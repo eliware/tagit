@@ -53,3 +53,18 @@ test("does not require npm metadata for a non-publishing private package", () =>
     isPrivate: true,
   });
 });
+
+test("returns no publication targets for a general package profile", () => {
+  expect(
+    readPublicationTarget({
+      existsSync: (file) => file === "package.json",
+      readFileSync: () => JSON.stringify({ name: "demo", eliware: { apply: ["general"] } }),
+    }),
+  ).toEqual({
+    applicable: false,
+    ghcrApplicable: false,
+    workflows: [],
+    packageName: null,
+    isPrivate: false,
+  });
+});

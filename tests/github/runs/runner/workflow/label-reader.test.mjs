@@ -1,4 +1,4 @@
-import { parseWorkflowRunnerLabels } from "../../../src/github/runs/read-workflow-runner-labels.mjs";
+import { parseWorkflowRunnerLabels } from "../../../../../src/github/runs/runner/workflow/label-reader.mjs";
 
 test("maps workflow job ids and display names to runner platforms", () => {
   expect(

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readWorkflowContentsFromGit } from "../../../../src/github/runs/runner/workflow-reader.mjs";
+import { readWorkflowContentsFromGit } from "../../../../../src/github/runs/runner/workflow/reader.mjs";
 
 test("reads workflow contents from the requested revision", () => {
   const content = "jobs:\n  validate:\n    runs-on: ubuntu-latest\n";
