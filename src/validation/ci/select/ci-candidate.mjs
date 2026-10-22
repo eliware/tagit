@@ -5,8 +5,5 @@ export function selectCiCandidate(runs, headSha) {
     .filter((run) => run.headSha === headSha)
     .sort((left, right) => Number(right.databaseId) - Number(left.databaseId));
   const candidates = matching.filter((run) => successfulRun(run));
-  return {
-    candidates,
-    pending: matching.find((run) => run.status !== "completed") ?? null,
-  };
+  return candidates;
 }

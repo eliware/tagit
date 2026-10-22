@@ -4,6 +4,7 @@ import { retryPendingRun } from "./pending-run.mjs";
 import { readExactHeadRuns } from "../read/exact-head/runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
 import { selectCiCandidate } from "../select/ci-candidate.mjs";
+import { selectPendingRun } from "../select/pending-run.mjs";
 import { createCiVerificationFailure } from "./result-policy.mjs";
 import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
 
@@ -19,7 +20,8 @@ export function verifyLatestCi(
   const { repoArg, runs } = readExactHeadRuns(execFileSync, headSha, repo, selectedRun);
   const latest = selectLatestRun(runs, headSha);
   validateCompletedConclusion(latest);
-  const { candidates, pending } = selectCiCandidate(runs, headSha);
+  const candidates = selectCiCandidate(runs, headSha);
+  const pending = selectPendingRun(runs, headSha);
   for (const run of candidates) {
     const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
     if (result) return result;
