@@ -18,16 +18,20 @@ function successfulDetails(headSha = "abc") {
   });
 }
 
+function exactHeadExec(runList, runDetails) {
+  return jest.fn((_command, args) => {
+    if (args[0] === "remote") return "https://github.com/eliware/demo.git";
+    if (args[0] === "api")
+      return JSON.stringify({
+        jobs: [{ id: 10, name: "ubuntu-latest", labels: ["ubuntu-latest"] }],
+      });
+    if (args[1] === "list") return runList;
+    return runDetails;
+  });
+}
+
 test("verifies a successful exact-head Ubuntu run", () => {
-  const exec = jest.fn((command, args) =>
-    args[0] === "remote"
-      ? "https://github.com/eliware/demo.git"
-      : args[0] === "api"
-        ? JSON.stringify({ jobs: [{ id: 10, name: "ubuntu-latest", labels: ["ubuntu-latest"] }] })
-        : args[1] === "list"
-          ? successfulRun()
-          : successfulDetails(),
-  );
+  const exec = exactHeadExec(successfulRun(), successfulDetails());
   expect(
     verifyLatestCi(exec, log, {
       headSha: "abc",
@@ -119,15 +123,7 @@ test("uses older successful exact-head evidence when the newest run failed", () 
 });
 
 test("rejects exact-head runs without passing Ubuntu evidence", () => {
-  const exec = jest.fn((command, args) =>
-    args[0] === "remote"
-      ? "https://github.com/eliware/demo.git"
-      : args[0] === "api"
-        ? JSON.stringify({ jobs: [{ id: 10, name: "ubuntu-latest", labels: ["ubuntu-latest"] }] })
-        : args[1] === "list"
-          ? successfulRun(4)
-          : successfulDetails("other"),
-  );
+  const exec = exactHeadExec(successfulRun(4), successfulDetails("other"));
   expect(() =>
     verifyLatestCi(exec, log, {
       headSha: "abc",
