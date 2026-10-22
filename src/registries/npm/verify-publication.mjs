@@ -1,17 +1,7 @@
 import { execFileCommand } from "../../process/async/exec-file.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
-
-function readNpmView(output, version) {
-  const value = JSON.parse(output);
-  return Array.isArray(value) ? value.length === 1 && value[0] === version : value === version;
-}
-
-function npmErrorSummary(error) {
-  const detail = String(error.stderr ?? error.stdout ?? error.message ?? "");
-  if (/\b404\b|E404|Not Found/i.test(detail)) return "404 not found";
-  if (error.code && /^[A-Z0-9_-]+$/i.test(String(error.code))) return String(error.code);
-  return "request failed";
-}
+import { npmErrorSummary } from "./error-summary.mjs";
+import { npmViewHasVersion } from "./view-response.mjs";
 
 export async function verifyNpmPublication(
   execFile,
@@ -23,7 +13,7 @@ export async function verifyNpmPublication(
     const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
     try {
       const output = await execFileCommand(execFile, executable, args, options);
-      const exists = readNpmView(output, version);
+      const exists = npmViewHasVersion(output, version);
       log.info?.(`${status}: ${exists ? "available" : "not found"}.`);
       if (exists) return;
     } catch (error) {

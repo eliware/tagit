@@ -8,7 +8,7 @@ import {
   buildCiVerificationFailure,
   buildPlatformVerificationFailure,
 } from "../build-ci-verification-failure.mjs";
-import { readRepositoryName } from "../../../github/links/read/repository-name.mjs";
+import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
 
 export function verifyLatestCi(
   execFileSync,

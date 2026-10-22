@@ -4,12 +4,8 @@ import { parseUpstreamArguments } from "./parse-upstream-arguments.mjs";
 import { mergeUpstream } from "./merge/upstream.mjs";
 
 export function runUpstream(args, execFileSync, now, log) {
-  const parsedArguments = parseUpstreamArguments(args);
-  const dryRun = parsedArguments.includes("--dry-run");
-  const message = mergeMessage(
-    parsedArguments.filter((argument) => argument !== "--dry-run"),
-    now,
-  );
+  const { dryRun, messageArguments } = parseUpstreamArguments(args);
+  const message = mergeMessage(messageArguments, now);
   if (dryRun) {
     const upstreamBranch = resolveUpstreamBranch(execFileSync);
     log.log(

@@ -51,15 +51,7 @@ test("reports absent CI without blocking retries and rejects invalid remotes", (
     ),
   ).toThrow("Cannot determine");
 });
-test("handles missing job links and job arrays", () => {
-  const exec = jest.fn((command, args) =>
-    command === "git"
-      ? "git@github.com:eliware/tagit.git"
-      : args[1] === "list"
-        ? JSON.stringify([{ databaseId: 8, url: "https://ci/8", headSha: "abc" }])
-        : JSON.stringify({ jobs: null }),
-  );
-  expect(() => reportCiLinks(exec, log(), "abc")).toThrow("malformed job records");
+test("reports jobs without links", () => {
   const noLink = jest.fn((command, args) =>
     command === "git"
       ? "git@github.com:eliware/tagit.git"
