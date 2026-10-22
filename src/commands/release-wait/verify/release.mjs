@@ -1,7 +1,6 @@
 import { execFile as defaultExecFile } from "node:child_process";
 import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
 import { prepareReleaseContext } from "../prepare-release-context.mjs";
-import { readPublicationTarget } from "../read/publication-target.mjs";
 import { reportReleaseStart } from "../report/release/start.mjs";
 import { verifyReleaseCompletion } from "./release/completion.mjs";
 export { npmExecutable } from "../../../process/commands/npm-executable.mjs";
@@ -25,15 +24,18 @@ export async function verifyRelease(
     execFile = defaultExecFile,
   } = {},
 ) {
-  const { repo, tag, headSha, runnerLabelsByJobName } = prepareReleaseContext(execFileSync, {
-    version,
-    release,
-    maxPolls,
-    npmRetries,
-    pollMs,
-    npmRetryMs,
-  });
-  const publication = readPublicationTarget(fs);
+  const { repo, tag, headSha, runnerLabelsByJobName, publication } = prepareReleaseContext(
+    execFileSync,
+    fs,
+    {
+      version,
+      release,
+      maxPolls,
+      npmRetries,
+      pollMs,
+      npmRetryMs,
+    },
+  );
   const publicationWorkflows = publication.workflows;
   const checkPublish = publicationWorkflows.length > 0;
   if (linksOnly) {

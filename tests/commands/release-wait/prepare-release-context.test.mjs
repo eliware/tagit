@@ -1,34 +1,63 @@
 import { jest } from "@jest/globals";
 import { prepareReleaseContext } from "../../../src/commands/release-wait/prepare-release-context.mjs";
 
-test("validates release inputs and prepares repository and runner context", () => {
+const options = {
+  version: "1.2.3",
+  release: { commitSha: "abc" },
+  maxPolls: 2,
+  npmRetries: 2,
+  pollMs: 1,
+  npmRetryMs: 1,
+};
+
+function packageFs(profiles = ["general"]) {
+  return {
+    existsSync: (file) =>
+      file === "package.json" ||
+      (profiles.includes("npm-published") && file === ".github/workflows/npm.yaml") ||
+      (profiles.includes("ghcr-published") && file === ".github/workflows/ghcr.yaml"),
+    readFileSync: () =>
+      JSON.stringify({
+        name: "demo",
+        private: false,
+        eliware: { apply: profiles },
+      }),
+  };
+}
+
+function gitMock() {
   const execFileSync = jest.fn((_command, args) => {
     if (args[0] === "rev-parse") return "abc";
     if (args[0] === "remote") return "https://github.com/eliware/demo.git";
     if (args[0] === "show") return "jobs:\n  validate:\n    runs-on: ubuntu-latest";
     return "";
   });
+  return execFileSync;
+}
+
+test.each([
+  ["npm", ["npm-published"], [".github/workflows/ci.yaml", ".github/workflows/npm.yaml"]],
+  ["GHCR", ["ghcr-published"], [".github/workflows/ci.yaml", ".github/workflows/ghcr.yaml"]],
+  ["neither", ["general"], [".github/workflows/ci.yaml"]],
+])("reads only CI and the %s publication workflow", (_profile, profiles, expectedPaths) => {
+  const execFileSync = gitMock();
   expect(
-    prepareReleaseContext(execFileSync, {
-      version: "1.2.3",
-      release: { commitSha: "abc" },
-      maxPolls: 2,
-      npmRetries: 2,
-      pollMs: 1,
-      npmRetryMs: 1,
-    }),
-  ).toEqual({
-    repo: "eliware/demo",
-    tag: "v1.2.3",
-    headSha: "abc",
-    runnerLabelsByJobName: { validate: ["ubuntu"] },
-  });
+    prepareReleaseContext(execFileSync, packageFs(profiles), options).publication.workflows.map(
+      ({ workflowPath }) => workflowPath,
+    ),
+  ).toEqual(expectedPaths.slice(1));
+  expect(
+    execFileSync.mock.calls
+      .filter(([, args]) => args[0] === "show")
+      .map(([, args]) => args[1].split(":")[1]),
+  ).toEqual(expectedPaths);
 });
 
 test("rejects invalid inputs before reading Git context", () => {
   const execFileSync = jest.fn();
+  const fs = { existsSync: jest.fn(), readFileSync: jest.fn() };
   expect(() =>
-    prepareReleaseContext(execFileSync, {
+    prepareReleaseContext(execFileSync, fs, {
       version: "next",
       release: { commitSha: "abc" },
       maxPolls: 2,
@@ -38,4 +67,5 @@ test("rejects invalid inputs before reading Git context", () => {
     }),
   ).toThrow("must be valid");
   expect(execFileSync).not.toHaveBeenCalled();
+  expect(fs.existsSync).not.toHaveBeenCalled();
 });
