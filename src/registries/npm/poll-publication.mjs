@@ -1,8 +1,6 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
-import { reportNpmViewFailure } from "./error/view/failure.mjs";
-import { reportNpmViewResult } from "./error/view/result.mjs";
-import { npmViewHasVersion } from "./view-response.mjs";
+import { reportNpmViewAttempt } from "./error/view/attempt.mjs";
 
 export async function pollNpmPublication(
   execFile,
@@ -14,11 +12,9 @@ export async function pollNpmPublication(
     const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
     try {
       const output = await execFileCommand(execFile, executable, args, options);
-      const exists = npmViewHasVersion(output, version);
-      reportNpmViewResult(log, status, exists);
-      if (exists) return;
+      if (reportNpmViewAttempt(log, status, { output, version })) return;
     } catch (error) {
-      reportNpmViewFailure(log, status, error);
+      reportNpmViewAttempt(log, status, { error });
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }
