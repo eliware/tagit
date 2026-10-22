@@ -3,11 +3,6 @@ import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
 import { prepareReleaseContext } from "../prepare-release-context.mjs";
 import { reportReleaseStart } from "../report/release/start.mjs";
 import { verifyReleaseCompletion } from "./release/completion.mjs";
-export { npmExecutable } from "../../../process/commands/npm-executable.mjs";
-export { waitSync } from "../../../process/timing/wait-sync.mjs";
-export { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
-export { execFileCommand as releaseCommand } from "../../../process/async/exec-file.mjs";
-export { reportCiLinks } from "../../../github/links/report-ci/links.mjs";
 export async function verifyRelease(
   execFileSync,
   fs,

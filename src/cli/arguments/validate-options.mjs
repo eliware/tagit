@@ -1,8 +1,5 @@
-import {
-  validateAllowedOptions,
-  validateCommandPolicy,
-  validateOptionDuplicates,
-} from "./option-policy.mjs";
+import { validateAllowedOptions, validateOptionDuplicates } from "./option-policy.mjs";
+import { validateCommandPolicy } from "./command-policy.mjs";
 
 export function validateOptions(argv, command) {
   validateAllowedOptions(argv);

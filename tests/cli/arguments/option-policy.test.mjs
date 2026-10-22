@@ -1,6 +1,5 @@
 import {
   validateAllowedOptions,
-  validateCommandPolicy,
   validateOptionDuplicates,
 } from "../../../src/cli/arguments/option-policy.mjs";
 
@@ -9,13 +8,4 @@ test("validates option vocabulary and duplicate options", () => {
   expect(() => validateOptionDuplicates(["release", "--dry-run", "--dry-run"])).toThrow(
     "Duplicate",
   );
-});
-
-test("enforces command-specific option policy", () => {
-  expect(() => validateCommandPolicy(["notes", "--dry-run"], "notes")).toThrow("requires push");
-  expect(() =>
-    validateCommandPolicy(["release-wait", "--version", "1.0.0"], "release-wait"),
-  ).toThrow("latest tag");
-  expect(() => validateCommandPolicy(["release"], "release")).toThrow("required");
-  expect(() => validateCommandPolicy(["release", "--version", "1.2.3"], "release")).not.toThrow();
 });

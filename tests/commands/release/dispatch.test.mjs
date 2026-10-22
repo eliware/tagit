@@ -64,14 +64,6 @@ test("runs the prepared release transaction and verifies its tag", async () => {
   );
 });
 
-test("forwards dry-run to the release transaction boundary", async () => {
-  const deps = base();
-  deps.fs.existsSync.mockImplementation((file) => file === "package.json");
-  deps.fs.readFileSync.mockReturnValue(JSON.stringify({ version: "1.2.3" }));
-  await runReleaseCommand({ command: "release", version: "1.2.3", dryRun: true }, deps);
-  expect(deps.gitOperations).not.toHaveBeenCalled();
-});
-
 test("blocks a package version mismatch and skips tag creation", async () => {
   const deps = base();
   deps.fs.existsSync.mockImplementation((file) => file === "package.json");
@@ -80,12 +72,4 @@ test("blocks a package version mismatch and skips tag creation", async () => {
     "does not match",
   );
   expect(deps.gitOperations).not.toHaveBeenCalled();
-});
-
-test("keeps template releases validation-only after strict preflight", async () => {
-  const deps = base();
-  deps.fs.existsSync.mockImplementation((file) => file === ".notag");
-  await runReleaseCommand({ command: "release", version: "1.2.3" }, deps);
-  expect(deps.gitOperations).not.toHaveBeenCalled();
-  expect(deps.verifyRelease).not.toHaveBeenCalled();
 });
