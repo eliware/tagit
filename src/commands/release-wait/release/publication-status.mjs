@@ -3,6 +3,7 @@ import { verifyRegistries } from "../verify/registries.mjs";
 import { verifyReleaseJobs } from "../../../github/runs/release/job-policy.mjs";
 import { verifyPublishJob } from "../verify/publish-job.mjs";
 import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
+import { reportPublicationJobLinks } from "../report/publication-job-links.mjs";
 
 export async function verifyReleasePublication({
   fs,
@@ -42,12 +43,7 @@ export async function verifyReleasePublication({
       isPrivate: target.isPrivate,
     });
     log.info(`Release ${target.profile} workflow verified for ${repo}@${tag}.`);
-    publishJobs.forEach((job) => {
-      if (job.url) log.info(`${target.profile}: [${job.url}](${job.url})`);
-    });
-    windowsJobs.forEach((job) => {
-      if (job.url) log.info(`Windows: [${job.url}](${job.url})`);
-    });
+    reportPublicationJobLinks(log, target.profile, windowsJobs, publishJobs);
   }
   if (!applicable && !ghcrApplicable)
     return { repo, tag, headSha, ci: true, npm: false, ghcr: false };

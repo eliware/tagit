@@ -1,4 +1,5 @@
-import { parseJobs, parseWorkflow } from "../../repository/metadata/workflow/format.mjs";
+import { parseJobs } from "../../repository/metadata/workflow/jobs.mjs";
+import { parseWorkflow } from "../../repository/metadata/workflow/sections.mjs";
 import { jobValue } from "../../repository/metadata/workflow/job-rules.mjs";
 
 function runnerValues(jobLines) {

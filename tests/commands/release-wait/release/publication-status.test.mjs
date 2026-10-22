@@ -88,7 +88,7 @@ test("rejects malformed publish jobs", async () => {
   ).rejects.toThrow("malformed job records");
 });
 
-test("checks GHCR after successful publish and reports job links", async () => {
+test("checks GHCR after a successful publish", async () => {
   const fs = {
     existsSync: (file) => file === "package.json" || file === ".github/workflows/ghcr.yaml",
     readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
@@ -125,6 +125,4 @@ test("checks GHCR after successful publish and reports job links", async () => {
       ],
     }),
   ).resolves.toMatchObject({ ci: true, npm: false, ghcr: true });
-  expect(log.info).toHaveBeenCalledWith("ghcr: [publish-url](publish-url)");
-  expect(log.info).toHaveBeenCalledWith("Windows: [windows-url](windows-url)");
 });
