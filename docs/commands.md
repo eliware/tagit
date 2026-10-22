@@ -1,6 +1,6 @@
 # Command guide
 
-Run tagit commands from the root of the target repository. Install tagit and its required tools first. See the [requirements guide](requirements.md).
+Run commands from the root of the repository that you want to check. Install the required tools first. See the [requirements guide](requirements.md).
 
 ## Install tagit
 
@@ -10,13 +10,13 @@ Install the global command:
 npm install --global @eliware/tagit
 ```
 
-Or run tagit without a global install:
+Run tagit without a global install:
 
 ```text
 npx --yes @eliware/tagit --help
 ```
 
-The npm package provides three commands: `tagit`, `push`, and `upstream`. The `push` command runs the same action as `tagit push`.
+The package provides `tagit`, `push`, and `upstream` commands. The `push` command runs the same action as `tagit push`.
 
 ## Show help or version
 
@@ -28,7 +28,7 @@ Run `tagit --help` or `tagit -h` to show command help. Run `tagit --version` or 
 tagit notes
 ```
 
-This command reports commits and changed files since the latest Git tag. Set the package version before release work. This command does not suggest a version or change files.
+This read-only command reports commits, changed files, and a short diff since the latest Git tag. Read the full diff before you write release notes. The command does not suggest a version or change files. It requires at least one Git tag.
 
 ## Check release readiness
 
@@ -36,11 +36,13 @@ This command reports commits and changed files since the latest Git tag. Set the
 tagit preflight [--ignore-100x4] [--ignore-monolith-limits]
 ```
 
-Preflight checks the worktree, branch, package data, required files, workflows, local test command, and exact-commit CI. It reports all local blockers. It requires passing Ubuntu CI for the current commit. It also requires each Windows job to pass when one exists.
+Run preflight from a clean `main` branch. It runs `npm test` and checks Ubuntu CI for the exact current commit. It also checks each Windows CI job when the workflow defines one. It reports blockers and exits with an error when a required check fails.
+
+The installed Eliware Test package runs the repository convention checks. These checks include package data, required files, workflows, tests, lint, type checks, audit, packaging, and coverage when the active profile requires them. Tagit checks the Git branch and worktree, then verifies GitHub Actions results.
+
+Use `--ignore-100x4` only with an approved coverage waiver. Use `--ignore-monolith-limits` only with an approved module-size waiver. These options apply to `preflight` and `release`. They do not skip other required checks.
 
 Preflight does not accept `--dry-run`. It does not change files, commits, tags, or registry data.
-
-The `--ignore-100x4` option forwards the coverage waiver to `npm test`. The `--ignore-monolith-limits` option forwards the monolith waiver. Use one option only with an approved waiver. These options apply only to `preflight` and `release`.
 
 ## Push existing commits
 
@@ -48,9 +50,9 @@ The `--ignore-100x4` option forwards the coverage waiver to `npm test`. The `--i
 tagit push [--dry-run]
 ```
 
-The command pushes commits from the current branch. It does not stage files or create commits. It ignores untracked files and reports available CI links.
+This command pushes commits from the current branch. It does not stage files or create commits. After the push, it looks for CI runs on the current commit and reports links when it finds them.
 
-Use `--dry-run` to skip the push and CI lookup.
+Use `--dry-run` to skip the push and CI lookup. The command does not require the branch to be `main`.
 
 ## Run a release
 
@@ -58,11 +60,11 @@ Use `--dry-run` to skip the push and CI lookup.
 tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-limits]
 ```
 
-Replace `X.Y.Z` with the version in `package.json`. The version has three numbers and no suffix. The command has no default version.
+Replace `X.Y.Z` with the exact three-part version in `package.json`. The command does not select a version. The version must match the package version.
 
-The command runs preflight on the current commit. If preflight passes, it creates an empty release commit. Its message includes the version and date. It adds `vX.Y.Z` to that commit and pushes the branch and tag atomically. It then polls for CI and one applicable publication workflow. It reports the workflow links and exits.
+The command runs preflight on the current commit. If preflight passes, tagit creates an empty release commit with the version and date. It adds the `vX.Y.Z` tag to that commit. It pushes `main` and the tag in one atomic operation. It then waits for CI and any applicable publication workflows to start. It reports their links and exits.
 
-Use `--dry-run` to check the release path without a version change, commit, tag, push, or publish action. The waiver options have the same limits as preflight.
+Use `--dry-run` to check release version data without preflight, commit, tag, push, or publication actions. Use the waiver options only with an approved waiver. A repository with a `.notag` file skips release actions.
 
 ## Check a release
 
@@ -70,7 +72,11 @@ Use `--dry-run` to check the release path without a version change, commit, tag,
 tagit release-wait
 ```
 
-The command uses the latest release tag. Do not pass `--version`. It waits for CI on the tagged commit and checks its result. When `npm.yaml` or `ghcr.yaml` matches a publication profile, it also checks publication. It retries registry checks until a fixed time limit. It returns an error if required CI or publication data is missing, incomplete, or failed.
+This command checks the latest release tag. Do not pass `--version`. Tagit checks CI for the commit that the tag identifies. It checks npm or GHCR publication only when both the matching `eliware.apply` profile and its workflow file exist.
+
+For npm, the profile is `npm-published` and the workflow is `.github/workflows/npm.yaml`. For GHCR, the profile is `ghcr-published` and the workflow is `.github/workflows/ghcr.yaml`. Tagit checks a registry only when its profile and workflow file exist.
+
+Tagit polls for missing CI or publication runs and for registry visibility. It reports progress during each check. It exits with an error if required CI, publication, or registry verification fails or does not complete before polling stops.
 
 ## Merge from upstream
 
@@ -78,14 +84,14 @@ The command uses the latest release tag. Do not pass `--version`. It waits for C
 upstream [--dry-run] [merge-message...]
 ```
 
-The command fetches the configured `upstream` remote, merges its default branch, and pushes the merge. It uses `upstream/HEAD` when Git defines it. If Git does not define that reference, it uses `upstream/main`.
+This command fetches the configured `upstream` remote, merges its default branch, and pushes the merge to the current branch. It uses `upstream/HEAD` when Git defines it. If Git does not define `upstream/HEAD`, it uses `upstream/main`.
 
-Pass a merge message after the options. If you omit the message, tagit uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. The message must not contain more than 500 characters or control characters.
+Pass a merge message after the options. If you omit the message, tagit uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. Use a maximum of 500 characters. Do not use control characters.
 
 Use `--dry-run` to show the branch and message without fetch, merge, or push actions.
 
 ## Errors and exit codes
 
-Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. The `tagit` command cuts off long error output. It redacts recognized credentials.
+Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. Tagit redacts recognized credentials and limits long error output.
 
-A bad option, repeated option, unknown argument, or missing version value returns `1`. `--version` needs a value for `release`. The version query accepts no value. `release-wait` always uses the latest tag.
+A bad option, repeated option, unknown argument, or missing required value returns `1`. The `release` command requires `--version X.Y.Z`. The version query accepts no value. `release-wait` always uses the latest tag.
