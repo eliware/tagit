@@ -1,5 +1,5 @@
-import { readGithubJson } from "../../../../github/cli/read-json.mjs";
 import { selectReleaseRun } from "../../../../github/runs/release/run/selection.mjs";
+import { readReleaseCiJson } from "./json.mjs";
 
 export async function readReleaseCiCandidate(
   execFile,
@@ -8,7 +8,7 @@ export async function readReleaseCiCandidate(
   tag,
   workflowPath = ".github/workflows/ci.yaml",
 ) {
-  const runs = await readGithubJson(execFile, "gh", [
+  const runs = await readReleaseCiJson(execFile, [
     "run",
     "list",
     "--repo",

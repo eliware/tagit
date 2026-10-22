@@ -1,7 +1,7 @@
 import { selectLatestRun } from "../select/run.mjs";
 import { verifyCompletedRun } from "./completed-run.mjs";
 import { retryPendingRun } from "./pending-run.mjs";
-import { readExactHeadRuns } from "../read/exact-head-runs.mjs";
+import { readExactHeadRuns } from "../read/exact-head/runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
 import { selectCiCandidate } from "../select/ci-candidate.mjs";
 import { createCiVerificationFailure } from "./result-policy.mjs";

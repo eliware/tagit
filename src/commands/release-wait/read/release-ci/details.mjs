@@ -1,7 +1,7 @@
-import { readGithubJson } from "../../../../github/cli/read-json.mjs";
+import { readReleaseCiJson } from "./json.mjs";
 
 export function readReleaseCiDetails(execFile, repo, databaseId) {
-  return readGithubJson(execFile, "gh", [
+  return readReleaseCiJson(execFile, [
     "run",
     "view",
     String(databaseId),

@@ -1,6 +1,8 @@
 import { pollReleaseCi } from "../../release/ci/status.mjs";
 import { verifyReleaseCi } from "./ci.mjs";
-import { verifyReleasePublication } from "../../release/publication/status.mjs";
+import { verifyPublicationJobs } from "../../release/publication/jobs.mjs";
+import { selectReleasePublicationTargets } from "../../release/publication/targets.mjs";
+import { verifyPublicationRegistries } from "../../release/publication/registries.mjs";
 
 export async function verifyReleaseCompletion({
   fs,
@@ -27,7 +29,7 @@ export async function verifyReleaseCompletion({
     workflowPath: ".github/workflows/ci.yaml",
     workflowLabel: "CI",
   });
-  const verifiedTarget = verifyReleaseCi(fs, log, repo, tag, run, runnerLabelsByJobName);
+  const npmTarget = verifyReleaseCi(fs, log, repo, tag, run, runnerLabelsByJobName);
   if (!checkPublish) return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
   const publicationRuns = [];
   for (const workflow of publicationWorkflows) {
@@ -38,19 +40,31 @@ export async function verifyReleaseCompletion({
     });
     publicationRuns.push({ ...workflow, run: publicationRun });
   }
-  return verifyReleasePublication({
+  const { targets, ghcrApplicable } = selectReleasePublicationTargets(fs, npmTarget);
+  verifyPublicationJobs({
+    targets,
+    publicationRuns,
+    applicable: npmTarget.applicable,
+    isPrivate: npmTarget.isPrivate,
+    repo,
+    tag,
+    log,
+  });
+  if (!npmTarget.applicable && !ghcrApplicable)
+    return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
+  return verifyPublicationRegistries({
     fs,
-    runnerLabelsByJobName,
     execFile,
     log,
     repo,
     tag,
     headSha,
     version,
-    run,
-    publicationRuns,
-    verifiedTarget,
     release,
+    applicable: npmTarget.applicable,
+    packageName: npmTarget.packageName,
+    isPrivate: npmTarget.isPrivate,
+    ghcrApplicable,
     maxPolls,
     npmRetries,
     pollMs,

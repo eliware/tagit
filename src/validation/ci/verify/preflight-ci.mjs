@@ -1,5 +1,5 @@
 import { verifyLatestCi } from "./exact-head.mjs";
-import { readWorkflowRunnerLabels } from "../../../github/runs/runner/label-reader.mjs";
+import { readWorkflowRunnerLabelsFile } from "../../../github/runs/runner/file-reader.mjs";
 
 export function verifyPreflightCi(execFileSync, log, status, fs = null) {
   if (status) return { passed: false, blocked: true };
@@ -7,7 +7,7 @@ export function verifyPreflightCi(execFileSync, log, status, fs = null) {
     const headSha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
     return verifyLatestCi(execFileSync, log, {
       headSha,
-      runnerLabelsByJobName: readWorkflowRunnerLabels(fs, ".github/workflows/ci.yaml"),
+      runnerLabelsByJobName: readWorkflowRunnerLabelsFile(fs, ".github/workflows/ci.yaml"),
     });
   } catch (error) {
     return { passed: false, error };

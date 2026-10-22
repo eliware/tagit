@@ -38,6 +38,24 @@ test("ends after CI when no publication profile applies", async () => {
   expect(poll.mock.calls[0][0].workflowPath).toBe(".github/workflows/ci.yaml");
 });
 
+test("returns after CI when publication checks find no targets", async () => {
+  const poll = jest.fn(async () => ({
+    databaseId: 1,
+    jobs: [
+      { name: "validate", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+    ],
+  }));
+  await expect(verifyReleaseCompletion({ ...base, checkPublish: true, poll })).resolves.toEqual({
+    repo: "eliware/demo",
+    tag: "v1.0.0",
+    headSha: "abc",
+    ci: true,
+    npm: false,
+    ghcr: false,
+  });
+  expect(poll).toHaveBeenCalledTimes(1);
+});
+
 test("uses the default CI poller when no poll override is supplied", async () => {
   const execFile = jest.fn((_command, args, _options, callback) => {
     if (args[1] === "list")
