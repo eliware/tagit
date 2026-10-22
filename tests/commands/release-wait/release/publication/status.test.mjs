@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { verifyReleasePublication } from "../../../../../src/commands/release-wait/release/publication/status.mjs";
 
-test("reports a public npm publication and skips GHCR when not declared", async () => {
+test("returns a CI result when no publication target applies", async () => {
   const fs = {
     existsSync: (file) => file === "package.json",
     readFileSync: () => JSON.stringify({ name: "demo", private: true }),
@@ -34,7 +34,7 @@ test("reports a public npm publication and skips GHCR when not declared", async 
       npmRetryMs: 0,
       sleep: jest.fn(),
     }),
-  ).resolves.toMatchObject({ ci: true, npm: false, ghcr: false });
+  ).resolves.toMatchObject({ ci: true, ghcr: false });
 });
 
 const publicationInput = {

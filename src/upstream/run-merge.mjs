@@ -1,4 +1,4 @@
-import { mergeMessage } from "./merge/message.mjs";
+import { mergeMessage } from "./merge/message/build.mjs";
 import { resolveUpstreamBranch } from "./branch.mjs";
 import { parseUpstreamArguments } from "./parse-upstream-arguments.mjs";
 import { mergeUpstream } from "./merge/upstream.mjs";

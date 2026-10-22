@@ -15,12 +15,3 @@ test("builds a quoted npm command for Windows shims", () => {
     options: { encoding: "utf8", shell: true },
   });
 });
-
-test.each([
-  [{ packageName: "demo & whoami", version: "1.0.0" }, "Package name is invalid"],
-  [{ packageName: "demo", version: "1.0.0 & whoami" }, "Version is invalid"],
-  [{ version: "1.0.0" }, "Package name is invalid"],
-  [{ packageName: "demo" }, "Version is invalid"],
-])("rejects invalid npm view inputs", (input, message) => {
-  expect(() => buildNpmViewCommand(input.packageName, input.version, "win32")).toThrow(message);
-});

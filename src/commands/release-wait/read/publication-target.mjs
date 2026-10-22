@@ -1,5 +1,5 @@
 import { readPackageName } from "../../../registries/npm/read-package-name.mjs";
-import { validateNpmPublicationName } from "../../../registries/npm/validate-publication-name.mjs";
+import { validateNpmPublicationName } from "../../../registries/npm/validate/publication-name.mjs";
 import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
 
 export function readPublicationTarget(fs) {

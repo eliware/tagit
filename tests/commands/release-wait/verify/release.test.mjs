@@ -61,13 +61,14 @@ test.each([
   expect(inspect).not.toHaveBeenCalled();
 });
 
-test("returns links-only CI evidence without registry verification", async () => {
-  await expect(
-    verifyRelease(execFileSync, fs, log, { ...input, linksOnly: true, execFile }),
-  ).resolves.toMatchObject({
-    ciRunId: 1,
-    publishRunId: null,
+test("selects the links-only report path when requested", async () => {
+  const result = await verifyRelease(execFileSync, fs, log, {
+    ...input,
+    linksOnly: true,
+    execFile,
   });
+  expect(result).toMatchObject({ linksOnly: true });
+  expect(result).not.toHaveProperty("ci");
 });
 
 test("rejects when CI details are invalid or the release identity is unavailable", async () => {
