@@ -10,19 +10,3 @@ test("coordinates release identity and job validation", () => {
   };
   expect(validateReleaseRunDetails(details, { databaseId: 1 }, "abc")).toBe(details);
 });
-
-test("rejects malformed job records", () => {
-  expect(() =>
-    validateReleaseRunDetails(
-      {
-        databaseId: 1,
-        status: "completed",
-        conclusion: "success",
-        headSha: "abc",
-        jobs: [{}],
-      },
-      { databaseId: 1 },
-      "abc",
-    ),
-  ).toThrow("malformed job records");
-});

@@ -2,15 +2,14 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { runUpstream } from "../src/upstream/run-merge.mjs";
+import { showUpstreamHelp } from "../src/upstream/cli/help.mjs";
+import { showUpstreamVersion } from "../src/upstream/cli/version.mjs";
 
 const args = process.argv.slice(2);
 if (args.includes("--help") || args.includes("-h")) {
-  console.log(
-    "Usage: upstream [--dry-run] [merge-message...]\nFetch upstream, merge its default branch, and push the result.",
-  );
+  showUpstreamHelp(console);
 } else if (args.includes("--version") || args.includes("-v")) {
-  const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-  console.log(packageJson.version);
+  showUpstreamVersion(readFileSync, new URL("../package.json", import.meta.url), console);
 } else {
   runUpstream(args, execFileSync, new Date(), console);
 }

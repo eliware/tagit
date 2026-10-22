@@ -1,6 +1,6 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
-import { npmErrorSummary } from "./error/summary.mjs";
+import { reportNpmViewFailure, reportNpmViewResult } from "./error/report-view-attempt.mjs";
 import { npmViewHasVersion } from "./view-response.mjs";
 import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
 
@@ -16,10 +16,10 @@ export async function verifyNpmPublication(
     try {
       const output = await execFileCommand(execFile, executable, args, options);
       const exists = npmViewHasVersion(output, version);
-      log.info?.(`${status}: ${exists ? "available" : "not found"}.`);
+      reportNpmViewResult(log, status, exists);
       if (exists) return;
     } catch (error) {
-      log.info?.(`${status}: failed (${npmErrorSummary(error)}).`);
+      reportNpmViewFailure(log, status, error);
     }
     if (attempt + 1 < retries) await sleep(retryMs);
   }
