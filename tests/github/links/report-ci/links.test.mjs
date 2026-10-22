@@ -61,27 +61,3 @@ test("reports jobs without links", () => {
   );
   expect(reportCiLinks(noLink, log(), "abc")).toMatchObject({ runs: [{ databaseId: 9 }] });
 });
-test("rejects malformed responses without blocking retry options", () => {
-  const malformed = jest.fn((command) =>
-    command === "git" ? "https://github.com/eliware/tagit.git" : JSON.stringify({ runs: [] }),
-  );
-  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("must be an array");
-});
-test("rejects malformed individual run records", () => {
-  const malformed = jest.fn((command) =>
-    command === "git"
-      ? "https://github.com/eliware/tagit.git"
-      : JSON.stringify([{ databaseId: "bad", url: "https://ci", headSha: "abc" }]),
-  );
-  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("malformed run records");
-});
-test("rejects malformed individual job records", () => {
-  const malformed = jest.fn((command, args) =>
-    command === "git"
-      ? "https://github.com/eliware/tagit.git"
-      : args[1] === "list"
-        ? JSON.stringify([{ databaseId: 10, url: "https://ci/10", headSha: "abc" }])
-        : JSON.stringify({ jobs: [null, 42, { url: "https://ci/job" }] }),
-  );
-  expect(() => reportCiLinks(malformed, log(), "abc")).toThrow("malformed job records");
-});

@@ -12,3 +12,13 @@ test("reads and filters exact-head CI runs", () => {
     { databaseId: 1, url: "run", headSha: "abc" },
   ]);
 });
+
+test("rejects a response that does not contain a run array", () => {
+  expect(() =>
+    readCiRuns(
+      jest.fn(() => JSON.stringify({ runs: [] })),
+      "eliware/demo",
+      "abc",
+    ),
+  ).toThrow("must be an array");
+});

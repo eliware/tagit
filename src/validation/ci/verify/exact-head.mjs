@@ -4,10 +4,7 @@ import { retryPendingRun } from "./pending-run.mjs";
 import { readExactHeadRuns } from "../read/exact-head-runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
 import { selectCiCandidate } from "../select/ci-candidate.mjs";
-import {
-  buildCiVerificationFailure,
-  buildPlatformVerificationFailure,
-} from "../build-ci-verification-failure.mjs";
+import { createCiVerificationFailure } from "./result-policy.mjs";
 import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
 
 export function verifyLatestCi(
@@ -39,6 +36,5 @@ export function verifyLatestCi(
     );
     if (retried) return retried;
   }
-  if (!candidates.length) throw new Error(buildCiVerificationFailure(runs, headSha));
-  throw new Error(buildPlatformVerificationFailure(execFileSync, candidates, headSha));
+  throw createCiVerificationFailure(execFileSync, candidates, runs, headSha);
 }

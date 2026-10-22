@@ -1,5 +1,4 @@
-import { isTemplateRepository } from "../../policy/template-repository-policy.mjs";
-import { validatePackageReleaseVersion } from "./validate-package-release-version.mjs";
+import { evaluateReleasePolicy } from "./policy.mjs";
 
 export async function runReleaseCommand({
   options,
@@ -10,14 +9,14 @@ export async function runReleaseCommand({
   gitOperations,
   startReleaseVerification,
 }) {
-  if (isTemplateRepository(fs)) {
+  const policyResult = evaluateReleasePolicy(fs, options);
+  if (policyResult === "template") {
     log.info(
       ".notag detected. The tagit command checked the template and skipped tagging and publication.",
     );
     return;
   }
-  validatePackageReleaseVersion(fs, options.version);
-  if (options.dryRun) {
+  if (policyResult === "dry-run") {
     log.info(
       "Dry run passed: release versioning, commit, tag, push, and publication were skipped.",
     );
