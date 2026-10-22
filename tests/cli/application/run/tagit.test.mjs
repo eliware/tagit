@@ -17,6 +17,37 @@ test("prints help from the public CLI application", async () => {
   await runTagit({ output, log, registerHandlersFn: noop, registerSignalsFn: noop }, ["--help"]);
   expect(output).toHaveBeenCalledWith(expect.stringContaining("Usage: tagit"));
 });
+test("release-wait follows the latest tag and rejects explicit versions", async () => {
+  const execFileSync = jest.fn((command, args) =>
+    args[0] === "describe" ? `v${packageData.version}` : "abc",
+  );
+  const verifyRelease = jest.fn().mockResolvedValue({});
+  await runTagit(
+    {
+      execFileSync,
+      verifyRelease,
+      log,
+      registerHandlersFn: jest.fn(),
+      registerSignalsFn: jest.fn(),
+    },
+    ["release-wait"],
+  );
+  expect(verifyRelease).toHaveBeenCalled();
+  const exit = jest.fn(() => {
+    throw new Error("exit");
+  });
+  await expect(
+    runTagit(
+      {
+        exit,
+        log,
+        registerHandlersFn: jest.fn(),
+        registerSignalsFn: jest.fn(),
+      },
+      ["release-wait", "--version", packageData.version],
+    ),
+  ).rejects.toThrow("exit");
+});
 test("runs the notes entry point with injected dependencies", async () => {
   const output = jest.fn();
   const buildNotesReport = jest.fn(() => "tagit notes report");
