@@ -15,7 +15,11 @@ test("reads CI and declared publication workflow labels from the release commit"
 
 test("ignores missing optional publication workflows", () => {
   const execFileSync = jest.fn(() => {
-    throw new Error("path not found");
+    const error = new Error("Git workflow file is missing.");
+    error.stderr = Buffer.from(
+      "fatal: path '.github/workflows/ci.yaml' does not exist in 'abc123'",
+    );
+    throw error;
   });
   expect(readReleaseRunnerLabels(execFileSync, "abc123", { workflows: [] })).toEqual(
     Object.create(null),
