@@ -1,4 +1,4 @@
-import { parseGhcrRepository } from "../../../src/registries/ghcr/parse-repository.mjs";
+import { parseGhcrRepository } from "../../../../src/registries/ghcr/parse/repository.mjs";
 
 test("splits a valid owner and image name", () => {
   expect(parseGhcrRepository("eliware/tagit")).toEqual(["eliware", "tagit"]);

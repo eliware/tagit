@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runReleaseCiPollAttempt } from "../../../../../src/commands/release-wait/release/ci/poll-attempt.mjs";
+import { runReleaseCiPollAttempt } from "../../../../../../src/commands/release-wait/release/ci/poll/attempt.mjs";
 
 function executor(list, details) {
   return jest.fn((_command, args, _options, callback) =>

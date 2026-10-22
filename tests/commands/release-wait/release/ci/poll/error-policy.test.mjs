@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { handleReleaseCiPollError } from "../../../src/commands/release-wait/handle-release-ci-poll-error.mjs";
+import { handleReleaseCiPollError } from "../../../../../../src/commands/release-wait/release/ci/poll/error-policy.mjs";
 
 test("rethrows malformed JSON immediately", async () => {
   await expect(

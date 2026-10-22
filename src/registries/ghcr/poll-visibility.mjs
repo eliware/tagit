@@ -1,5 +1,5 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
-import { hasVersionTag } from "./verify/version-tag.mjs";
+import { parseGhcrVersionsResponse } from "./parse/versions-response.mjs";
 
 export async function pollGhcrVisibility(
   execFile,
@@ -9,17 +9,13 @@ export async function pollGhcrVisibility(
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
       log.info(`GHCR check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`);
-      let versions = JSON.parse(
-        await execFileCommand(execFile, "gh", [
-          "api",
-          "--paginate",
-          "--slurp",
-          `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`,
-        ]),
-      );
-      if (!Array.isArray(versions)) throw new Error("GHCR returned an invalid versions response.");
-      if (versions.every(Array.isArray)) versions = versions.flat();
-      const image = versions.find((item) => hasVersionTag(item, `v${version}`));
+      const output = await execFileCommand(execFile, "gh", [
+        "api",
+        "--paginate",
+        "--slurp",
+        `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`,
+      ]);
+      const image = parseGhcrVersionsResponse(output, version);
       if (image) return image;
     } catch (error) {
       log.debug?.(`GHCR check ${attempt + 1}/${retries} failed: ${String(error).slice(0, 300)}`);

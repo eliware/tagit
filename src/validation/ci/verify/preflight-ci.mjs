@@ -1,5 +1,5 @@
 import { verifyLatestCi } from "./exact-head.mjs";
-import { readWorkflowRunnerLabels } from "../../../github/runs/runner-label-reader.mjs";
+import { readWorkflowRunnerLabels } from "../../../github/runs/runner/label-reader.mjs";
 
 export function verifyPreflightCi(execFileSync, log, status, fs = null) {
   if (status) return { passed: false, blocked: true };

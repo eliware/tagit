@@ -1,5 +1,5 @@
-import { runReleaseCiPollAttempt } from "./poll-attempt.mjs";
-import { handleReleaseCiPollError } from "../../handle-release-ci-poll-error.mjs";
+import { runReleaseCiPollAttempt } from "./poll/attempt.mjs";
+import { handleReleaseCiPollError } from "./poll/error-policy.mjs";
 
 export async function pollReleaseCi({
   execFile,
