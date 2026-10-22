@@ -1,23 +1,17 @@
 import { jest } from "@jest/globals";
 import { resolveLatestReleaseTag } from "../../../../src/commands/release-wait/resolve/latest-tag.mjs";
 
-test("resolves and confirms the latest semantic release tag", () => {
+test("resolves the latest semantic release tag and commit", () => {
   const exec = jest.fn((command, args) => {
     if (args[0] === "describe") return "v1.2.3\n";
     if (args[0] === "rev-list") return "abc\n";
     return "tag-object\n";
   });
   expect(resolveLatestReleaseTag(exec)).toEqual({ version: "1.2.3", commitSha: "abc" });
-});
-test("resolves the exact tag selected by Git describe", () => {
-  const exec = jest.fn((command, args) => {
-    if (args[0] === "describe") return "1.2.3\n";
-    if (args[0] === "rev-list") return "abc\n";
-    return "tag-object\n";
-  });
-  expect(resolveLatestReleaseTag(exec)).toEqual({ version: "1.2.3", commitSha: "abc" });
-  expect(exec).toHaveBeenNthCalledWith(2, "git", ["rev-parse", "refs/tags/1.2.3"]);
+  expect(exec).toHaveBeenNthCalledWith(1, "git", ["describe", "--tags", "--abbrev=0"]);
+  expect(exec).toHaveBeenNthCalledWith(2, "git", ["rev-parse", "refs/tags/v1.2.3"]);
   expect(exec).toHaveBeenNthCalledWith(3, "git", ["rev-list", "-n", "1", "tag-object"]);
+  expect(exec).toHaveBeenNthCalledWith(4, "git", ["rev-parse", "refs/tags/v1.2.3"]);
 });
 
 test("rejects invalid or changing latest tags", () => {

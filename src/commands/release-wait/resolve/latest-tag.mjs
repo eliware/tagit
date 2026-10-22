@@ -1,7 +1,9 @@
+import { isReleaseVersion } from "../../../versioning/is-release-version.mjs";
+
 export function resolveLatestReleaseTag(execFileSync) {
   const tag = execFileSync("git", ["describe", "--tags", "--abbrev=0"]).toString().trim();
   const version = tag.replace(/^v/, "");
-  if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version))
+  if (!isReleaseVersion(version))
     throw new Error(`Latest tag is not a semantic release tag: ${tag}`);
   const tagRef = `refs/tags/${tag}`;
   const tagObject = execFileSync("git", ["rev-parse", tagRef]).toString().trim();

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readReleaseRunnerLabels } from "../../../../src/commands/release-wait/read/runner-labels.mjs";
+import { readReleaseRunnerLabels } from "../../../../../src/commands/release-wait/read/runner/labels.mjs";
 
 test("reads CI and declared publication workflow labels from the release commit", () => {
   const execFileSync = jest.fn(() => "jobs:\n  validate:\n    runs-on: ubuntu-latest");

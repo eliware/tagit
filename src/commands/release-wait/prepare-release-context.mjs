@@ -1,5 +1,5 @@
 import { readPublicationTarget } from "./read/publication-target.mjs";
-import { readReleaseRunnerLabels } from "./read/runner-labels.mjs";
+import { readReleaseRunnerLabels } from "./read/runner/labels.mjs";
 import { resolveReleaseContext } from "./resolve/release-context.mjs";
 import { validateReleaseInput } from "./validate/input.mjs";
 
