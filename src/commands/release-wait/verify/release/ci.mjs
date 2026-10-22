@@ -1,6 +1,6 @@
 import { verifyReleaseJobs } from "../../../../github/runs/release/job-policy.mjs";
-import { releaseLinks } from "../../release/links.mjs";
 import { readPublicationTarget } from "../../read/publication-target.mjs";
+import { reportReleaseCiLinks } from "./link-report.mjs";
 
 export function verifyReleaseCi(fs, log, repo, tag, run, runnerLabelsByJobName = {}) {
   if (!Array.isArray(run.jobs))
@@ -8,8 +8,6 @@ export function verifyReleaseCi(fs, log, repo, tag, run, runnerLabelsByJobName =
   const jobs = run.jobs;
   const { windowsJobs } = verifyReleaseJobs(jobs, runnerLabelsByJobName);
   const target = readPublicationTarget(fs);
-  const links = releaseLinks(run, windowsJobs, []);
-  log.info(`Release CI verified for ${repo}@${tag}:`);
-  links.forEach(([label, url]) => log.info(`${label}: [${url}](${url})`));
+  reportReleaseCiLinks(log, repo, tag, run, windowsJobs);
   return target;
 }

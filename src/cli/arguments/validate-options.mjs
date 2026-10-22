@@ -1,5 +1,6 @@
 import { validateAllowedOptions, validateOptionDuplicates } from "./option-policy.mjs";
 import { validateCommandPolicy } from "./command-policy.mjs";
+import { validatePositionals } from "./positional-policy.mjs";
 
 export function validateOptions(argv, command) {
   validateAllowedOptions(argv);
@@ -8,17 +9,7 @@ export function validateOptions(argv, command) {
     argv.some((argument) => ["--version", "-v"].includes(argument))
   )
     throw new Error("Help and version options cannot be combined.");
-  for (let index = command ? 1 : 0; index < argv.length; index += 1) {
-    if (argv[index] === "--version") {
-      index += 1;
-      if (!argv[index] && !command && argv.length === 1) continue;
-      if (!argv[index] || argv[index].startsWith("-"))
-        throw new Error("A value is required after --version.");
-      if (!command) throw new Error("The version query does not accept a value.");
-      continue;
-    }
-    if (!argv[index].startsWith("-")) throw new Error("Unexpected positional argument.");
-  }
+  validatePositionals(argv, command);
   validateOptionDuplicates(argv);
   validateCommandPolicy(argv, command);
 }
