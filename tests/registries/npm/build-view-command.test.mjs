@@ -15,3 +15,11 @@ test("builds a quoted npm command for Windows shims", () => {
     options: { encoding: "utf8", shell: true },
   });
 });
+
+test("builds a command from the supplied package and version", () => {
+  expect(buildNpmViewCommand("bad name", "not-a-version", "linux")).toEqual({
+    executable: "npm",
+    args: ["view", "bad name@not-a-version", "version", "--json"],
+    options: { encoding: "utf8" },
+  });
+});

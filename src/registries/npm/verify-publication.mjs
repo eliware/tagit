@@ -2,12 +2,14 @@ import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
 import { npmErrorSummary } from "./error-summary.mjs";
 import { npmViewHasVersion } from "./view-response.mjs";
+import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
 
 export async function verifyNpmPublication(
   execFile,
   log,
   { packageName, version, retries, retryMs, sleep },
 ) {
+  validateNpmViewCommandInputs(packageName, version);
   const { executable, args, options } = buildNpmViewCommand(packageName, version);
   for (let attempt = 0; attempt < retries; attempt += 1) {
     const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;

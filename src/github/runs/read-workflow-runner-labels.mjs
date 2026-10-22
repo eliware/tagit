@@ -1,7 +1,8 @@
 import { parseJobs } from "../../repository/metadata/workflow/jobs.mjs";
 import { parseWorkflow } from "../../repository/metadata/workflow/sections.mjs";
 import { jobValue } from "../../repository/metadata/workflow/job-rules.mjs";
-import { classifyRunnerPlatforms, readRunnerValues } from "./runner/platforms.mjs";
+import { classifyRunnerPlatforms } from "./runner/platforms.mjs";
+import { readRunnerValues } from "./runner/value-reader.mjs";
 
 export function parseWorkflowRunnerLabels(workflowText) {
   const sections = parseWorkflow(workflowText);

@@ -20,6 +20,20 @@ test("waits for npm visibility and succeeds at the expected version", async () =
   expect(info).toHaveBeenNthCalledWith(2, "npm view @eliware/demo@2.1.0 (2/2): available.");
 });
 
+test.each([
+  ["invalid name", "1.0.0", "Package name is invalid"],
+  ["demo", "latest", "Version is invalid"],
+])(
+  "rejects invalid publication inputs before checking the registry",
+  async (packageName, version, message) => {
+    const exec = jest.fn();
+    await expect(
+      verifyNpmPublication(exec, { info: jest.fn() }, { packageName, version, retries: 1 }),
+    ).rejects.toThrow(message);
+    expect(exec).not.toHaveBeenCalled();
+  },
+);
+
 test("reports bounded npm visibility failures", async () => {
   const exec = jest.fn((_command, _args, _options, callback) =>
     callback(new Error("registry unavailable"), "", ""),

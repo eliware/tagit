@@ -1,7 +1,4 @@
-import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
-
 export function buildNpmViewCommand(packageName, version, platform = process.platform) {
-  validateNpmViewCommandInputs(packageName, version);
   const args = ["view", `${packageName}@${version}`, "version", "--json"];
   if (platform === "win32")
     return {
