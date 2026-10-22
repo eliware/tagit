@@ -1,6 +1,4 @@
-import { validateJobRecords } from "../../../validation/ci/validate/job-records.mjs";
-
-export function validateReleaseRunDetails(details, candidate, headSha) {
+export function validateReleaseRunIdentity(details, candidate, headSha) {
   if (
     !details ||
     (details.databaseId !== undefined && typeof details.databaseId !== "number") ||
@@ -16,7 +14,6 @@ export function validateReleaseRunDetails(details, candidate, headSha) {
     throw new Error(
       `Release CI details identify run ${details.databaseId}, expected ${candidate.databaseId}.`,
     );
-  validateJobRecords(details.jobs, candidate.databaseId);
   if (details.headSha !== headSha)
     throw new Error(`Release CI details have commit ${details.headSha}, expected ${headSha}.`);
   return details;

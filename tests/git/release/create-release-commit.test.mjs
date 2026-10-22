@@ -35,3 +35,12 @@ test("rejects invalid HEAD before creating a release commit", () => {
   expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current commit");
   expect(runGit).toHaveBeenCalledTimes(1);
 });
+
+test.each(["", undefined])(
+  "rejects invalid HEAD output %s before creating a commit or tag",
+  (head) => {
+    const runGit = jest.fn(() => head);
+    expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current commit");
+    expect(runGit.mock.calls.some(([args]) => ["commit", "tag"].includes(args[0]))).toBe(false);
+  },
+);

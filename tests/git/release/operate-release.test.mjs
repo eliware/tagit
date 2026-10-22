@@ -147,24 +147,3 @@ test("uses the peeled commit for annotated remote tags", () => {
     tag: "v1.0.0",
   });
 });
-
-test("rejects an empty HEAD without creating or pushing a tag", () => {
-  const exec = jest.fn((executable, args) => {
-    if (executable === "git" && args[0] === "rev-parse" && args[1] === "HEAD") return "";
-    if (executable === "git" && args[0] === "rev-parse") return "";
-    return "";
-  });
-  const logger = log();
-  expect(() => gitOperations(exec, {}, logger, "1.0.0")).toThrow("valid current commit");
-  expect(exec.mock.calls.some(([, args]) => args?.[0] === "tag" || args?.[0] === "push")).toBe(
-    false,
-  );
-});
-
-test("rejects undefined HEAD output without creating or pushing a tag", () => {
-  const exec = jest.fn((executable, args) => {
-    if (executable === "git" && args[0] === "rev-parse") return undefined;
-    return undefined;
-  });
-  expect(() => gitOperations(exec, {}, log(), "1.0.0")).toThrow("valid current commit");
-});
