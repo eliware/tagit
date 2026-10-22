@@ -1,6 +1,6 @@
 import { pollReleaseCi } from "../../release/ci/status.mjs";
 import { verifyReleaseCi } from "./ci.mjs";
-import { verifyReleasePublication } from "../../release/publication-status.mjs";
+import { verifyReleasePublication } from "../../release/publication/status.mjs";
 
 export async function verifyReleaseCompletion({
   fs,

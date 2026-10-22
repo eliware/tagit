@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyReleasePublication } from "../../../../src/commands/release-wait/release/publication-status.mjs";
+import { verifyReleasePublication } from "../../../../../src/commands/release-wait/release/publication/status.mjs";
 
 test("reports a public npm publication and skips GHCR when not declared", async () => {
   const fs = {

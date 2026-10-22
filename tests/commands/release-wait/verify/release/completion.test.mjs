@@ -58,10 +58,12 @@ test("checks publication and registry after CI when the profile applies", async 
         { name: "publish", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
       ],
     });
+  const log = { info: jest.fn() };
   await expect(
     verifyReleaseCompletion({
       ...base,
       fs,
+      log,
       checkPublish: true,
       publicationWorkflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
       poll,
@@ -73,4 +75,34 @@ test("checks publication and registry after CI when the profile applies", async 
   });
   expect(poll).toHaveBeenCalledTimes(2);
   expect(poll.mock.calls[1][0].workflowPath).toBe(".github/workflows/npm.yaml");
+  expect(log.info).toHaveBeenCalledWith("npm verified: demo@1.0.0.");
+});
+
+test("checks GHCR publication when ghcr.yaml and its profile apply", async () => {
+  const fs = {
+    existsSync: (file) => file === "package.json" || file === ".github/workflows/ghcr.yaml",
+    readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
+  };
+  const jobs = [
+    { name: "publish", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+  ];
+  const poll = jest.fn(async ({ workflowPath }) => ({
+    databaseId: workflowPath.endsWith("ghcr.yaml") ? 2 : 1,
+    url: "run-url",
+    jobs,
+  }));
+  const execFile = jest.fn((_command, _args, _options, callback) =>
+    callback(null, JSON.stringify([{ metadata: { container: { tags: ["v1.0.0"] } } }]), ""),
+  );
+  await expect(
+    verifyReleaseCompletion({
+      ...base,
+      fs,
+      execFile,
+      checkPublish: true,
+      publicationWorkflows: [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }],
+      poll,
+    }),
+  ).resolves.toMatchObject({ ci: true, npm: false, ghcr: true });
+  expect(poll.mock.calls[1][0].workflowPath).toBe(".github/workflows/ghcr.yaml");
 });
