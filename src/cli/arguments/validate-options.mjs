@@ -1,4 +1,5 @@
-import { validateAllowedOptions, validateOptionDuplicates } from "./option-policy.mjs";
+import { validateAllowedOptions } from "./allowed-options.mjs";
+import { validateOptionDuplicates } from "./option-duplicates.mjs";
 import { validateCommandPolicy } from "./command-policy.mjs";
 import { validatePositionals } from "./positional-policy.mjs";
 

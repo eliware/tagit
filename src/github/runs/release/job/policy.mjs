@@ -1,18 +1,8 @@
+import { normalizeCompletedWorkflowJob } from "./status.mjs";
+
 export function verifyReleaseJobs(jobs, runnerLabelsByJobName = {}, workflowRun = {}) {
   const successful = (job) => job.status === "completed" && job.conclusion === "success";
-  const verifiedJobs = jobs.map((job) => {
-    const completedSteps =
-      Array.isArray(job.steps) &&
-      job.steps.length > 0 &&
-      job.steps.every((step) => step.status === "completed" && step.conclusion === "success");
-    const staleJob = job.status !== "completed" || job.conclusion === null;
-    return workflowRun.status === "completed" &&
-      workflowRun.conclusion === "success" &&
-      staleJob &&
-      completedSteps
-      ? { ...job, status: "completed", conclusion: "success" }
-      : job;
-  });
+  const verifiedJobs = jobs.map((job) => normalizeCompletedWorkflowJob(job, workflowRun));
   const labels = (job) =>
     Array.isArray(job.labels) ? job.labels : (runnerLabelsByJobName[job.name] ?? []);
   const windowsJobs = verifiedJobs.filter((job) =>

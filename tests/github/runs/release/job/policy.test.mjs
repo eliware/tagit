@@ -1,4 +1,4 @@
-import { verifyReleaseJobs } from "../../../../src/github/runs/release/job-policy.mjs";
+import { verifyReleaseJobs } from "../../../../../src/github/runs/release/job/policy.mjs";
 
 test("accepts successful Ubuntu and optional Windows jobs", () => {
   const result = verifyReleaseJobs([

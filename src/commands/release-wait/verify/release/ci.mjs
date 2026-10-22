@@ -1,4 +1,4 @@
-import { verifyReleaseJobs } from "../../../../github/runs/release/job-policy.mjs";
+import { verifyReleaseJobs } from "../../../../github/runs/release/job/policy.mjs";
 import { readPublicationTarget } from "../../read/publication-target.mjs";
 import { reportReleaseCiLinks } from "./link-report.mjs";
 
