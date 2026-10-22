@@ -1,5 +1,5 @@
 import { readGithubJson } from "../../../../github/cli/read-json.mjs";
-import { selectReleaseRun } from "../../../../github/runs/release/run-selection.mjs";
+import { selectReleaseRun } from "../../../../github/runs/release/run/selection.mjs";
 
 export async function readReleaseCiCandidate(
   execFile,

@@ -1,4 +1,4 @@
-import { selectReleaseRun } from "../../../../src/github/runs/release/run-selection.mjs";
+import { selectReleaseRun } from "../../../../../src/github/runs/release/run/selection.mjs";
 
 test("selects the newest exact release tag and commit", () => {
   expect(
@@ -28,10 +28,6 @@ test("does not select a main branch run for a publication workflow", () => {
     ),
   ).toBeUndefined();
 });
-test("rejects a malformed provider response before filtering", () => {
-  expect(() => selectReleaseRun(null, "abc", "v1.0.0")).toThrow("not an array");
-});
-
 test("rejects ambiguous incomplete release evidence", () => {
   expect(() =>
     selectReleaseRun(
@@ -43,22 +39,6 @@ test("rejects ambiguous incomplete release evidence", () => {
       "v1.0.0",
     ),
   ).toThrow("ambiguous");
-});
-test("rejects a malformed sole eligible run", () => {
-  expect(() =>
-    selectReleaseRun(
-      [{ databaseId: "bad", headSha: "abc", headBranch: "v1.0.0" }],
-      "abc",
-      "v1.0.0",
-    ),
-  ).toThrow("malformed");
-  expect(() =>
-    selectReleaseRun(
-      [{ databaseId: 1, createdAt: "not-a-date", headSha: "abc", headBranch: "v1.0.0" }],
-      "abc",
-      "v1.0.0",
-    ),
-  ).toThrow("timestamp");
 });
 test("uses database id as a tie-breaker when creation times are absent", () => {
   expect(

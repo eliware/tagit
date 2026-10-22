@@ -1,6 +1,6 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewCommand } from "./build-view-command.mjs";
-import { npmErrorSummary } from "./error-summary.mjs";
+import { npmErrorSummary } from "./error/summary.mjs";
 import { npmViewHasVersion } from "./view-response.mjs";
 import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
 

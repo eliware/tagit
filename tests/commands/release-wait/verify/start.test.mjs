@@ -1,14 +1,4 @@
 import { jest } from "@jest/globals";
-
-const reportReleaseVerificationStart = jest.fn(async (options) => ({
-  ...options,
-  linksOnly: true,
-}));
-jest.unstable_mockModule(
-  "../../../../src/commands/release-wait/report/release/start-verification.mjs",
-  () => ({ reportReleaseVerificationStart }),
-);
-
 const { startReleaseVerification } =
   await import("../../../../src/commands/release-wait/verify/start.mjs");
 
@@ -25,27 +15,49 @@ function execFileSync(_command, args) {
   return "abc";
 }
 
-beforeEach(() => jest.clearAllMocks());
+function releasePoller() {
+  return jest.fn((_command, args, _options, callback) => {
+    const workflow = args[args.indexOf("--workflow") + 1];
+    if (args[1] === "list") {
+      const databaseId = workflow.endsWith("npm.yaml") ? 102 : 101;
+      return callback(
+        null,
+        JSON.stringify([{ databaseId, headSha: "abc", headBranch: "v1.0.0" }]),
+        "",
+      );
+    }
+    const databaseId = Number(args[2]);
+    return callback(
+      null,
+      JSON.stringify({
+        databaseId,
+        status: "completed",
+        conclusion: "success",
+        headSha: "abc",
+        jobs: [],
+        url: `https://example.test/runs/${databaseId}`,
+      }),
+      "",
+    );
+  });
+}
+
+beforeEach(() => log.info.mockClear());
 
 test("starts CI link checks for the prepared release", async () => {
-  const execFile = jest.fn();
+  const execFile = releasePoller();
   await expect(
     startReleaseVerification(execFileSync, baseFs(), log, { ...input, execFile }),
   ).resolves.toMatchObject({
     repo: "eliware/demo",
     tag: "v1.0.0",
     headSha: "abc",
+    ciRunId: 101,
+    publishRunId: null,
     linksOnly: true,
   });
-  expect(reportReleaseVerificationStart).toHaveBeenCalledWith(
-    expect.objectContaining({
-      repo: "eliware/demo",
-      tag: "v1.0.0",
-      headSha: "abc",
-      checkPublish: false,
-      publicationWorkflows: [],
-      execFile,
-    }),
+  expect(log.info).toHaveBeenCalledWith(
+    "CI: [https://example.test/runs/101](https://example.test/runs/101)",
   );
 });
 
@@ -60,15 +72,17 @@ test("starts publication link checks when an npm workflow applies", async () => 
           eliware: { apply: ["npm-published"] },
         })
       : "publish";
-  await startReleaseVerification(execFileSync, fs, log, {
-    version: input.version,
-    release: input.release,
-  });
-  expect(reportReleaseVerificationStart).toHaveBeenCalledWith(
-    expect.objectContaining({
-      checkPublish: true,
-      publicationWorkflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+  const execFile = releasePoller();
+  await expect(
+    startReleaseVerification(execFileSync, fs, log, {
+      version: input.version,
+      release: input.release,
+      maxPolls: 1,
+      execFile,
     }),
+  ).resolves.toMatchObject({ ciRunId: 101, publishRunId: 102, linksOnly: true });
+  expect(log.info).toHaveBeenCalledWith(
+    "npm: [https://example.test/runs/102](https://example.test/runs/102)",
   );
 });
 
