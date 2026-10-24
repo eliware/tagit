@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportUpstreamMergeConflict } from "../../../src/upstream/merge/conflict-report.mjs";
+import { reportUpstreamMergeConflict } from "../../../../src/upstream/merge/conflict/report.mjs";
 
 test("reports merge conflicts and lists unresolved files", () => {
   const exec = jest.fn();

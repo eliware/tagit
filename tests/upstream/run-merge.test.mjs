@@ -12,6 +12,7 @@ test("merges upstream and pushes", () => {
 test("reports merge conflicts without pushing", () => {
   const exec = jest.fn((command, args) => {
     if (args[0] === "merge") throw new Error("conflict");
+    if (args[0] === "diff") return "conflicted.txt\n";
     return "";
   });
   const log = { log: jest.fn() };
