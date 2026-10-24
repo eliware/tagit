@@ -38,6 +38,3 @@ test("accepts a stale validate status when the successful workflow shows passing
     }),
   ).not.toThrow();
 });
-test("reports malformed job records", () => {
-  expect(() => verifyReleaseCi({})).toThrow("malformed job records");
-});

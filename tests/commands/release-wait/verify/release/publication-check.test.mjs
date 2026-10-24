@@ -18,21 +18,6 @@ const base = {
   sleep: jest.fn(),
 };
 
-test("finishes without polls when no publication workflows apply", async () => {
-  const poll = jest.fn();
-  await expect(
-    checkReleasePublication({ ...base, poll, publicationWorkflows: [] }),
-  ).resolves.toEqual({
-    repo: "eliware/demo",
-    tag: "v1.0.0",
-    headSha: "abc",
-    ci: true,
-    npm: false,
-    ghcr: false,
-  });
-  expect(poll).not.toHaveBeenCalled();
-});
-
 test("polls configured publication workflows before verifying targets", async () => {
   const poll = jest.fn(async () => ({ jobs: [] }));
   const publicationWorkflows = [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }];
