@@ -1,12 +1,9 @@
 import { validateReleaseRunRecords } from "./records.mjs";
+import { selectReleaseRunBranches } from "./branch-policy.mjs";
 
 export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/workflows/ci.yaml") {
   validateReleaseRunRecords(runs, tag);
-  const branches = [".github/workflows/npm.yaml", ".github/workflows/ghcr.yaml"].includes(
-    workflowPath,
-  )
-    ? [tag, `refs/tags/${tag}`]
-    : ["main", tag, `refs/tags/${tag}`];
+  const branches = selectReleaseRunBranches(tag, workflowPath);
   const eligible = runs
     .filter((item) => item.headSha === headSha && branches.includes(item.headBranch))
     .sort((a, b) => {
