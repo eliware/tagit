@@ -20,3 +20,9 @@ test("classifies a successful validate job using the tag workflow runner", () =>
   );
   expect(result).toEqual([]);
 });
+
+test("rejects malformed CI job records through the shared validator", () => {
+  expect(() => verifyReleaseCi({ jobs: null, databaseId: 17 })).toThrow(
+    "GitHub Actions run 17 returned malformed job records: jobs must be an array.",
+  );
+});

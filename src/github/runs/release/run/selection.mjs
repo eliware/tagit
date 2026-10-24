@@ -1,5 +1,6 @@
 import { validateReleaseRunRecords } from "./records.mjs";
 import { selectReleaseRunBranches } from "./branch-policy.mjs";
+import { assertUnambiguousReleaseRunTimestamps } from "./ambiguity-policy.mjs";
 
 export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/workflows/ci.yaml") {
   validateReleaseRunRecords(runs, tag);
@@ -13,13 +14,6 @@ export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/wor
         ? createdDifference
         : Number(b.databaseId) - Number(a.databaseId);
     });
-  if (
-    eligible.length > 1 &&
-    eligible.some((item) => !item.createdAt) &&
-    eligible.some((item) => item.createdAt)
-  )
-    throw new Error(
-      `Release CI data is ambiguous because eligible runs do not have creation timestamps for ${tag}.`,
-    );
+  assertUnambiguousReleaseRunTimestamps(eligible, tag);
   return eligible[0];
 }

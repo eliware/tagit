@@ -1,10 +1,14 @@
 import { verifyReleaseJobs } from "../../../../../src/github/runs/release/job/policy.mjs";
 
-test("accepts successful Ubuntu and optional Windows jobs", () => {
-  const result = verifyReleaseJobs([
-    { name: "test", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
-    { name: "test", labels: ["windows-latest"], status: "completed", conclusion: "success" },
-  ]);
+test("accepts successful Ubuntu and optional Windows jobs from labels and runner metadata", () => {
+  const result = verifyReleaseJobs(
+    [
+      { name: "test", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+      { name: "test", labels: ["windows-latest"], status: "completed", conclusion: "success" },
+      { name: "validate", status: "completed", conclusion: "success" },
+    ],
+    { validate: ["ubuntu"] },
+  );
   expect(result.windowsJobs).toHaveLength(1);
 });
 
@@ -46,17 +50,6 @@ test("rejects stale jobs when steps fail or the workflow is not successful", () 
       { status: "in_progress", conclusion: null },
     ),
   ).toThrow("validate: ");
-});
-
-test("classifies neutral validation job names from the release workflow runner", () => {
-  const result = verifyReleaseJobs(
-    [
-      { name: "validate", status: "completed", conclusion: "success" },
-      { name: "publish", status: "completed", conclusion: "success" },
-    ],
-    { validate: ["ubuntu"], publish: ["ubuntu"] },
-  );
-  expect(result.windowsJobs).toEqual([]);
 });
 
 test("classifies a prototype-named job from its workflow runner", () => {
