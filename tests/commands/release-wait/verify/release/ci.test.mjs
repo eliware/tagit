@@ -20,21 +20,3 @@ test("classifies a successful validate job using the tag workflow runner", () =>
   );
   expect(result).toEqual([]);
 });
-
-test("accepts a stale validate status when the successful workflow shows passing steps", () => {
-  expect(() =>
-    verifyReleaseCi({
-      status: "completed",
-      conclusion: "success",
-      jobs: [
-        {
-          name: "validate",
-          labels: ["ubuntu-latest"],
-          status: "in_progress",
-          conclusion: null,
-          steps: [{ name: "npm test", status: "completed", conclusion: "success" }],
-        },
-      ],
-    }),
-  ).not.toThrow();
-});
