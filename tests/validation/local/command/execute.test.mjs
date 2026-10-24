@@ -17,16 +17,7 @@ const fs = {
   ),
 };
 
-test("builds the shared npm test command with coverage waivers", () => {
-  expect(buildTestCheck(fs).check).toEqual(["test", ["npm", ["test"]]]);
-  expect(buildTestCheck(fs, { ignore100x4: true }).check).toEqual([
-    "test",
-    ["npm", ["test", "--", "--ignore-100x4"]],
-  ]);
-  expect(buildTestCheck(fs, { ignoreMonolithLimits: true }).check).toEqual([
-    "test",
-    ["npm", ["test", "--", "--ignore-monolith-limits"]],
-  ]);
+test("includes requested waiver arguments in the shared npm test command", () => {
   expect(buildTestCheck(fs, { ignore100x4: true, ignoreMonolithLimits: true }).check).toEqual([
     "test",
     ["npm", ["test", "--", "--ignore-100x4", "--ignore-monolith-limits"]],

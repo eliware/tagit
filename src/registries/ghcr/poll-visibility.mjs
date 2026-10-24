@@ -1,5 +1,4 @@
-import { execFileCommand } from "../../process/async/exec-file-command.mjs";
-import { parseGhcrVersionsResponse } from "./parse/versions-response.mjs";
+import { lookupGhcrVisibleImage } from "./verify/visibility-lookup.mjs";
 
 export async function pollGhcrVisibility(
   execFile,
@@ -9,13 +8,7 @@ export async function pollGhcrVisibility(
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
       log.info(`GHCR check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`);
-      const output = await execFileCommand(execFile, "gh", [
-        "api",
-        "--paginate",
-        "--slurp",
-        `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`,
-      ]);
-      const image = parseGhcrVersionsResponse(output, version);
+      const image = await lookupGhcrVisibleImage(execFile, { owner, imageName, version });
       if (image) return image;
     } catch (error) {
       log.debug?.(`GHCR check ${attempt + 1}/${retries} failed: ${String(error).slice(0, 300)}`);
