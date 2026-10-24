@@ -1,6 +1,5 @@
-import { readPackageName } from "../../../registries/npm/read-package-name.mjs";
-import { validateNpmPublicationName } from "../../../registries/npm/validate/publication-name.mjs";
 import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
+import { readNpmPublicationTarget } from "./npm-target.mjs";
 
 export function readPublicationTarget(fs) {
   if (!fs.existsSync("package.json"))
@@ -12,23 +11,18 @@ export function readPublicationTarget(fs) {
       isPrivate: null,
     };
   const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
-  const profiles = packageData?.eliware?.apply;
-  const npmWorkflow = fs.existsSync(".github/workflows/npm.yaml");
-  const npmApplicable =
-    npmWorkflow && Array.isArray(profiles) && profiles.includes("npm-published");
+  const npmTarget = readNpmPublicationTarget(fs, packageData);
   const ghcrApplicable = publishesGhcr(fs);
   const workflows = [];
-  if (npmApplicable) workflows.push({ workflowPath: ".github/workflows/npm.yaml", profile: "npm" });
+  if (npmTarget.applicable)
+    workflows.push({ workflowPath: ".github/workflows/npm.yaml", profile: "npm" });
   if (ghcrApplicable)
     workflows.push({ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" });
-  const packageName = npmApplicable
-    ? validateNpmPublicationName(readPackageName(fs), Boolean(packageData.private))
-    : null;
   return {
-    applicable: npmApplicable,
+    applicable: npmTarget.applicable,
     ghcrApplicable,
     workflows,
-    packageName,
+    packageName: npmTarget.packageName,
     isPrivate: Boolean(packageData.private),
   };
 }
