@@ -1,6 +1,6 @@
 import { selectLatestRun } from "../select/run.mjs";
 import { verifyCompletedRun } from "./completed-run.mjs";
-import { retryPendingRun } from "./pending-run.mjs";
+import { pollExactHeadCi } from "./poll-exact-head.mjs";
 import { readExactHeadRuns } from "../read/exact-head/runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
 import { selectCiCandidate } from "../select/ci-candidate.mjs";
@@ -26,16 +26,23 @@ export function verifyLatestCi(
     const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
     if (result) return result;
   }
-  if (waitForCompletion) {
-    const retried = retryPendingRun(execFileSync, log, pending, repoArg, pollAttempt, () =>
-      verifyLatestCi(
-        execFileSync,
-        log,
-        { headSha, repository: repo, waitForCompletion: true, runnerLabelsByJobName },
-        pollAttempt + 1,
-        null,
-      ),
-    );
+  {
+    const retried = pollExactHeadCi({
+      execFileSync,
+      log,
+      pending,
+      repoArg,
+      attempt: pollAttempt,
+      waitForCompletion,
+      retry: (nextAttempt) =>
+        verifyLatestCi(
+          execFileSync,
+          log,
+          { headSha, repository: repo, waitForCompletion: true, runnerLabelsByJobName },
+          nextAttempt,
+          null,
+        ),
+    });
     if (retried) return retried;
   }
   throw createCiVerificationFailure(execFileSync, candidates, runs, headSha);
