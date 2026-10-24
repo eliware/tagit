@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportReleaseCiLinks } from "../../../../../src/commands/release-wait/verify/release/link-report.mjs";
+import { reportReleaseCiLinks } from "../../../../../../src/commands/release-wait/verify/release/ci/links.mjs";
 
 test("reports workflow and successful Ubuntu links", () => {
   const log = { info: jest.fn() };

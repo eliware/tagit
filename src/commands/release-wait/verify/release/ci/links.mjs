@@ -1,4 +1,4 @@
-import { releaseLinks } from "../../release/links.mjs";
+import { releaseLinks } from "../../../release/links.mjs";
 
 export function reportReleaseCiLinks(log, repo, tag, run, windowsJobs) {
   const links = releaseLinks(run, windowsJobs, []);

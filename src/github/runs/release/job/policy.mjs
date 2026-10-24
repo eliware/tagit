@@ -1,28 +1,9 @@
 import { normalizeCompletedWorkflowJob } from "./status.mjs";
+import { classifyReleaseJobPlatforms } from "./platforms.mjs";
+import { enforceReleaseJobPolicy } from "./acceptance-policy.mjs";
 
 export function verifyReleaseJobs(jobs, runnerLabelsByJobName = {}, workflowRun = {}) {
-  const successful = (job) => job.status === "completed" && job.conclusion === "success";
   const verifiedJobs = jobs.map((job) => normalizeCompletedWorkflowJob(job, workflowRun));
-  const labels = (job) =>
-    Array.isArray(job.labels) ? job.labels : (runnerLabelsByJobName[job.name] ?? []);
-  const windowsJobs = verifiedJobs.filter((job) =>
-    labels(job).some((label) => /windows/i.test(label)),
-  );
-  if (windowsJobs.length && !windowsJobs.every(successful))
-    throw new Error("Release CI has a failing Windows job.");
-  const failed = verifiedJobs.filter(
-    (job) =>
-      job.status !== "completed" || !["success", "skipped", "neutral"].includes(job.conclusion),
-  );
-  if (failed.length)
-    throw new Error(
-      `Release CI failed: ${failed.map((job) => `${job.name}: ${job.conclusion}`).join("; ")}`,
-    );
-  if (
-    !verifiedJobs.some(
-      (job) => successful(job) && labels(job).some((label) => /ubuntu/i.test(label)),
-    )
-  )
-    throw new Error("Release CI lacks a passing Ubuntu job.");
-  return { successful, windowsJobs };
+  const platforms = classifyReleaseJobPlatforms(verifiedJobs, runnerLabelsByJobName);
+  return enforceReleaseJobPolicy(verifiedJobs, platforms);
 }

@@ -1,21 +1,16 @@
-import { jest } from "@jest/globals";
 import { verifyReleaseCi } from "../../../../../src/commands/release-wait/verify/release/ci.mjs";
 
-test("validates CI job policy and reports links", () => {
-  const log = { info: jest.fn() };
-  const result = verifyReleaseCi(log, "eliware/tagit", "v1.0.0", {
+test("validates CI job policy", () => {
+  const result = verifyReleaseCi({
     jobs: [
       { name: "validate", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
     ],
   });
-  expect(result).toBeUndefined();
+  expect(result).toEqual([]);
 });
 
 test("classifies a successful validate job using the tag workflow runner", () => {
   const result = verifyReleaseCi(
-    { info: jest.fn() },
-    "eliware/tagit",
-    "v1.0.0",
     {
       jobs: [
         { name: "validate", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
@@ -23,12 +18,12 @@ test("classifies a successful validate job using the tag workflow runner", () =>
     },
     { validate: ["ubuntu"] },
   );
-  expect(result).toBeUndefined();
+  expect(result).toEqual([]);
 });
 
 test("accepts a stale validate status when the successful workflow shows passing steps", () => {
   expect(() =>
-    verifyReleaseCi({ info: jest.fn() }, "eliware/codescope", "v15.0.0", {
+    verifyReleaseCi({
       status: "completed",
       conclusion: "success",
       jobs: [
@@ -44,7 +39,5 @@ test("accepts a stale validate status when the successful workflow shows passing
   ).not.toThrow();
 });
 test("reports malformed job records", () => {
-  expect(() => verifyReleaseCi({ info: jest.fn() }, "demo", "v1.0.0", {})).toThrow(
-    "malformed job records",
-  );
+  expect(() => verifyReleaseCi({})).toThrow("malformed job records");
 });

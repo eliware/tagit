@@ -1,5 +1,5 @@
 import { pollReleaseCi } from "../../release/ci/status.mjs";
-import { checkReleaseCi } from "./ci-check.mjs";
+import { checkReleaseCi } from "./ci/check.mjs";
 import { checkReleasePublication } from "./publication-check.mjs";
 
 export async function verifyReleaseCompletion({

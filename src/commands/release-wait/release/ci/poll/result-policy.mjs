@@ -1,10 +1,10 @@
-import { formatReleaseCiFailure } from "../../../format-release-ci-failure.mjs";
 import { mergeReleaseRun } from "../../../merge-release-run.mjs";
+import { formatReleasePollFailure } from "./failure-message.mjs";
 
 export function applyReleaseCiResultPolicy(candidate, details, { linksOnly, log, workflowLabel }) {
-  const failure = formatReleaseCiFailure(details);
+  const failure = formatReleasePollFailure(details, workflowLabel);
   if (failure && !linksOnly) {
-    const error = new Error(failure.replaceAll("Release CI", `Release ${workflowLabel ?? "CI"}`));
+    const error = new Error(failure);
     error.code = "ERR_RELEASE_CI_FAILED";
     throw error;
   }

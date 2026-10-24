@@ -1,6 +1,6 @@
 import { verifyPublicationJobs } from "../../release/publication/jobs.mjs";
-import { selectReleasePublicationTargets } from "../../release/publication/targets.mjs";
 import { verifyPublicationRegistries } from "../../release/publication/registries.mjs";
+import { buildReleasePublicationPlan } from "./publication/targets.mjs";
 
 export async function verifyReleasePublication({
   fs,
@@ -19,7 +19,11 @@ export async function verifyReleasePublication({
   npmRetryMs,
   sleep,
 }) {
-  const { targets, ghcrApplicable } = selectReleasePublicationTargets(fs, npmTarget);
+  const {
+    targets,
+    ghcrApplicable,
+    applicable: publicationApplies,
+  } = buildReleasePublicationPlan(fs, npmTarget);
   verifyPublicationJobs({
     targets,
     publicationRuns,
@@ -29,8 +33,7 @@ export async function verifyReleasePublication({
     tag,
     log,
   });
-  if (!npmTarget.applicable && !ghcrApplicable)
-    return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
+  if (!publicationApplies) return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
   return verifyPublicationRegistries({
     fs,
     execFile,

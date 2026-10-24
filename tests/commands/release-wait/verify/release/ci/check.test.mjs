@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { checkReleaseCi } from "../../../../../src/commands/release-wait/verify/release/ci-check.mjs";
+import { checkReleaseCi } from "../../../../../../src/commands/release-wait/verify/release/ci/check.mjs";
 
 test("polls and verifies the release CI workflow", async () => {
   const poll = jest.fn(async () => ({
