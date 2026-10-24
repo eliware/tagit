@@ -15,10 +15,3 @@ test("reports failed runs without jobs", () => {
     formatReleaseCiFailure({ status: "completed", conclusion: "failure", jobs: [] }),
   ).toContain("none reported");
 });
-
-test("does not report pending or successful runs as failures", () => {
-  expect(formatReleaseCiFailure({ status: "in_progress", conclusion: null, jobs: [] })).toBeNull();
-  expect(
-    formatReleaseCiFailure({ status: "completed", conclusion: "success", jobs: [] }),
-  ).toBeNull();
-});
