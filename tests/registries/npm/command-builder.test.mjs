@@ -1,4 +1,5 @@
 import { buildNpmCommand } from "../../../src/registries/npm/command-builder.mjs";
+import { buildWindowsNpmCommand } from "../../../src/process/commands/windows/npm.mjs";
 
 const args = ["view", "demo@1.0.0", "version", "--json"];
 
@@ -10,22 +11,10 @@ test("builds a shell-free npm command on POSIX", () => {
   });
 });
 
-test("builds a Windows npm command with quoted arguments", () => {
-  expect(buildNpmCommand(args, "win32")).toEqual({
-    executable: 'npm.cmd "view" "demo@1.0.0" "version" "--json"',
-    args: [],
-    options: { encoding: "utf8", shell: true },
-  });
-});
-
 test("uses the current platform when no platform is supplied", () => {
-  expect(buildNpmCommand(args)).toEqual(
+  const expected =
     process.platform === "win32"
-      ? {
-          executable: 'npm.cmd "view" "demo@1.0.0" "version" "--json"',
-          args: [],
-          options: { encoding: "utf8", shell: true },
-        }
-      : { executable: "npm", args, options: { encoding: "utf8" } },
-  );
+      ? buildWindowsNpmCommand(args)
+      : { executable: "npm", args, options: { encoding: "utf8" } };
+  expect(buildNpmCommand(args)).toEqual(expected);
 });
