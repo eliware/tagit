@@ -9,7 +9,7 @@ export function runReleaseTagTransaction({
   prepareReleaseTag,
   pushReleaseRefs,
   runGit,
-  verifyRemoteTag,
+  verifyPushedTag,
 }) {
   let remoteSideEffects = false;
   try {
@@ -19,15 +19,7 @@ export function runReleaseTagTransaction({
     log.info("Pushing the release commit and tag to the remote");
     remoteSideEffects = true;
     pushReleaseRefs((args, options) => git(args, options), releaseTag);
-    const remoteTag = String(
-      git(
-        ["ls-remote", "--tags", "origin", `refs/tags/${releaseTag}`, `refs/tags/${releaseTag}^{}`],
-        {
-          encoding: "utf8",
-        },
-      ) ?? "",
-    ).trim();
-    verifyRemoteTag(remoteTag, releaseTag, currentHead);
+    verifyPushedTag(git, releaseTag, currentHead);
     log.info("Git operations complete");
     return { commitSha: currentHead, tag: releaseTag };
   } catch (error) {

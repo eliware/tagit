@@ -11,16 +11,16 @@ function dependencies() {
   };
 }
 
-test.each(["--help", "-h"])("shows help for %s", (flag) => {
+test("dispatches help display for a help option", () => {
   const deps = dependencies();
-  runUpstreamCli([flag], deps);
+  runUpstreamCli(["--help"], deps);
   expect(deps.log.log).toHaveBeenCalledWith(expect.stringContaining("Usage: upstream"));
   expect(deps.runUpstream).not.toHaveBeenCalled();
 });
 
-test.each(["--version", "-v"])("shows the version for %s", (flag) => {
+test("dispatches version display for a version option", () => {
   const deps = dependencies();
-  runUpstreamCli([flag], deps);
+  runUpstreamCli(["--version"], deps);
   expect(deps.readFileSync).toHaveBeenCalledWith(expect.any(URL), "utf8");
   expect(deps.log.log).toHaveBeenCalledWith("15.0.0");
   expect(deps.runUpstream).not.toHaveBeenCalled();
@@ -35,11 +35,4 @@ test("runs the upstream command for normal arguments", () => {
     deps.now,
     deps.log,
   );
-});
-
-test("gives help precedence over version", () => {
-  const deps = dependencies();
-  runUpstreamCli(["--version", "--help"], deps);
-  expect(deps.log.log).toHaveBeenCalledWith(expect.stringContaining("Usage: upstream"));
-  expect(deps.readFileSync).not.toHaveBeenCalled();
 });

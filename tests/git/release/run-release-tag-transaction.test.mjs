@@ -6,6 +6,7 @@ test("runs the release tag transaction and returns the exact head", () => {
   const prepareReleaseTag = jest.fn(() => ({ currentHead: "abc" }));
   const pushTag = jest.fn();
   const runGit = jest.fn(() => "abc\trefs/tags/v1.0.0\n");
+  const verifyPushedTag = jest.fn();
   expect(
     runReleaseTagTransaction({
       execFileSync: jest.fn(),
@@ -16,8 +17,9 @@ test("runs the release tag transaction and returns the exact head", () => {
       prepareReleaseTag,
       pushReleaseRefs: pushTag,
       runGit,
-      verifyRemoteTag: jest.fn(),
+      verifyPushedTag,
     }),
   ).toEqual({ commitSha: "abc", tag: "v1.0.0" });
   expect(pushTag).toHaveBeenCalled();
+  expect(verifyPushedTag).toHaveBeenCalledWith(expect.any(Function), "v1.0.0", "abc");
 });

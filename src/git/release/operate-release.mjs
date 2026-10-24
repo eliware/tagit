@@ -8,7 +8,7 @@ import { runGit } from "../commands/run-git.mjs";
 import { createReleaseCommit } from "./create-release-commit.mjs";
 import { pushReleaseRefs } from "./push-release-refs.mjs";
 import { prepareReleaseTag } from "./prepare-release-tag.mjs";
-import { verifyRemoteTag } from "../tags/verify-remote-tag.mjs";
+import { verifyPushedTag } from "./verify-pushed-tag.mjs";
 
 export function gitOperations(execFileSync, _fs, log, newVersion, { dryRun = false } = {}) {
   const releaseTag = releaseTagForVersion(newVersion);
@@ -27,6 +27,6 @@ export function gitOperations(execFileSync, _fs, log, newVersion, { dryRun = fal
     prepareReleaseTag,
     pushReleaseRefs,
     runGit,
-    verifyRemoteTag,
+    verifyPushedTag,
   });
 }
