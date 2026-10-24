@@ -1,4 +1,4 @@
-import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
+import { publishesGhcr } from "../../../../registries/ghcr/discover-publication.mjs";
 
 export function selectRegistryPolicy(
   fs,

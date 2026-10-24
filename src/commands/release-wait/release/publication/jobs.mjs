@@ -1,4 +1,5 @@
-import { verifyPublishJob } from "../../verify/publish-job.mjs";
+import { selectSuccessfulPublishJobs } from "../../verify/publish/job.mjs";
+import { requirePublishJob } from "../../verify/publish/policy.mjs";
 import { reportPublicationJobLinks } from "../../report/publication-job-links.mjs";
 
 export function verifyPublicationJobs({
@@ -15,7 +16,8 @@ export function verifyPublicationJobs({
     if (!publication) throw new Error(`Release ${target.profile} workflow did not complete.`);
     if (!Array.isArray(publication.run.jobs))
       throw new Error(`Release ${target.profile} workflow returned malformed job records.`);
-    const publishJobs = verifyPublishJob(publication.run.jobs, {
+    const publishJobs = selectSuccessfulPublishJobs(publication.run.jobs);
+    requirePublishJob(publishJobs, {
       applicable: target.profile === "ghcr" || (applicable && !isPrivate),
       packageName: target.packageName,
       isPrivate: target.isPrivate,

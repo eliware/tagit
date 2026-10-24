@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { selectRegistryPolicy } from "../../../../src/commands/release-wait/verify/registry-policy.mjs";
+import { selectRegistryPolicy } from "../../../../../src/commands/release-wait/verify/registry/policy.mjs";
 
 const fsWithGhcr = (enabled) => ({
   existsSync: (file) =>

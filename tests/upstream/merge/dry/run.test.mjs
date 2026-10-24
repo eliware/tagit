@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportUpstreamDryRun } from "../../../src/upstream/merge/dry-run.mjs";
+import { reportUpstreamDryRun } from "../../../../src/upstream/merge/dry/run.mjs";
 
 test("reports the upstream merge plan", () => {
   const log = { log: jest.fn() };

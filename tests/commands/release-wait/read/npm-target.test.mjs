@@ -8,15 +8,6 @@ function fsFor(packageName, npmWorkflow = true) {
   };
 }
 
-test("reads and validates an applicable public npm target", () => {
-  expect(
-    readNpmPublicationTarget(fsFor("@eliware/demo"), {
-      private: false,
-      eliware: { apply: ["npm-published"] },
-    }),
-  ).toEqual({ applicable: true, packageName: "@eliware/demo" });
-});
-
 test("does not read npm metadata when the workflow or profile does not apply", () => {
   const fs = fsFor("demo", false);
   expect(

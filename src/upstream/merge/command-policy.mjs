@@ -1,5 +1,5 @@
 import { resolveUpstreamBranch } from "../branch.mjs";
-import { reportUpstreamDryRun } from "./dry-run.mjs";
+import { reportUpstreamDryRun } from "./dry/run.mjs";
 
 export function handleUpstreamDryRun(execFileSync, log, dryRun, message) {
   if (!dryRun) return false;
