@@ -6,7 +6,7 @@ jest.unstable_mockModule("../../../../../src/registries/npm/verify-publication.m
 }));
 
 const { verifyNpmRegistry } =
-  await import("../../../../../src/commands/release-wait/verify/registries/npm.mjs");
+  await import("../../../../../src/commands/release-wait/verify/registries/npm-check.mjs");
 
 beforeEach(() => jest.clearAllMocks());
 

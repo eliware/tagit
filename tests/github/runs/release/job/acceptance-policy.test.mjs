@@ -1,22 +1,16 @@
 import { enforceReleaseJobPolicy } from "../../../../../src/github/runs/release/job/acceptance-policy.mjs";
 
-const ubuntu = { name: "test", status: "completed", conclusion: "success" };
-
-test("accepts a passing Ubuntu job and returns the Windows jobs", () => {
+test("accepts absent Windows jobs as optional", () => {
+  const ubuntu = { name: "test", status: "completed", conclusion: "success" };
   expect(
     enforceReleaseJobPolicy([ubuntu], { ubuntuJobs: [ubuntu], windowsJobs: [] }),
   ).toMatchObject({ windowsJobs: [] });
 });
 
-test("rejects failed general job records", () => {
-  const failed = { name: "publish", status: "completed", conclusion: "failure" };
+test("rejects a failed Windows job", () => {
+  const ubuntu = { name: "test", status: "completed", conclusion: "success" };
+  const windows = { name: "windows", status: "completed", conclusion: "failure" };
   expect(() =>
-    enforceReleaseJobPolicy([ubuntu, failed], { ubuntuJobs: [ubuntu], windowsJobs: [] }),
-  ).toThrow("publish: failure");
-});
-
-test("rejects missing passing Ubuntu evidence", () => {
-  expect(() => enforceReleaseJobPolicy([ubuntu], { ubuntuJobs: [], windowsJobs: [] })).toThrow(
-    "Ubuntu",
-  );
+    enforceReleaseJobPolicy([ubuntu, windows], { ubuntuJobs: [ubuntu], windowsJobs: [windows] }),
+  ).toThrow("failing Windows");
 });

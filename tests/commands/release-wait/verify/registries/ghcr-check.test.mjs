@@ -8,11 +8,13 @@ jest.unstable_mockModule("../../../../../src/registries/ghcr/discover-publicatio
 }));
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/registries/ghcr.mjs",
-  () => ({ verifyGhcrRegistry }),
+  () => ({
+    verifyGhcrRegistry,
+  }),
 );
 
 const { verifyGhcrPublication } =
-  await import("../../../../../src/commands/release-wait/verify/registries/ghcr-adapter.mjs");
+  await import("../../../../../src/commands/release-wait/verify/registries/ghcr-check.mjs");
 
 beforeEach(() => jest.clearAllMocks());
 

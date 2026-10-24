@@ -4,11 +4,14 @@ const verifyNpmRegistry = jest.fn(async () => {});
 const verifyGhcrPublication = jest.fn(async () => ({ ghcr: false }));
 const selectRegistryPolicy = jest.fn(() => ({ npm: false, ghcr: false }));
 
-jest.unstable_mockModule("../../../../src/commands/release-wait/verify/registries/npm.mjs", () => ({
-  verifyNpmRegistry,
-}));
 jest.unstable_mockModule(
-  "../../../../src/commands/release-wait/verify/registries/ghcr-adapter.mjs",
+  "../../../../src/commands/release-wait/verify/registries/npm-check.mjs",
+  () => ({
+    verifyNpmRegistry,
+  }),
+);
+jest.unstable_mockModule(
+  "../../../../src/commands/release-wait/verify/registries/ghcr-check.mjs",
   () => ({
     verifyGhcrPublication,
   }),

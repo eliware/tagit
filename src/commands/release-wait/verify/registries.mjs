@@ -1,5 +1,5 @@
-import { verifyNpmRegistry } from "./registries/npm.mjs";
-import { verifyGhcrPublication } from "./registries/ghcr-adapter.mjs";
+import { verifyNpmRegistry } from "./registries/npm-check.mjs";
+import { verifyGhcrPublication } from "./registries/ghcr-check.mjs";
 import { selectRegistryPolicy } from "./registry-policy.mjs";
 
 export async function verifyRegistries({
