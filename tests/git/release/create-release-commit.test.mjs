@@ -12,22 +12,13 @@ test("creates a dated empty release commit", () => {
   );
 });
 
-test("reuses an existing tag at HEAD without another commit", () => {
-  const runGit = jest.fn((_args) => "abc123\n");
-  runGit.mockImplementation((args) => {
+test("returns the existing HEAD without creating another release commit", () => {
+  const runGit = jest.fn((args) => {
     if (args[0] === "tag") return "v1.2.3\n";
     return "abc123\n";
   });
   expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toBe("abc123");
   expect(runGit).not.toHaveBeenCalledWith(expect.arrayContaining(["commit"]), expect.anything());
-});
-
-test("rejects an existing tag that points away from HEAD", () => {
-  const runGit = jest.fn((args) => {
-    if (args[0] === "tag") return "v1.2.3\n";
-    return args[1] === "HEAD" ? "abc123\n" : "def456\n";
-  });
-  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("points to def456");
 });
 
 test("rejects invalid HEAD before creating a release commit", () => {

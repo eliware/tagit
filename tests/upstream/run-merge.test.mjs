@@ -25,7 +25,7 @@ test("runs with explicit time and logger dependencies", () => {
   expect(runUpstream([], exec, new Date("2026-07-29T18:07:59Z"), console)).toBe(true);
 });
 
-test("dry run reports the merge plan without changing remote or worktree state", () => {
+test("coordinates a prepared merge dry run without changing remote or worktree state", () => {
   const exec = jest.fn(() => "refs/remotes/upstream/main\n");
   const log = { log: jest.fn() };
   expect(runUpstream(["--dry-run", "sync"], exec, new Date("2026-07-29T18:07:59Z"), log)).toBe(
