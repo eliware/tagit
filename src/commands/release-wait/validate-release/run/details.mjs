@@ -1,5 +1,5 @@
 import { validateJobRecords } from "../../../../validation/ci/validate/job-records.mjs";
-import { validateReleaseRunIdentity } from "./details-policy.mjs";
+import { validateReleaseRunIdentity } from "./identity.mjs";
 
 export function validateReleaseRunDetails(details, candidate, headSha) {
   validateReleaseRunIdentity(details, candidate, headSha);

@@ -1,4 +1,4 @@
-import { validateReleaseRunIdentity } from "../../../../../src/commands/release-wait/validate-release/run/details-policy.mjs";
+import { validateReleaseRunIdentity } from "../../../../../src/commands/release-wait/validate-release/run/identity.mjs";
 
 const candidate = { databaseId: 1 };
 const validDetails = {

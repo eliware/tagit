@@ -1,5 +1,4 @@
-import { parseJobs } from "../../../../repository/metadata/workflow/jobs.mjs";
-import { parseWorkflow } from "../../../../repository/metadata/workflow/sections.mjs";
+import { parseJobs, parseWorkflow } from "../../../../repository/metadata/workflow/parser.mjs";
 import { jobValue } from "../../../../repository/metadata/workflow/job-rules.mjs";
 import { readWorkflowRunnerLabels } from "./labels.mjs";
 
