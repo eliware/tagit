@@ -1,9 +1,10 @@
+import { reportUpstreamMergeConflict } from "./conflict-report.mjs";
+
 export function mergeUpstream(execFileSync, upstreamBranch, message, log) {
   try {
     execFileSync("git", ["merge", upstreamBranch, "-m", message], { stdio: "inherit" });
   } catch {
-    log.log("Merge conflicts detected. Resolve conflicts in these files:");
-    execFileSync("git", ["diff", "--name-only", "--diff-filter=U"], { stdio: "inherit" });
+    reportUpstreamMergeConflict(execFileSync, log);
     return false;
   }
   return true;

@@ -1,9 +1,7 @@
 import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
 import { parseGhcrRepository } from "../parse/repository.mjs";
 import { pollGhcrVisibility } from "../poll-visibility.mjs";
-import { imageDigest } from "./digest.mjs";
-import { requireExpectedDigest } from "./expected-digest-policy.mjs";
-import { reportGhcrPublication } from "./report-publication.mjs";
+import { finalizeGhcrPublication } from "./finalize-publication.mjs";
 
 export async function verifyGhcrPublication(
   execFile,
@@ -27,8 +25,5 @@ export async function verifyGhcrPublication(
     retryMs,
     sleep,
   });
-  const digest = imageDigest(image);
-  requireExpectedDigest(digest, expectedDigest, repository, version);
-  reportGhcrPublication(log, repository, version, digest);
-  return { imageDigest: digest };
+  return finalizeGhcrPublication(log, repository, version, expectedDigest, image);
 }

@@ -1,5 +1,5 @@
 import { runReleaseCiPollAttempt } from "./poll/attempt.mjs";
-import { handleReleaseCiPollError } from "./poll/error-policy.mjs";
+import { recoverReleaseCiPollError } from "./poll/error/recovery.mjs";
 
 export async function pollReleaseCi({
   execFile,
@@ -29,8 +29,8 @@ export async function pollReleaseCi({
       });
       if (result && !result.pending) return result;
     } catch (error) {
-      if (error.code === "ERR_RELEASE_CI_FAILED") throw error;
-      await handleReleaseCiPollError(error, poll, maxPolls, pollMs, sleep);
+      const shouldRetry = await recoverReleaseCiPollError(error, poll, maxPolls, pollMs, sleep);
+      if (!shouldRetry) throw error;
       continue;
     }
     if (poll + 1 < maxPolls) await sleep(pollMs);
