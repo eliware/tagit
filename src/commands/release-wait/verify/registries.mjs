@@ -1,5 +1,5 @@
 import { verifyNpmRegistry } from "./registries/npm.mjs";
-import { verifyGhcrRegistryIfApplicable } from "./ghcr-registry.mjs";
+import { verifyGhcrPublication } from "./registries/ghcr-adapter.mjs";
 import { selectRegistryPolicy } from "./registry-policy.mjs";
 
 export async function verifyRegistries({
@@ -36,21 +36,17 @@ export async function verifyRegistries({
       sleep,
     });
   }
-  const ghcrResult = ghcr
-    ? await verifyGhcrRegistryIfApplicable(
-        fs,
-        {
-          execFile,
-          log,
-          repo,
-          version,
-          retries: maxPolls,
-          retryMs: pollMs,
-          release,
-          sleep,
-        },
-        ghcr,
-      )
-    : { ghcr: false };
+  const ghcrResult = await verifyGhcrPublication({
+    fs,
+    applicable: ghcr,
+    execFile,
+    log,
+    repo,
+    version,
+    retries: maxPolls,
+    retryMs: pollMs,
+    release,
+    sleep,
+  });
   return { npm, ...ghcrResult };
 }

@@ -1,8 +1,9 @@
 import { validateMergeMessage } from "./policy.mjs";
+import { createDefaultMergeMessage } from "./default.mjs";
 
 export function mergeMessage(args = [], now) {
-  const timestamp = () => (now ?? new Date()).toISOString().replace("T", " ").slice(0, 19);
-  const message = args.length ? args.join(" ") : timestamp();
+  if (!args.length) return createDefaultMergeMessage(now);
+  const message = args.join(" ");
   validateMergeMessage(message);
   return message;
 }
