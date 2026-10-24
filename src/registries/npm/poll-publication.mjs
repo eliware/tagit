@@ -1,7 +1,7 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { buildNpmViewArguments } from "./build-view-command.mjs";
 import { buildNpmCommand } from "./command-builder.mjs";
-import { reportNpmViewAttempt } from "./error/view/attempt.mjs";
+import { reportNpmViewAttempt } from "./error/view/report-attempt.mjs";
 
 export async function pollNpmPublication(
   execFile,

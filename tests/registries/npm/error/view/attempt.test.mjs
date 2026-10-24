@@ -1,24 +1,24 @@
-import { jest } from "@jest/globals";
-import { reportNpmViewAttempt } from "../../../../../src/registries/npm/error/view/attempt.mjs";
+import { classifyNpmViewAttempt } from "../../../../../src/registries/npm/error/view/attempt.mjs";
 
-test("reports an available npm view result", () => {
-  const log = { info: jest.fn() };
-  reportNpmViewAttempt(log, "npm view demo@1.0.0 (1/1)", {
-    output: '"1.0.0"',
-    version: "1.0.0",
-  });
-  expect(log.info).toHaveBeenCalledWith("npm view demo@1.0.0 (1/1): available.");
+test("classifies an available npm view result", () => {
+  expect(
+    classifyNpmViewAttempt({
+      output: '"1.0.0"',
+      version: "1.0.0",
+    }),
+  ).toEqual({ type: "result", exists: true });
 });
 
-test("reports missing versions and command failures as unsuccessful attempts", () => {
-  const log = { info: jest.fn() };
-  reportNpmViewAttempt(log, "npm view demo@1.0.0 (1/2)", {
-    output: '"0.9.0"',
-    version: "1.0.0",
-  });
-  reportNpmViewAttempt(log, "npm view demo@1.0.0 (2/2)", {
-    error: { stderr: "npm error 404 Not Found" },
-  });
-  expect(log.info).toHaveBeenNthCalledWith(1, "npm view demo@1.0.0 (1/2): not found.");
-  expect(log.info).toHaveBeenNthCalledWith(2, "npm view demo@1.0.0 (2/2): failed (404 not found).");
+test("classifies a missing version", () => {
+  expect(
+    classifyNpmViewAttempt({
+      output: '"0.9.0"',
+      version: "1.0.0",
+    }),
+  ).toEqual({ type: "result", exists: false });
+});
+
+test("classifies command failures without reporting them", () => {
+  const error = { code: "EAI_AGAIN" };
+  expect(classifyNpmViewAttempt({ error })).toEqual({ type: "failure", error });
 });

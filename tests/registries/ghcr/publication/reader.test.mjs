@@ -14,11 +14,3 @@ test("does not read metadata when a required file is missing", () => {
   expect(readGhcrPublication({ existsSync: () => false, readFileSync })).toBeNull();
   expect(readFileSync).not.toHaveBeenCalled();
 });
-
-test("does not read metadata when the GHCR workflow is missing", () => {
-  const readFileSync = jest.fn();
-  expect(
-    readGhcrPublication({ existsSync: (file) => file === "package.json", readFileSync }),
-  ).toBeNull();
-  expect(readFileSync).not.toHaveBeenCalled();
-});

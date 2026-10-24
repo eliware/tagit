@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { publishesGhcr } from "../../../src/registries/ghcr/discover-publication.mjs";
 
 test("detects the declared GHCR publication profile", () => {
@@ -17,10 +18,12 @@ test("ignores GHCR text unless the package declares the profile", () => {
   ).toBe(false);
 });
 test("requires ghcr.yaml for the GHCR profile", () => {
+  const existsSync = jest.fn((file) => file === "package.json");
   expect(
     publishesGhcr({
-      existsSync: (file) => file === "package.json",
+      existsSync,
       readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
     }),
   ).toBe(false);
+  expect(existsSync).toHaveBeenCalledWith(".github/workflows/ghcr.yaml");
 });
