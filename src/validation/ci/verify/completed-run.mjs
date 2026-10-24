@@ -1,4 +1,4 @@
-import { readCompletedRun } from "../read/completed-run.mjs";
+import { readCompletedRun } from "../read/completed/run.mjs";
 
 export function verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName = {}) {
   const result = readCompletedRun(execFileSync, run.databaseId, headSha, runnerLabelsByJobName);

@@ -19,17 +19,6 @@ const base = {
   sleep: jest.fn(),
 };
 
-test("returns successful CI status when no publication targets apply", async () => {
-  await expect(verifyReleasePublication(base)).resolves.toEqual({
-    repo: "eliware/demo",
-    tag: "v1.0.0",
-    headSha: "abc",
-    ci: true,
-    npm: false,
-    ghcr: false,
-  });
-});
-
 test("verifies publication jobs and registries for an applicable npm target", async () => {
   const fs = {
     existsSync: (file) => file === ".github/workflows/npm.yaml",

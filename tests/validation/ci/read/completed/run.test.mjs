@@ -1,4 +1,4 @@
-import { readCompletedRun } from "../../../../src/validation/ci/read/completed-run.mjs";
+import { readCompletedRun } from "../../../../../src/validation/ci/read/completed/run.mjs";
 
 const details = (overrides = {}) =>
   JSON.stringify({

@@ -1,7 +1,8 @@
 import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
 import { parseGhcrRepository } from "../parse/repository.mjs";
 import { pollGhcrVisibility } from "../poll-visibility.mjs";
-import { imageDigest, requireExpectedDigest } from "./digest.mjs";
+import { imageDigest } from "./digest.mjs";
+import { requireExpectedDigest } from "./expected-digest-policy.mjs";
 import { reportGhcrPublication } from "./report-publication.mjs";
 
 export async function verifyGhcrPublication(
