@@ -1,6 +1,6 @@
 import { selectSuccessfulPublishJobs } from "../../verify/publish/job.mjs";
 import { requirePublishJob } from "../../verify/publish/policy.mjs";
-import { reportPublicationJobLinks } from "../../report/publication-job-links.mjs";
+import { reportPublicationJobLinks } from "./job-links.mjs";
 
 export function verifyPublicationJobs({
   targets,

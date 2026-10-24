@@ -1,9 +1,11 @@
 import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
+import { readPackageData } from "./package-data.mjs";
 import { readNpmPublicationTarget } from "./npm-target.mjs";
 import { buildPublicationWorkflowTargets } from "./workflow-targets.mjs";
 
 export function readPublicationTarget(fs) {
-  if (!fs.existsSync("package.json"))
+  const packageData = readPackageData(fs);
+  if (packageData === null)
     return {
       applicable: false,
       ghcrApplicable: false,
@@ -11,7 +13,6 @@ export function readPublicationTarget(fs) {
       packageName: null,
       isPrivate: null,
     };
-  const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
   const npmTarget = readNpmPublicationTarget(fs, packageData);
   const ghcrApplicable = publishesGhcr(fs);
   return {

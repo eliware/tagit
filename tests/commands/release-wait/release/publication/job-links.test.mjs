@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportPublicationJobLinks } from "../../../../src/commands/release-wait/report/publication-job-links.mjs";
+import { reportPublicationJobLinks } from "../../../../../src/commands/release-wait/release/publication/job-links.mjs";
 
 test("reports available publish job links", () => {
   const log = { info: jest.fn() };

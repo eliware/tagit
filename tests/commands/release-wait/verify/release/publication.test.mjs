@@ -19,11 +19,11 @@ const base = {
   sleep: jest.fn(),
 };
 
-test("verifies publication jobs and registries for an applicable npm target", async () => {
+test("rejects an applicable npm target without a passing publish job", async () => {
   const fs = {
     existsSync: (file) => file === ".github/workflows/npm.yaml",
   };
-  const execFile = jest.fn((_command, args, _options, callback) => callback(null, '"1.0.0"', ""));
+  const execFile = jest.fn();
   const log = { info: jest.fn() };
   await expect(
     verifyReleasePublication({
@@ -35,18 +35,10 @@ test("verifies publication jobs and registries for an applicable npm target", as
       publicationRuns: [
         {
           profile: "npm",
-          run: {
-            jobs: [
-              {
-                name: "publish",
-                status: "completed",
-                conclusion: "success",
-              },
-            ],
-          },
+          run: { jobs: [{ name: "validate", status: "completed", conclusion: "success" }] },
         },
       ],
     }),
-  ).resolves.toMatchObject({ ci: true, npm: true, ghcr: false });
-  expect(log.info).toHaveBeenCalledWith("Release npm workflow verified for eliware/demo@v1.0.0.");
+  ).rejects.toThrow("lacks a passing publish job");
+  expect(execFile).not.toHaveBeenCalled();
 });

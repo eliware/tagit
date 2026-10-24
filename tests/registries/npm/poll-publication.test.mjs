@@ -8,6 +8,7 @@ test("polls npm visibility until the requested version appears", async () => {
     pollNpmPublication(exec, log, {
       packageName: "demo",
       version: "1.2.0",
+      command: { executable: "npm", args: [], options: {} },
       retries: 1,
       retryMs: 0,
       sleep: jest.fn(),
