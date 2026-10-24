@@ -25,3 +25,12 @@ test("requires present Windows jobs to pass", () => {
     successful: true,
   });
 });
+
+test("uses preclassified Windows jobs when runner metadata supplied the platform", () => {
+  const job = { name: "validate", status: "completed", conclusion: "success" };
+  expect(windowsCiPolicy([], successful, [job])).toEqual({
+    present: true,
+    passed: true,
+    successful: true,
+  });
+});

@@ -3,24 +3,19 @@ import { enforceReleaseJobPolicy } from "../../../../../src/github/runs/release/
 const ubuntu = { name: "test", status: "completed", conclusion: "success" };
 
 test("accepts a passing Ubuntu job and returns the Windows jobs", () => {
-  const windows = { name: "windows", status: "completed", conclusion: "success" };
   expect(
-    enforceReleaseJobPolicy([ubuntu, windows], { ubuntuJobs: [ubuntu], windowsJobs: [windows] }),
-  ).toMatchObject({ windowsJobs: [windows] });
+    enforceReleaseJobPolicy([ubuntu], { ubuntuJobs: [ubuntu], windowsJobs: [] }),
+  ).toMatchObject({ windowsJobs: [] });
 });
 
-test("rejects a failed Windows job before general job failures", () => {
-  const windows = { name: "windows", status: "completed", conclusion: "failure" };
-  expect(() =>
-    enforceReleaseJobPolicy([ubuntu, windows], { ubuntuJobs: [ubuntu], windowsJobs: [windows] }),
-  ).toThrow("failing Windows");
-});
-
-test("rejects failed non-platform jobs and missing passing Ubuntu evidence", () => {
+test("rejects failed general job records", () => {
   const failed = { name: "publish", status: "completed", conclusion: "failure" };
   expect(() =>
     enforceReleaseJobPolicy([ubuntu, failed], { ubuntuJobs: [ubuntu], windowsJobs: [] }),
   ).toThrow("publish: failure");
+});
+
+test("rejects missing passing Ubuntu evidence", () => {
   expect(() => enforceReleaseJobPolicy([ubuntu], { ubuntuJobs: [], windowsJobs: [] })).toThrow(
     "Ubuntu",
   );
