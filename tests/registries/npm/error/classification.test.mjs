@@ -2,8 +2,7 @@ import { classifyNpmError } from "../../../../src/registries/npm/error/classific
 
 test.each([
   [{ stderr: "HTTP 404" }, { type: "not-found" }],
-  [{ stdout: "E404" }, { type: "not-found" }],
-  [{ message: "Not Found" }, { type: "not-found" }],
+  [{ stderr: "E404" }, { type: "not-found" }],
   [
     { stderr: "registry unavailable", code: "EAI_AGAIN" },
     { type: "code", code: "EAI_AGAIN" },

@@ -3,9 +3,15 @@ import { checkReleaseCi } from "../../../../../../src/commands/release-wait/veri
 
 test("polls and verifies the release CI workflow", async () => {
   const poll = jest.fn(async () => ({
-    url: "ci-url",
+    url: "https://github.com/eliware/demo/actions/runs/1",
     jobs: [
-      { name: "validate", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+      {
+        name: "validate",
+        labels: ["ubuntu-latest"],
+        status: "completed",
+        conclusion: "success",
+        url: "https://github.com/eliware/demo/actions/runs/1/jobs/2",
+      },
     ],
   }));
   const log = { info: jest.fn() };
@@ -24,4 +30,9 @@ test("polls and verifies the release CI workflow", async () => {
     workflowPath: ".github/workflows/ci.yaml",
     workflowLabel: "CI",
   });
+  expect(log.info.mock.calls.map(([message]) => message)).toEqual([
+    "Release CI verified for eliware/demo@v1.0.0:",
+    "Workflow: [https://github.com/eliware/demo/actions/runs/1](https://github.com/eliware/demo/actions/runs/1)",
+    "Ubuntu: [https://github.com/eliware/demo/actions/runs/1/jobs/2](https://github.com/eliware/demo/actions/runs/1/jobs/2)",
+  ]);
 });
