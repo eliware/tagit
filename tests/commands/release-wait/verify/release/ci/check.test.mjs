@@ -1,19 +1,29 @@
 import { jest } from "@jest/globals";
-import { checkReleaseCi } from "../../../../../../src/commands/release-wait/verify/release/ci/check.mjs";
+const verifyReleaseCi = jest.fn();
+const reportReleaseCiLinks = jest.fn();
+
+jest.unstable_mockModule(
+  "../../../../../../src/commands/release-wait/verify/release/ci.mjs",
+  () => ({ verifyReleaseCi }),
+);
+jest.unstable_mockModule(
+  "../../../../../../src/commands/release-wait/verify/release/ci/links.mjs",
+  () => ({ reportReleaseCiLinks }),
+);
+
+const { checkReleaseCi } =
+  await import("../../../../../../src/commands/release-wait/verify/release/ci/check.mjs");
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 test("polls and verifies the release CI workflow", async () => {
-  const poll = jest.fn(async () => ({
-    url: "https://github.com/eliware/demo/actions/runs/1",
-    jobs: [
-      {
-        name: "validate",
-        labels: ["ubuntu-latest"],
-        status: "completed",
-        conclusion: "success",
-        url: "https://github.com/eliware/demo/actions/runs/1/jobs/2",
-      },
-    ],
-  }));
+  const run = { databaseId: 1, url: "https://github.com/eliware/demo/actions/runs/1", jobs: [] };
+  const windowsJobs = [{ name: "windows", status: "completed", conclusion: "success" }];
+  const runnerLabelsByJobName = { validate: ["ubuntu"] };
+  const poll = jest.fn(async () => run);
+  verifyReleaseCi.mockReturnValue(windowsJobs);
   const log = { info: jest.fn() };
   await expect(
     checkReleaseCi({
@@ -22,6 +32,7 @@ test("polls and verifies the release CI workflow", async () => {
       log,
       repo: "eliware/demo",
       tag: "v1.0.0",
+      runnerLabelsByJobName,
     }),
   ).resolves.toBeUndefined();
   expect(poll).toHaveBeenCalledWith({
@@ -30,9 +41,12 @@ test("polls and verifies the release CI workflow", async () => {
     workflowPath: ".github/workflows/ci.yaml",
     workflowLabel: "CI",
   });
-  expect(log.info.mock.calls.map(([message]) => message)).toEqual([
-    "Release CI verified for eliware/demo@v1.0.0:",
-    "Workflow: [https://github.com/eliware/demo/actions/runs/1](https://github.com/eliware/demo/actions/runs/1)",
-    "Ubuntu: [https://github.com/eliware/demo/actions/runs/1/jobs/2](https://github.com/eliware/demo/actions/runs/1/jobs/2)",
-  ]);
+  expect(verifyReleaseCi).toHaveBeenCalledWith(run, runnerLabelsByJobName);
+  expect(reportReleaseCiLinks).toHaveBeenCalledWith(
+    log,
+    "eliware/demo",
+    "v1.0.0",
+    run,
+    windowsJobs,
+  );
 });

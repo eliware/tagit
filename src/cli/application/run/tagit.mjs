@@ -4,7 +4,6 @@ import { runCliBoundary } from "./cli-boundary.mjs";
 import { buildDispatchContext } from "../build-dispatch-context.mjs";
 
 export { isHelp, parseOptions } from "../../arguments/parse/options.mjs";
-export { getReleaseVersion } from "../../arguments/parse/version-option.mjs";
 export { helpText } from "../../guidance/help-text.mjs";
 export { preflightGuide } from "../../guidance/preflight-guide.mjs";
 export { releaseGuide } from "../../guidance/release-guide.mjs";
