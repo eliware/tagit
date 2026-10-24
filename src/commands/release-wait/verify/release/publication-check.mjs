@@ -1,11 +1,10 @@
-import { readPublicationTarget } from "../../read/publication-target.mjs";
 import { verifyReleasePublication } from "./publication.mjs";
 
 export async function checkReleasePublication({
   fs,
   poll,
   common,
-  publicationWorkflows,
+  publication,
   execFile,
   log,
   repo,
@@ -20,7 +19,7 @@ export async function checkReleasePublication({
   sleep,
 }) {
   const publicationRuns = [];
-  for (const workflow of publicationWorkflows) {
+  for (const workflow of publication.workflows) {
     const run = await poll({
       ...common,
       workflowPath: workflow.workflowPath,
@@ -28,7 +27,6 @@ export async function checkReleasePublication({
     });
     publicationRuns.push({ ...workflow, run });
   }
-  const npmTarget = readPublicationTarget(fs);
   return verifyReleasePublication({
     fs,
     execFile,
@@ -38,7 +36,7 @@ export async function checkReleasePublication({
     headSha,
     version,
     release,
-    npmTarget,
+    publication,
     publicationRuns,
     maxPolls,
     npmRetries,

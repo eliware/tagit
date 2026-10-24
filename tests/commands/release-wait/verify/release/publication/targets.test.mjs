@@ -2,19 +2,23 @@ import { buildReleasePublicationPlan } from "../../../../../../src/commands/rele
 
 test("returns an empty plan when publication does not apply", () => {
   expect(
-    buildReleasePublicationPlan(
-      { existsSync: () => false },
-      { applicable: false, packageName: null, isPrivate: null },
-    ),
+    buildReleasePublicationPlan({
+      applicable: false,
+      ghcrApplicable: false,
+      packageName: null,
+      isPrivate: null,
+    }),
   ).toEqual({ targets: [], ghcrApplicable: false, applicable: false });
 });
 
 test("marks an npm target as applicable", () => {
   expect(
-    buildReleasePublicationPlan(
-      { existsSync: () => false },
-      { applicable: true, packageName: "demo", isPrivate: false },
-    ),
+    buildReleasePublicationPlan({
+      applicable: true,
+      ghcrApplicable: false,
+      packageName: "demo",
+      isPrivate: false,
+    }),
   ).toEqual({
     targets: [{ profile: "npm", packageName: "demo", isPrivate: false }],
     ghcrApplicable: false,
@@ -23,13 +27,10 @@ test("marks an npm target as applicable", () => {
 });
 
 test("marks a GHCR-only publication target as applicable", () => {
-  const fs = {
-    existsSync: (file) => file === "package.json" || file === ".github/workflows/ghcr.yaml",
-    readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
-  };
   expect(
-    buildReleasePublicationPlan(fs, {
+    buildReleasePublicationPlan({
       applicable: false,
+      ghcrApplicable: true,
       packageName: null,
       isPrivate: false,
     }),

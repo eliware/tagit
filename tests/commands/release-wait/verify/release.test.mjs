@@ -46,7 +46,13 @@ test("coordinates complete release verification", async () => {
       headSha: "abc",
       version: "1.0.0",
       checkPublish: false,
-      publicationWorkflows: [],
+      publication: {
+        applicable: false,
+        ghcrApplicable: false,
+        workflows: [],
+        packageName: null,
+        isPrivate: false,
+      },
       execFile,
     }),
   );

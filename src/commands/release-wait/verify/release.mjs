@@ -29,8 +29,7 @@ export async function verifyRelease(
       npmRetryMs,
     },
   );
-  const publicationWorkflows = publication.workflows;
-  const checkPublish = publicationWorkflows.length > 0;
+  const checkPublish = publication.workflows.length > 0;
   return verifyReleaseCompletion({
     fs,
     runnerLabelsByJobName,
@@ -42,7 +41,7 @@ export async function verifyRelease(
     version,
     release,
     checkPublish,
-    publicationWorkflows,
+    publication,
     pollMs,
     maxPolls,
     npmRetries,

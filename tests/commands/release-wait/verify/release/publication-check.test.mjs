@@ -1,12 +1,7 @@
 import { jest } from "@jest/globals";
 
-const readPublicationTarget = jest.fn();
 const verifyReleasePublication = jest.fn();
 
-jest.unstable_mockModule(
-  "../../../../../src/commands/release-wait/read/publication-target.mjs",
-  () => ({ readPublicationTarget }),
-);
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/release/publication.mjs",
   () => ({ verifyReleasePublication }),
@@ -19,9 +14,14 @@ test("forwards polled publication runs and target data to verification", async (
   const fs = {};
   const poll = jest.fn(async () => ({ databaseId: 8, jobs: [] }));
   const workflow = { workflowPath: ".github/workflows/npm.yaml", profile: "npm" };
-  const npmTarget = { applicable: true, packageName: "demo", isPrivate: false };
+  const publication = {
+    applicable: true,
+    ghcrApplicable: false,
+    packageName: "demo",
+    isPrivate: false,
+    workflows: [workflow],
+  };
   const result = { ci: true, npm: true, ghcr: false };
-  readPublicationTarget.mockReturnValue(npmTarget);
   verifyReleasePublication.mockResolvedValue(result);
 
   await expect(
@@ -29,7 +29,7 @@ test("forwards polled publication runs and target data to verification", async (
       fs,
       poll,
       common: { repo: "eliware/demo", tag: "v1.0.0" },
-      publicationWorkflows: [workflow],
+      publication,
       execFile: jest.fn(),
       log: { info: jest.fn() },
       repo: "eliware/demo",
@@ -44,10 +44,9 @@ test("forwards polled publication runs and target data to verification", async (
       sleep: jest.fn(),
     }),
   ).resolves.toBe(result);
-  expect(readPublicationTarget).toHaveBeenCalledWith(fs);
   expect(verifyReleasePublication).toHaveBeenCalledWith(
     expect.objectContaining({
-      npmTarget,
+      publication,
       publicationRuns: [{ ...workflow, run: { databaseId: 8, jobs: [] } }],
     }),
   );

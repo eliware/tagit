@@ -41,7 +41,13 @@ test("prepares the release identity and runner label context", () => {
     repo: "eliware/demo",
     tag: "v1.2.3",
     headSha: "abc",
-    publication: { applicable: false, workflows: [] },
+    publication: {
+      applicable: false,
+      ghcrApplicable: false,
+      workflows: [],
+      packageName: null,
+      isPrivate: false,
+    },
     runnerLabelsByJobName: { validate: ["ubuntu"] },
   });
 });

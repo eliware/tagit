@@ -1,9 +1,9 @@
 import { selectReleasePublicationTargets } from "../../../release/publication/targets.mjs";
 
-export function buildReleasePublicationPlan(fs, npmTarget) {
-  const selection = selectReleasePublicationTargets(fs, npmTarget);
+export function buildReleasePublicationPlan(publication) {
+  const selection = selectReleasePublicationTargets(publication);
   return {
     ...selection,
-    applicable: npmTarget.applicable || selection.ghcrApplicable,
+    applicable: publication.applicable || selection.ghcrApplicable,
   };
 }

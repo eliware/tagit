@@ -1,15 +1,10 @@
 import { selectReleasePublicationTargets } from "../../../../../src/commands/release-wait/release/publication/targets.mjs";
 
-const fsWithGhcr = (enabled) => ({
-  existsSync: (file) =>
-    file === "package.json" || (enabled && file === ".github/workflows/ghcr.yaml"),
-  readFileSync: () => JSON.stringify({ eliware: { apply: ["ghcr-published"] } }),
-});
-
 test("selects applicable npm and GHCR publication targets", () => {
   expect(
-    selectReleasePublicationTargets(fsWithGhcr(true), {
+    selectReleasePublicationTargets({
       applicable: true,
+      ghcrApplicable: true,
       packageName: "demo",
       isPrivate: false,
     }),
@@ -24,8 +19,9 @@ test("selects applicable npm and GHCR publication targets", () => {
 
 test("selects no publication targets when no publication applies", () => {
   expect(
-    selectReleasePublicationTargets(fsWithGhcr(false), {
+    selectReleasePublicationTargets({
       applicable: false,
+      ghcrApplicable: false,
       packageName: null,
       isPrivate: true,
     }),

@@ -10,7 +10,13 @@ const base = {
   headSha: "abc",
   version: "1.0.0",
   release: {},
-  npmTarget: { applicable: false, packageName: null, isPrivate: null },
+  publication: {
+    applicable: false,
+    ghcrApplicable: false,
+    packageName: null,
+    isPrivate: null,
+    workflows: [],
+  },
   publicationRuns: [],
   maxPolls: 1,
   npmRetries: 1,
@@ -31,7 +37,13 @@ test("rejects an applicable npm target without a passing publish job", async () 
       fs,
       execFile,
       log,
-      npmTarget: { applicable: true, packageName: "demo", isPrivate: false },
+      publication: {
+        applicable: true,
+        ghcrApplicable: false,
+        packageName: "demo",
+        isPrivate: false,
+        workflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+      },
       publicationRuns: [
         {
           profile: "npm",

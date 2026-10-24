@@ -11,6 +11,13 @@ const base = {
   headSha: "abc",
   version: "1.0.0",
   release: {},
+  publication: {
+    applicable: false,
+    ghcrApplicable: false,
+    packageName: null,
+    isPrivate: null,
+    workflows: [],
+  },
   maxPolls: 1,
   npmRetries: 1,
   pollMs: 0,
@@ -113,7 +120,13 @@ test("checks publication and registry after CI when the profile applies", async 
       fs,
       log,
       checkPublish: true,
-      publicationWorkflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+      publication: {
+        applicable: true,
+        ghcrApplicable: false,
+        packageName: "demo",
+        isPrivate: false,
+        workflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+      },
       poll,
     }),
   ).resolves.toMatchObject({
@@ -148,7 +161,13 @@ test("checks GHCR publication when ghcr.yaml and its profile apply", async () =>
       fs,
       execFile,
       checkPublish: true,
-      publicationWorkflows: [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }],
+      publication: {
+        applicable: false,
+        ghcrApplicable: true,
+        packageName: null,
+        isPrivate: false,
+        workflows: [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }],
+      },
       poll,
     }),
   ).resolves.toMatchObject({ ci: true, npm: false, ghcr: true });

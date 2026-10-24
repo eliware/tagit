@@ -1,14 +1,12 @@
-import { publishesGhcr } from "../../../../registries/ghcr/discover-publication.mjs";
-
-export function selectReleasePublicationTargets(fs, npmTarget) {
-  const ghcrApplicable = publishesGhcr(fs);
+export function selectReleasePublicationTargets(publication) {
+  const ghcrApplicable = publication.ghcrApplicable;
   const targets = [
-    ...(npmTarget.applicable
+    ...(publication.applicable
       ? [
           {
             profile: "npm",
-            packageName: npmTarget.packageName,
-            isPrivate: npmTarget.isPrivate,
+            packageName: publication.packageName,
+            isPrivate: publication.isPrivate,
           },
         ]
       : []),
