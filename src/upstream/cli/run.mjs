@@ -1,4 +1,4 @@
-import { showUpstreamInformation } from "./information.mjs";
+import { showUpstreamInformation } from "./information/display.mjs";
 import { selectInformationOption } from "./information-option.mjs";
 
 const packageJsonUrl = new URL("../../../package.json", import.meta.url);

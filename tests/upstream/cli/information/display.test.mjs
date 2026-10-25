@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { showUpstreamInformation } from "../../../src/upstream/cli/information.mjs";
+import { showUpstreamInformation } from "../../../../src/upstream/cli/information/display.mjs";
 
 test("shows selected help information", () => {
   const log = { log: jest.fn() };

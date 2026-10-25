@@ -7,7 +7,7 @@ test.each([
     { stderr: "registry unavailable", code: "EAI_AGAIN" },
     { type: "code", code: "EAI_AGAIN" },
   ],
-  [{ code: "bad code" }, { type: "request-failed" }],
+  [{ code: "bad code" }, { type: "code", code: "bad code" }],
   [{}, { type: "request-failed" }],
 ])("classifies npm error data %p", (error, expected) => {
   expect(classifyNpmError(error)).toEqual(expected);

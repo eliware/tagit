@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { showUpstreamVersion } from "../../../src/upstream/cli/version.mjs";
+import { showUpstreamVersion } from "../../../../src/upstream/cli/information/version.mjs";
 
 test("reads and prints the package version", () => {
   const packageJsonUrl = new URL("file:///tagit/package.json");

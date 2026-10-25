@@ -3,6 +3,7 @@ import { npmErrorSummary } from "../../../../src/registries/npm/error/summary.mj
 test.each([
   [{ stderr: "HTTP 404" }, "404 not found"],
   [{ code: "EAI_AGAIN" }, "EAI_AGAIN"],
+  [{ code: "bad code" }, "request failed"],
   [{}, "request failed"],
 ])("formats a concise npm error summary: %p", (error, expected) => {
   expect(npmErrorSummary(error)).toBe(expected);
