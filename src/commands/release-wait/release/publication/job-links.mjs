@@ -3,3 +3,8 @@ export function reportPublicationJobLinks(log, profile, publishJobs) {
     if (job.url) log.info(`${profile}: [${job.url}](${job.url})`);
   });
 }
+
+export function reportVerifiedPublicationJobLinks(log, publications) {
+  for (const { profile, publishJobs } of publications)
+    reportPublicationJobLinks(log, profile, publishJobs);
+}
