@@ -124,6 +124,29 @@ test("retries transient list inspection before finding the workflow", async () =
   expect(options.sleep).toHaveBeenCalled();
 });
 
+test("retries malformed run details before returning a valid run", async () => {
+  let views = 0;
+  const run = { databaseId: 8, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
+  const details = {
+    databaseId: 8,
+    status: "completed",
+    conclusion: "success",
+    headSha: "abc",
+    jobs: [],
+  };
+  const execFile = jest.fn((_command, args, _options, callback) => {
+    if (args[1] === "list") return callback(null, JSON.stringify([run]), "");
+    views += 1;
+    callback(null, views === 1 ? "{bad details" : JSON.stringify(details), "");
+  });
+  await expect(pollReleaseCi({ ...options, execFile, maxPolls: 2 })).resolves.toMatchObject({
+    databaseId: 8,
+    conclusion: "success",
+  });
+  expect(views).toBe(2);
+  expect(options.sleep).toHaveBeenCalled();
+});
+
 test("waits through a pending detail until the next poll", async () => {
   let views = 0;
   const run = { databaseId: 6, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };

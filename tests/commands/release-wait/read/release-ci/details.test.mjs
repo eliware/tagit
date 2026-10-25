@@ -13,3 +13,9 @@ test("reads details for a selected workflow", async () => {
     databaseId: 7,
   });
 });
+
+test("preserves non-JSON errors from the details reader", async () => {
+  const error = new Error("network unavailable");
+  const execFile = jest.fn((_command, _args, _options, callback) => callback(error, "", ""));
+  await expect(readReleaseCiDetails(execFile, "eliware/demo", 7)).rejects.toBe(error);
+});

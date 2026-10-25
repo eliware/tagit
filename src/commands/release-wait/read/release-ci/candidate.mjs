@@ -9,9 +9,12 @@ export async function readReleaseCiCandidate(
   tag,
   workflowPath = ".github/workflows/ci.yaml",
 ) {
-  const runs = await readReleaseCiJson(
-    execFile,
-    createReleaseCiListArgs(repo, headSha, workflowPath),
-  );
-  return selectReleaseRun(runs, headSha, tag, workflowPath);
+  let runs;
+  try {
+    runs = await readReleaseCiJson(execFile, createReleaseCiListArgs(repo, headSha, workflowPath));
+  } catch (error) {
+    if (error instanceof SyntaxError) error.code = "ERR_RELEASE_CI_LIST_JSON";
+    throw error;
+  }
+  return selectReleaseRun(runs, headSha, tag);
 }

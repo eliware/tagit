@@ -2,9 +2,9 @@ import { validateReleaseRunRecords } from "./records.mjs";
 import { selectReleaseRunBranches } from "./branch-policy.mjs";
 import { assertUnambiguousReleaseRunTimestamps } from "./ambiguity-policy.mjs";
 
-export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/workflows/ci.yaml") {
+export function selectReleaseRun(runs, headSha, tag) {
   validateReleaseRunRecords(runs, tag);
-  const branches = selectReleaseRunBranches(tag, workflowPath);
+  const branches = selectReleaseRunBranches(tag);
   const eligible = runs
     .filter((item) => item.headSha === headSha && branches.includes(item.headBranch))
     .sort((a, b) => {

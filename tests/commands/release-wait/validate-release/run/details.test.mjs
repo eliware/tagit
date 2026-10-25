@@ -8,5 +8,7 @@ test("coordinates release identity and job validation", () => {
     headSha: "abc",
     jobs: [{ name: "validate", status: "completed", conclusion: "success" }],
   };
-  expect(validateReleaseRunDetails(details, { databaseId: 1 }, "abc")).toBe(details);
+  expect(
+    validateReleaseRunDetails(details, { databaseId: 1, headBranch: "v1.0.0" }, "abc", "v1.0.0"),
+  ).toBe(details);
 });

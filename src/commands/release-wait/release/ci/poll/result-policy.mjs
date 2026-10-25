@@ -8,7 +8,14 @@ export function applyReleaseCiResultPolicy(candidate, details, { linksOnly, log,
     error.code = "ERR_RELEASE_CI_FAILED";
     throw error;
   }
-  if (linksOnly || details.status === "completed") return mergeReleaseRun(candidate, details);
+  if (linksOnly)
+    return {
+      ...candidate,
+      url: details.url,
+      jobs: details.jobs,
+      linksOnly: true,
+    };
+  if (details.status === "completed") return mergeReleaseRun(candidate, details);
   log.info(`Release ${workflowLabel ?? "CI"} is ${details.status}. Waiting.`);
   return { pending: true };
 }
