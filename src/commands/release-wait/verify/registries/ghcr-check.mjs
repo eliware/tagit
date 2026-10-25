@@ -1,9 +1,7 @@
-import { publishesGhcr } from "../../../../registries/ghcr/discover-publication.mjs";
 import { verifyGhcrRegistry } from "./ghcr.mjs";
 
 export async function verifyGhcrPublication({
-  fs,
-  applicable = publishesGhcr(fs),
+  applicable,
   execFile,
   log,
   repo,

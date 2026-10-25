@@ -4,13 +4,14 @@ Tagit checks release readiness and publication. It does not deploy applications 
 
 ## Prepare an owner handoff
 
-1. Update the code, package data, documentation, tests, and release notes.
-2. Set `package.json` to the planned release version.
-3. Run `tagit notes` and inspect its commit list, changed files, and diff excerpt.
-4. Commit the intended changes and push them to `main`.
-5. Wait for CI on that exact commit.
-6. Run `tagit preflight` after CI passes.
-7. Give DevOps the commit ID and package version after preflight passes.
+1. Read the full diff. Check user-visible, compatibility, and operation changes.
+2. Update the code, package data, documentation, tests, and release notes.
+3. Set `package.json` to the planned release version.
+4. Run `tagit notes` and inspect its commit list, changed files, and diff excerpt.
+5. Commit the intended changes and push them to `main`.
+6. Wait for CI on that exact commit.
+7. Run `tagit preflight` after CI passes.
+8. Give DevOps the commit ID and package version after preflight passes.
 
 Do not hand off a different commit. Preflight checks CI for the current commit. Fix every reported blocker, push the repair, wait for its CI, and run preflight again.
 

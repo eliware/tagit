@@ -12,4 +12,5 @@ test("reports the tag range without a version suggestion", () => {
   });
   expect(report).toContain("Range: v1.0.0..current commit");
   expect(report).not.toMatch(/suggested release|release level|version bump/i);
+  expect(report).not.toContain("AI ACTIONS");
 });

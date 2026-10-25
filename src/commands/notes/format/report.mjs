@@ -1,5 +1,3 @@
-import { formatNotesActions } from "./actions.mjs";
-
 export function formatNotesReport(tag, changes) {
   const { commits, files, excerpt } = changes;
   return [
@@ -14,7 +12,5 @@ export function formatNotesReport(tag, changes) {
     "",
     "DIFF",
     excerpt || "(no source diff)",
-    "",
-    ...formatNotesActions(),
   ].join("\n");
 }

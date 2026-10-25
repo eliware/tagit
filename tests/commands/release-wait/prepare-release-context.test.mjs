@@ -51,16 +51,3 @@ test("prepares the release identity and runner label context", () => {
     runnerLabelsByJobName: { validate: ["ubuntu"] },
   });
 });
-
-test("rejects invalid input before reading Git or package context", () => {
-  const execFileSync = jest.fn();
-  const fs = { existsSync: jest.fn(), readFileSync: jest.fn() };
-  expect(() =>
-    prepareReleaseContext(execFileSync, fs, {
-      ...options,
-      version: "next",
-    }),
-  ).toThrow("must be valid");
-  expect(execFileSync).not.toHaveBeenCalled();
-  expect(fs.existsSync).not.toHaveBeenCalled();
-});

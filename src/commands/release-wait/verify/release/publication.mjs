@@ -1,5 +1,4 @@
-import { verifyPublicationJobs } from "../../release/publication/jobs.mjs";
-import { reportVerifiedPublicationJobLinks } from "../../release/publication/job-links.mjs";
+import { verifyReleasePublicationJobs } from "./publication/jobs.mjs";
 import { verifyPublicationRegistries } from "../../release/publication/registries.mjs";
 import { buildReleasePublicationPlan } from "./publication/targets.mjs";
 
@@ -25,7 +24,7 @@ export async function verifyReleasePublication({
     ghcrApplicable,
     applicable: publicationApplies,
   } = buildReleasePublicationPlan(publication);
-  const verifiedPublications = verifyPublicationJobs({
+  verifyReleasePublicationJobs({
     targets,
     publicationRuns,
     applicable: publication.applicable,
@@ -34,7 +33,6 @@ export async function verifyReleasePublication({
     tag,
     log,
   });
-  reportVerifiedPublicationJobLinks(log, verifiedPublications);
   if (!publicationApplies) return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
   return verifyPublicationRegistries({
     fs,

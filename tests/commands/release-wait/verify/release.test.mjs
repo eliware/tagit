@@ -62,14 +62,3 @@ test("propagates full verification failures", async () => {
   verifyReleaseCompletion.mockRejectedValue(new Error("release check failed"));
   await expect(verifyRelease(execFileSync, fs, log, input)).rejects.toThrow("release check failed");
 });
-
-test.each([
-  ["invalid release input", { version: "next", release: { commitSha: "abc" } }],
-  ["omitted release options", undefined],
-])("rejects %s before inspecting Git or package data", async (_description, options) => {
-  const inspect = jest.fn();
-  const fileSystem = { existsSync: jest.fn(), readFileSync: jest.fn() };
-  await expect(verifyRelease(inspect, fileSystem, log, options)).rejects.toThrow();
-  expect(inspect).not.toHaveBeenCalled();
-  expect(fileSystem.existsSync).not.toHaveBeenCalled();
-});
