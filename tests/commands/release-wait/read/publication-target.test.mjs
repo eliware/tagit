@@ -33,6 +33,21 @@ test("reads an explicit npm profile when npm.yaml exists", () => {
   expect(packageReads).toBe(1);
 });
 
+test("skips an npm profile when npm.yaml is missing", () => {
+  expect(
+    readPublicationTarget({
+      existsSync: (file) => file === "package.json",
+      readFileSync: () => JSON.stringify({ name: "demo", eliware: { apply: ["npm-published"] } }),
+    }),
+  ).toEqual({
+    applicable: false,
+    ghcrApplicable: false,
+    workflows: [],
+    packageName: null,
+    isPrivate: false,
+  });
+});
+
 test("skips npm publication checks for a GHCR-only profile", () => {
   expect(
     readPublicationTarget({

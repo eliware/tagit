@@ -1,10 +1,6 @@
-import { showUpstreamInformation } from "./information/display.mjs";
-import { selectInformationOption } from "./information-option.mjs";
-
-const packageJsonUrl = new URL("../../../package.json", import.meta.url);
+import { dispatchUpstreamInformation } from "./information/dispatch.mjs";
 
 export function runUpstreamCli(args, { execFileSync, readFileSync, now, log, runUpstream }) {
-  const option = selectInformationOption(args);
-  if (showUpstreamInformation(option, { readFileSync, log }, packageJsonUrl)) return;
+  if (dispatchUpstreamInformation(args, { readFileSync, log })) return;
   return runUpstream(args, execFileSync, now, log);
 }
