@@ -6,6 +6,7 @@
 
 - Describe that `push --dry-run` skips the push and CI lookup.
 - Describe that `release --dry-run` checks version data and skips preflight, commit, tag, push, and publication.
+- Accept `main` CI runs for the exact commit behind a release tag.
 
 ## 15.0.0 — 2026-10-25
 

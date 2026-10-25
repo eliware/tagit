@@ -27,6 +27,24 @@ test("rejects a different run id or commit", () => {
 
 test("rejects a run candidate from main instead of the release tag", () => {
   expect(() =>
-    validateReleaseRunIdentity(validDetails, { ...candidate, headBranch: "main" }, "abc", "v1.0.0"),
-  ).toThrow("expected release tag v1.0.0");
+    validateReleaseRunIdentity(
+      validDetails,
+      { ...candidate, headBranch: "main" },
+      "abc",
+      "v1.0.0",
+      ".github/workflows/npm.yaml",
+    ),
+  ).toThrow("not valid for release tag v1.0.0");
+});
+
+test("accepts the main branch for CI on the tagged commit", () => {
+  expect(
+    validateReleaseRunIdentity(
+      validDetails,
+      { ...candidate, headBranch: "main" },
+      "abc",
+      "v1.0.0",
+      ".github/workflows/ci.yaml",
+    ),
+  ).toBe(validDetails);
 });

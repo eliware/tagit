@@ -12,10 +12,10 @@ test("selects the newest exact release tag and commit", () => {
     ).databaseId,
   ).toBe(2);
 });
-test("does not select a main branch run for the tagged commit", () => {
+test("selects the main CI run for the tagged commit", () => {
   expect(
     selectReleaseRun([{ databaseId: 4, headSha: "abc", headBranch: "main" }], "abc", "v1.0.0"),
-  ).toBeUndefined();
+  ).toMatchObject({ databaseId: 4 });
 });
 test("does not select a main branch run for a publication workflow", () => {
   expect(

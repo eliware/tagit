@@ -16,6 +16,6 @@ export async function runReleaseCiPollAttempt({
   const candidate = await readReleaseCiCandidate(execFile, repo, headSha, tag, workflowPath);
   if (!candidate) return null;
   const details = await readReleaseCiDetails(execFile, repo, candidate.databaseId);
-  validateReleaseRunDetails(details, candidate, headSha, tag);
+  validateReleaseRunDetails(details, candidate, headSha, tag, workflowPath);
   return applyReleaseCiResultPolicy(candidate, details, { linksOnly, log, workflowLabel });
 }
