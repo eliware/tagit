@@ -1,5 +1,12 @@
 # Release Notes
 
+## 15.0.1 — 2026-10-25
+
+### Fixed
+
+- Describe that `push --dry-run` skips the push and CI lookup.
+- Describe that `release --dry-run` checks version data and skips preflight, commit, tag, push, and publication.
+
 ## 15.0.0 — 2026-10-25
 
 ### Added
