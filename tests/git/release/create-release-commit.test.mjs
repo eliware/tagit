@@ -3,9 +3,10 @@ import { createReleaseCommit } from "../../../src/git/release/create-release-com
 
 test("creates a dated empty release commit", () => {
   const runGit = jest.fn((args) => (args[0] === "rev-parse" ? "abc123\n" : ""));
-  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3", new Date("2026-10-15T12:00:00Z"))).toBe(
-    "abc123",
-  );
+  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3", new Date("2026-10-15T12:00:00Z"))).toEqual({
+    currentHead: "abc123",
+    tagReused: false,
+  });
   expect(runGit).toHaveBeenCalledWith(
     ["commit", "--allow-empty", "-m", "Release v1.2.3 - 2026-10-15"],
     { stdio: "inherit" },
@@ -17,7 +18,10 @@ test("returns the existing HEAD without creating another release commit", () => 
     if (args[0] === "tag") return "v1.2.3\n";
     return "abc123\n";
   });
-  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toBe("abc123");
+  expect(createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toEqual({
+    currentHead: "abc123",
+    tagReused: true,
+  });
   expect(runGit).not.toHaveBeenCalledWith(expect.arrayContaining(["commit"]), expect.anything());
 });
 

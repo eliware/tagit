@@ -13,10 +13,11 @@ test("does not read npm metadata when the workflow or profile does not apply", (
   const fs = fsFor("demo", false);
   expect(
     readNpmPublicationTarget(fs, { private: false, eliware: { apply: ["npm-published"] } }),
-  ).toEqual({ applicable: false, packageName: null });
+  ).toEqual({ applicable: false, packageName: null, workflow: null });
   expect(readNpmPublicationTarget(fsFor("demo"), { eliware: { apply: ["general"] } })).toEqual({
     applicable: false,
     packageName: null,
+    workflow: null,
   });
 });
 
@@ -32,7 +33,11 @@ test("uses the parsed package name for an applicable public target", () => {
       private: false,
       eliware: { apply: ["npm-published"] },
     }),
-  ).toEqual({ applicable: true, packageName: "@eliware/demo" });
+  ).toEqual({
+    applicable: true,
+    packageName: "@eliware/demo",
+    workflow: { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
+  });
   expect(readFileSync).not.toHaveBeenCalled();
 });
 
@@ -43,5 +48,9 @@ test("allows a private npm target without a package name", () => {
   };
   expect(
     readNpmPublicationTarget(fs, { private: true, eliware: { apply: ["npm-published"] } }),
-  ).toEqual({ applicable: true, packageName: null });
+  ).toEqual({
+    applicable: true,
+    packageName: null,
+    workflow: { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
+  });
 });

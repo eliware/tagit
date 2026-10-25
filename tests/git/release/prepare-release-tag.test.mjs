@@ -1,16 +1,21 @@
 import { jest } from "@jest/globals";
 import { prepareReleaseTag } from "../../../src/git/release/prepare-release-tag.mjs";
-test("prepares a tag from current HEAD", () => {
-  const exec = jest.fn((command, args) => (args[0] === "rev-parse" ? "abc" : ""));
-  expect(prepareReleaseTag(exec, { info: jest.fn() }, "v1.2.3").currentHead).toBe("abc");
+test("adds a tag to the validated release commit", () => {
+  const exec = jest.fn();
+  const log = { info: jest.fn() };
+  expect(
+    prepareReleaseTag(exec, log, "v1.2.3", { currentHead: "abc", tagReused: false }).currentHead,
+  ).toBe("abc");
+  expect(exec).toHaveBeenCalledWith("git", ["tag", "v1.2.3", "abc"], { stdio: "inherit" });
+  expect(log.info).toHaveBeenCalledWith("Add tag v1.2.3 to the current commit.");
 });
 
-test("rejects a release tag that points to another commit", () => {
-  const exec = jest.fn((_command, args) => {
-    if (args.join(" ") === "rev-parse HEAD") return "abc";
-    if (args.join(" ") === "tag --list v1.2.3") return "v1.2.3";
-    if (args.join(" ") === "rev-parse v1.2.3") return "def";
-    return "";
-  });
-  expect(() => prepareReleaseTag(exec, { info: jest.fn() }, "v1.2.3")).toThrow("points to def");
+test("does not add a tag that release preparation already reused", () => {
+  const exec = jest.fn();
+  const log = { info: jest.fn() };
+  expect(
+    prepareReleaseTag(exec, log, "v1.2.3", { currentHead: "abc", tagReused: true }).currentHead,
+  ).toBe("abc");
+  expect(exec).not.toHaveBeenCalled();
+  expect(log.info).toHaveBeenCalledWith("Tag v1.2.3 points to the current commit. Use the tag.");
 });

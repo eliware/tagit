@@ -18,7 +18,7 @@ export function readPublicationTarget(fs) {
   return {
     applicable: npmTarget.applicable,
     ghcrApplicable,
-    workflows: buildPublicationWorkflowTargets(npmTarget.applicable, ghcrApplicable),
+    workflows: buildPublicationWorkflowTargets(npmTarget.workflow, ghcrApplicable),
     packageName: npmTarget.packageName,
     isPrivate: Boolean(packageData.private),
   };

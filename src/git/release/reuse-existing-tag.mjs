@@ -2,7 +2,7 @@ import { validateCurrentHead } from "../tags/validate-release-tag.mjs";
 
 export function reuseExistingReleaseTag(runGit, head, tag) {
   const existing = String(runGit(["tag", "--list", tag], { encoding: "utf8" })).trim();
-  if (!existing) return null;
+  if (!existing) return { currentHead: head, tagReused: false };
   const { currentHead, existingTagHead } = validateCurrentHead(
     head,
     runGit(["rev-parse", tag], { encoding: "utf8" }),
@@ -11,5 +11,5 @@ export function reuseExistingReleaseTag(runGit, head, tag) {
     throw new Error(
       `Release tag ${tag} points to ${existingTagHead}, not the current commit ${currentHead}.`,
     );
-  return currentHead;
+  return { currentHead, tagReused: true };
 }

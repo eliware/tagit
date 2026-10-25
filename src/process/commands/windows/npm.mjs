@@ -1,8 +1,10 @@
-import { buildWindowsNpmCommandString } from "./command-string.mjs";
+function quoteWindowsArgument(argument) {
+  return `"${argument}"`;
+}
 
 export function buildWindowsNpmCommand(args) {
   return {
-    executable: buildWindowsNpmCommandString(args),
+    executable: `npm.cmd ${args.map(quoteWindowsArgument).join(" ")}`,
     args: [],
     options: { encoding: "utf8", shell: true },
   };

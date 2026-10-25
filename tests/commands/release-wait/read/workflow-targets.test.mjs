@@ -1,17 +1,24 @@
 import { buildPublicationWorkflowTargets } from "../../../../src/commands/release-wait/read/workflow-targets.mjs";
 
 test.each([
-  [false, false, []],
-  [true, false, [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }]],
-  [false, true, [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }]],
+  [null, false, []],
   [
-    true,
+    { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
+    false,
+    [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+  ],
+  [null, true, [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }]],
+  [
+    { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
     true,
     [
       { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
       { workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" },
     ],
   ],
-])("builds workflow targets for npm=%s and ghcr=%s", (npmApplicable, ghcrApplicable, expected) => {
-  expect(buildPublicationWorkflowTargets(npmApplicable, ghcrApplicable)).toEqual(expected);
-});
+])(
+  "combines the discovered npm workflow with GHCR applicability",
+  (npmWorkflow, ghcrApplicable, expected) => {
+    expect(buildPublicationWorkflowTargets(npmWorkflow, ghcrApplicable)).toEqual(expected);
+  },
+);

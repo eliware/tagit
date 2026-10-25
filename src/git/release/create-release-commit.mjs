@@ -6,11 +6,15 @@ export function createReleaseCommit(runGit, version, tag, date = new Date()) {
     runGit(["rev-parse", "HEAD"], { encoding: "utf8" }),
     null,
   );
-  const reusedHead = reuseExistingReleaseTag(runGit, head, tag);
-  if (reusedHead) return reusedHead;
+  const releaseTag = reuseExistingReleaseTag(runGit, head, tag);
+  if (releaseTag.tagReused) return releaseTag;
   const releaseDate = date.toISOString().slice(0, 10);
   runGit(["commit", "--allow-empty", "-m", `Release v${version} - ${releaseDate}`], {
     stdio: "inherit",
   });
-  return validateCurrentHead(runGit(["rev-parse", "HEAD"], { encoding: "utf8" }), null).currentHead;
+  return {
+    currentHead: validateCurrentHead(runGit(["rev-parse", "HEAD"], { encoding: "utf8" }), null)
+      .currentHead,
+    tagReused: false,
+  };
 }

@@ -14,8 +14,8 @@ export function runReleaseTagTransaction({
   let remoteSideEffects = false;
   try {
     const git = (args, options) => runGit(execFileSync, args, options);
-    createReleaseCommit(git, version, releaseTag);
-    const { currentHead } = prepareReleaseTag(execFileSync, log, releaseTag);
+    const releaseState = createReleaseCommit(git, version, releaseTag);
+    const { currentHead } = prepareReleaseTag(execFileSync, log, releaseTag, releaseState);
     log.info("Pushing the release commit and tag to the remote");
     remoteSideEffects = true;
     pushReleaseRefs((args, options) => git(args, options), releaseTag);
