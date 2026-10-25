@@ -1,23 +1,35 @@
 # Release Notes
 
-## 15.0.0 — 2026-10-22
+## 15.0.0 — 2026-10-25
 
 ### Added
 
 - Add release marker commits so CI checks the tagged release commit.
-- Report links after release CI and applicable publication workflows start.
+- Push the release commit and version tag to `main` in one atomic operation.
+- Report links after CI and applicable publication workflows start.
+- Check release CI and publication workflows with `tagit release-wait`.
+- Support repositories without a publication workflow. Release-wait ends after tagged-commit CI passes.
 
 ### Changed
 
-- Use Eliware Test 15 for repository convention and package checks.
-- Check publication only when the repository profile and matching workflow apply.
-- Push the release commit and version tag in one atomic operation.
+- Align repository conventions, GitHub Actions, Knit, package metadata, and specifications with Eliware Test v13, v14, and v15.
+- Use Eliware Test v15 and `@eliware/common` v15 for package checks and shared utilities.
+- Check npm or GHCR publication only when its package profile and matching workflow apply.
+- Use `.github/workflows/npm.yaml` for npm publication checks.
+- Require CI for the exact tagged commit and classify jobs from workflow runner labels.
+- Keep Windows CI optional when the workflow has no Windows job.
+- Show one status line for each release-wait check and a concise npm visibility error.
 - Remove version suggestions from `tagit notes`.
-- Align GitHub Actions, Knit, package metadata, and repository specifications with Convention v15.
+- Split CLI, release, workflow, registry, and validation logic into focused modules.
+- Expand and update end-user documentation and repository guidance.
 
 ### Fixed
 
-- Check release CI and publication results for the tagged commit.
+- Return a nonzero exit code when release CI or publication fails.
+- Keep release-start links separate from a workflow pass result.
+- Retry transient release details errors and reject malformed run status data.
+- Reject CI runs from `main` when release-wait checks a version tag.
+- Set no runner label for job names with conflicting labels across workflow files.
 - Preserve full Git history in CI for tag-based validation.
 - Extend the local validation timeout to three minutes.
 
