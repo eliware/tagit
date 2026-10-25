@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { applyReleaseCiResultPolicy } from "../../../../../../src/commands/release-wait/release/ci/poll/result-policy.mjs";
+import { applyReleaseCiResultPolicy } from "../../../../../../src/commands/release-wait/release/ci/poll/result.mjs";
 
 const candidate = { databaseId: 7, headBranch: "v1.2.3" };
 const baseDetails = {

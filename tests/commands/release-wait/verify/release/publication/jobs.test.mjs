@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { verifyReleasePublicationJobs } from "../../../../../../src/commands/release-wait/verify/release/publication/jobs.mjs";
 
-test("verifies publication jobs and reports their links", () => {
+test("verifies publication jobs", () => {
   const log = { info: jest.fn() };
   const publishJob = {
     name: "publish",
@@ -20,5 +20,5 @@ test("verifies publication jobs and reports their links", () => {
   });
 
   expect(result).toEqual([{ profile: "npm", publishJobs: [publishJob] }]);
-  expect(log.info).toHaveBeenCalledWith("npm: [publish-url](publish-url)");
+  expect(log.info).toHaveBeenCalledWith("Release npm workflow verified for eliware/demo@v1.0.0.");
 });

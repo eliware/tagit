@@ -1,23 +1,17 @@
 import { execFileCommand } from "../../process/async/exec-file-command.mjs";
 import { reportNpmViewAttempt } from "./error/view/report-attempt.mjs";
 
-export async function pollNpmPublication(
+export async function checkNpmPublicationAttempt(
   execFile,
   log,
-  { command, packageName, version, retries, retryMs, sleep },
+  { command, packageName, version, attempt, retries },
 ) {
   const { executable, args, options } = command;
-  for (let attempt = 0; attempt < retries; attempt += 1) {
-    const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
-    try {
-      const output = await execFileCommand(execFile, executable, args, options);
-      if (reportNpmViewAttempt(log, status, { output, version })) return;
-    } catch (error) {
-      reportNpmViewAttempt(log, status, { error });
-    }
-    if (attempt + 1 < retries) await sleep(retryMs);
+  const status = `npm view ${packageName}@${version} (${attempt + 1}/${retries})`;
+  try {
+    const output = await execFileCommand(execFile, executable, args, options);
+    return reportNpmViewAttempt(log, status, { output, version });
+  } catch (error) {
+    return reportNpmViewAttempt(log, status, { error });
   }
-  const message = `npm did not expose ${packageName}@${version} after ${retries} checks.`;
-  log.info?.(message);
-  throw new Error(message);
 }

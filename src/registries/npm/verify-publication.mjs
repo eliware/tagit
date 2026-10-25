@@ -1,7 +1,7 @@
 import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
 import { buildNpmViewArguments } from "./build-view-command.mjs";
 import { buildNpmCommand } from "./command-builder.mjs";
-import { pollNpmPublication } from "./poll-publication.mjs";
+import { pollNpmPublication } from "./poll.mjs";
 
 export async function verifyNpmPublication(
   execFile,
