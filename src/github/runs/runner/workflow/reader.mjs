@@ -1,5 +1,5 @@
 function isMissingWorkflow(error, revision, workflowPath) {
-  const details = `${error?.stderr ?? ""}\n${error?.message ?? ""}`;
+  const details = `${error?.stderr ?? ""}\n${error?.stdout ?? ""}\n${error?.message ?? ""}`;
   return details.includes(`fatal: path '${workflowPath}' does not exist in '${revision}'`);
 }
 

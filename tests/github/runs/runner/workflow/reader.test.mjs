@@ -24,6 +24,17 @@ test("skips workflow paths that do not exist in the requested revision", () => {
   ).toEqual(Object.create(null));
 });
 
+test("skips missing workflow paths when Git reports the error on stdout", () => {
+  const execFileSync = jest.fn(() => {
+    throw {
+      stdout: Buffer.from("fatal: path '.github/workflows/npm.yaml' does not exist in 'abc123'"),
+    };
+  });
+  expect(
+    readWorkflowContentsFromGit(execFileSync, "abc123", [".github/workflows/npm.yaml"]),
+  ).toEqual(Object.create(null));
+});
+
 test("propagates Git failures that do not report a missing workflow path", () => {
   const error = new Error("fatal: not a git repository");
   const execFileSync = jest.fn(() => {

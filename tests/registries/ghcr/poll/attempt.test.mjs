@@ -26,7 +26,7 @@ test("logs and returns a visible image", async () => {
 });
 
 test("logs lookup failures and returns no image", async () => {
-  lookupGhcrVisibleImage.mockRejectedValue(new Error("registry unavailable"));
+  lookupGhcrVisibleImage.mockRejectedValue(new Error("registry unavailable token=secret-value"));
   const log = { info: jest.fn(), debug: jest.fn() };
   await expect(
     readGhcrVisibilityAttempt(jest.fn(), log, {
@@ -37,7 +37,10 @@ test("logs lookup failures and returns no image", async () => {
       retries: 3,
     }),
   ).resolves.toBeNull();
-  expect(log.debug).toHaveBeenCalledWith("GHCR check 2/3 failed: Error: registry unavailable");
+  expect(log.debug).toHaveBeenCalledWith(
+    "GHCR check 2/3 failed: Error: registry unavailable token=[REDACTED]",
+  );
+  expect(log.debug.mock.calls[0][0]).not.toContain("secret-value");
 });
 
 test("handles lookup failures when debug logging is unavailable", async () => {
