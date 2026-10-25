@@ -13,6 +13,7 @@ export async function pollReleaseCi({
   log,
   workflowPath = ".github/workflows/ci.yaml",
   workflowLabel = "CI",
+  runnerLabelsByJobName = {},
 }) {
   for (let poll = 0; poll < maxPolls; poll += 1) {
     try {
@@ -26,6 +27,7 @@ export async function pollReleaseCi({
         log,
         workflowPath,
         workflowLabel,
+        runnerLabelsByJobName,
       });
       if (result && !result.pending) return result;
     } catch (error) {

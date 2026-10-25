@@ -48,6 +48,24 @@ test("rejects a failed run in links-only mode", () => {
   ).toThrow("Release CI failed: failure");
 });
 
+test("checks CI jobs before reporting a completed run in links-only mode", () => {
+  expect(() =>
+    applyReleaseCiResultPolicy(
+      candidate,
+      {
+        ...baseDetails,
+        jobs: [{ name: "validate", status: "completed", conclusion: "failure" }],
+      },
+      {
+        linksOnly: true,
+        log: { info: jest.fn() },
+        workflowPath: ".github/workflows/ci.yaml",
+        runnerLabelsByJobName: { validate: ["ubuntu"] },
+      },
+    ),
+  ).toThrow("Release CI failed: validate: failure");
+});
+
 test("reports a pending run and returns pending state", () => {
   const log = { info: jest.fn() };
   expect(

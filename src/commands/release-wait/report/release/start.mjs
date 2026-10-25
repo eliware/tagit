@@ -14,6 +14,7 @@ export async function reportReleaseStart({
   log,
   checkPublish,
   publicationWorkflows = [],
+  runnerLabelsByJobName = {},
   poll = pollReleaseCi,
 }) {
   const common = buildReleaseCiPollOptions({
@@ -31,6 +32,7 @@ export async function reportReleaseStart({
     { workflowPath: ".github/workflows/ci.yaml", profile: "CI" },
     ...(checkPublish ? publicationWorkflows : []),
   ];
+  common.runnerLabelsByJobName = runnerLabelsByJobName;
   const results = await pollReleaseWorkflows(poll, common, workflows);
   for (const { workflow, run } of results)
     reportReleaseLinks(log, repo, tag, run, workflow.profile);

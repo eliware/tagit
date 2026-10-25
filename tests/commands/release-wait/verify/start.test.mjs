@@ -34,7 +34,7 @@ function releasePoller() {
         status: "completed",
         conclusion: "success",
         headSha: "abc",
-        jobs: [],
+        jobs: [{ name: "validate", status: "completed", conclusion: "success" }],
         url: `https://example.test/runs/${databaseId}`,
       }),
       "",

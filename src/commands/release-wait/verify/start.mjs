@@ -18,14 +18,18 @@ export async function startReleaseVerification(
     execFile = defaultExecFile,
   } = {},
 ) {
-  const { repo, tag, headSha, publication } = prepareReleaseContext(execFileSync, fs, {
-    version,
-    release,
-    maxPolls,
-    npmRetries,
-    pollMs,
-    npmRetryMs,
-  });
+  const { repo, tag, headSha, publication, runnerLabelsByJobName } = prepareReleaseContext(
+    execFileSync,
+    fs,
+    {
+      version,
+      release,
+      maxPolls,
+      npmRetries,
+      pollMs,
+      npmRetryMs,
+    },
+  );
   return reportReleaseVerificationStart({
     execFile,
     repo,
@@ -37,5 +41,6 @@ export async function startReleaseVerification(
     log,
     checkPublish: publication.workflows.length > 0,
     publicationWorkflows: publication.workflows,
+    runnerLabelsByJobName,
   });
 }

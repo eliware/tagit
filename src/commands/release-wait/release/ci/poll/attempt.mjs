@@ -12,10 +12,17 @@ export async function runReleaseCiPollAttempt({
   log,
   workflowPath,
   workflowLabel,
+  runnerLabelsByJobName,
 }) {
   const candidate = await readReleaseCiCandidate(execFile, repo, headSha, tag, workflowPath);
   if (!candidate) return null;
   const details = await readReleaseCiDetails(execFile, repo, candidate.databaseId);
   validateReleaseRunDetails(details, candidate, headSha, tag, workflowPath);
-  return applyReleaseCiResultPolicy(candidate, details, { linksOnly, log, workflowLabel });
+  return applyReleaseCiResultPolicy(candidate, details, {
+    linksOnly,
+    log,
+    workflowLabel,
+    workflowPath,
+    runnerLabelsByJobName,
+  });
 }
