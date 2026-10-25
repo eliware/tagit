@@ -1,5 +1,6 @@
 import { pollReleaseCi } from "../../release/ci/status.mjs";
 import { checkReleaseCi } from "./ci/check.mjs";
+import { buildReleaseCiPollOptions } from "./ci/options.mjs";
 import { checkReleasePublication } from "./publication-check.mjs";
 
 export async function verifyReleaseCompletion({
@@ -21,7 +22,17 @@ export async function verifyReleaseCompletion({
   sleep,
   poll = pollReleaseCi,
 }) {
-  const common = { execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly: false, log };
+  const common = buildReleaseCiPollOptions({
+    execFile,
+    repo,
+    headSha,
+    tag,
+    pollMs,
+    maxPolls,
+    sleep,
+    linksOnly: false,
+    log,
+  });
   await checkReleaseCi({
     poll,
     common,

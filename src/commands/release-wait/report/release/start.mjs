@@ -1,5 +1,6 @@
 import { pollReleaseCi } from "../../release/ci/status.mjs";
 import { pollReleaseWorkflows } from "../../release/poll/workflows.mjs";
+import { buildReleaseCiPollOptions } from "../../verify/release/ci/options.mjs";
 import { reportReleaseLinks } from "./links.mjs";
 
 export async function reportReleaseStart({
@@ -15,7 +16,17 @@ export async function reportReleaseStart({
   publicationWorkflows = [],
   poll = pollReleaseCi,
 }) {
-  const common = { execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly: true, log };
+  const common = buildReleaseCiPollOptions({
+    execFile,
+    repo,
+    headSha,
+    tag,
+    pollMs,
+    maxPolls,
+    sleep,
+    linksOnly: true,
+    log,
+  });
   const workflows = [
     { workflowPath: ".github/workflows/ci.yaml", profile: "CI" },
     ...(checkPublish ? publicationWorkflows : []),

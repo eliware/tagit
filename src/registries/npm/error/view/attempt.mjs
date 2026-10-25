@@ -1,8 +1,10 @@
 import { classifyNpmViewResult } from "./result-policy.mjs";
 import { readNpmViewResponse } from "./response-reader.mjs";
+import { classifyNpmViewFailure } from "./failure-policy.mjs";
 
 export function classifyNpmViewAttempt(attempt) {
-  if ("error" in attempt) return { type: "failure", error: attempt.error };
+  const failure = classifyNpmViewFailure(attempt);
+  if (failure) return failure;
   return {
     type: "result",
     exists:

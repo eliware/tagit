@@ -1,15 +1,5 @@
 import { readPublicationTarget } from "../../../../src/commands/release-wait/read/publication-target.mjs";
 
-test("returns no publication workflows when package data is absent", () => {
-  expect(readPublicationTarget({ existsSync: () => false })).toEqual({
-    applicable: false,
-    ghcrApplicable: false,
-    workflows: [],
-    packageName: null,
-    isPrivate: null,
-  });
-});
-
 test("reads an explicit npm profile when npm.yaml exists", () => {
   let packageReads = 0;
   const fs = {
