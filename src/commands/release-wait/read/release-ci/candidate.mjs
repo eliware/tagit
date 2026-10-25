@@ -1,5 +1,6 @@
 import { selectReleaseRun } from "../../../../github/runs/release/run/selection.mjs";
 import { readReleaseCiJson } from "./json.mjs";
+import { createReleaseCiListArgs } from "./command.mjs";
 
 export async function readReleaseCiCandidate(
   execFile,
@@ -8,19 +9,9 @@ export async function readReleaseCiCandidate(
   tag,
   workflowPath = ".github/workflows/ci.yaml",
 ) {
-  const runs = await readReleaseCiJson(execFile, [
-    "run",
-    "list",
-    "--repo",
-    repo,
-    "--commit",
-    headSha,
-    "--workflow",
-    workflowPath,
-    "--limit",
-    "1000",
-    "--json",
-    "databaseId,createdAt,headSha,headBranch",
-  ]);
+  const runs = await readReleaseCiJson(
+    execFile,
+    createReleaseCiListArgs(repo, headSha, workflowPath),
+  );
   return selectReleaseRun(runs, headSha, tag, workflowPath);
 }

@@ -1,13 +1,6 @@
 import { readReleaseCiJson } from "./json.mjs";
+import { createReleaseCiViewArgs } from "./command.mjs";
 
 export function readReleaseCiDetails(execFile, repo, databaseId) {
-  return readReleaseCiJson(execFile, [
-    "run",
-    "view",
-    String(databaseId),
-    "--repo",
-    repo,
-    "--json",
-    "databaseId,status,conclusion,headSha,jobs,url",
-  ]);
+  return readReleaseCiJson(execFile, createReleaseCiViewArgs(repo, databaseId));
 }

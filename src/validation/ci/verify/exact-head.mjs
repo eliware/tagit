@@ -1,5 +1,5 @@
 import { selectLatestRun } from "../select/run.mjs";
-import { verifyCompletedRun } from "./completed-run.mjs";
+import { verifyCiCandidates } from "./candidates.mjs";
 import { pollExactHeadCi } from "./poll-exact-head.mjs";
 import { readExactHeadRuns } from "../read/exact-head/runs.mjs";
 import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
@@ -22,10 +22,8 @@ export function verifyLatestCi(
   validateCompletedConclusion(latest);
   const candidates = selectCiCandidate(runs, headSha);
   const pending = selectPendingRun(runs, headSha);
-  for (const run of candidates) {
-    const result = verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName);
-    if (result) return result;
-  }
+  const result = verifyCiCandidates(execFileSync, log, candidates, headSha, runnerLabelsByJobName);
+  if (result) return result;
   {
     const retried = pollExactHeadCi({
       execFileSync,
