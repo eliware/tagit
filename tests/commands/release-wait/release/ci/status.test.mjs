@@ -47,6 +47,25 @@ test("returns links-only evidence without waiting for completion", async () => {
   ).resolves.toMatchObject({ databaseId: 2 });
 });
 
+test("rejects a completed failed run during links-only polling", async () => {
+  const run = { databaseId: 9, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
+  const details = {
+    databaseId: 9,
+    status: "completed",
+    conclusion: "failure",
+    headSha: "abc",
+    jobs: [],
+  };
+  await expect(
+    pollReleaseCi({
+      ...options,
+      execFile: executor([run], details),
+      maxPolls: 1,
+      linksOnly: true,
+    }),
+  ).rejects.toThrow("Release CI failed: failure");
+});
+
 test("reports malformed list data and exhausted inspection", async () => {
   const malformed = jest.fn((_command, args, _options, callback) =>
     callback(null, args[1] === "list" ? "{bad" : "{}", ""),

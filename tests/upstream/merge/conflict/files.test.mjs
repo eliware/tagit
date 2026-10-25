@@ -9,12 +9,12 @@ test("reads unmerged Git file names", () => {
   });
 });
 
-test("returns null when Git cannot read unmerged file names", () => {
-  expect(
+test("propagates errors when Git cannot read unmerged file names", () => {
+  expect(() =>
     readUpstreamMergeConflictFiles(
       jest.fn(() => {
         throw new Error("git diff failed");
       }),
     ),
-  ).toBeNull();
+  ).toThrow("git diff failed");
 });

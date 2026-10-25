@@ -38,14 +38,14 @@ test("throws a named release error for a failed run", () => {
   }
 });
 
-test("returns only start links when a run has already failed in links-only mode", () => {
+test("rejects a failed run in links-only mode", () => {
   const details = { ...baseDetails, conclusion: "failure", url: "run-url" };
-  expect(
+  expect(() =>
     applyReleaseCiResultPolicy(candidate, details, {
       linksOnly: true,
       log: { info: jest.fn() },
     }),
-  ).toEqual({ databaseId: 7, headBranch: "v1.2.3", url: "run-url", jobs: [], linksOnly: true });
+  ).toThrow("Release CI failed: failure");
 });
 
 test("reports a pending run and returns pending state", () => {

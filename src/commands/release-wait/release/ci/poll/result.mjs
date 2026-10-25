@@ -3,7 +3,7 @@ import { formatReleasePollFailure } from "./failure-message.mjs";
 
 export function applyReleaseCiResultPolicy(candidate, details, { linksOnly, log, workflowLabel }) {
   const failure = formatReleasePollFailure(details, workflowLabel);
-  if (failure && !linksOnly) {
+  if (failure) {
     const error = new Error(failure);
     error.code = "ERR_RELEASE_CI_FAILED";
     throw error;
