@@ -27,6 +27,8 @@ export function validateReleaseRunDetailsShape(details, runId) {
     (details.conclusion !== null &&
       details.conclusion !== undefined &&
       (typeof details.conclusion !== "string" || !RUN_CONCLUSIONS.has(details.conclusion))) ||
+    (details.status === "completed" &&
+      (typeof details.conclusion !== "string" || !RUN_CONCLUSIONS.has(details.conclusion))) ||
     typeof details.headSha !== "string" ||
     !Array.isArray(details.jobs)
   )

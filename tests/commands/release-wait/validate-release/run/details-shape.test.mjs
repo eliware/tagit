@@ -8,17 +8,17 @@ const validDetails = {
   jobs: [],
 };
 
-test("accepts complete run details with an optional run id and conclusion", () => {
+test("accepts completed details and pending details with optional conclusions", () => {
   expect(validateReleaseRunDetailsShape(validDetails, 1)).toBe(validDetails);
   expect(
     validateReleaseRunDetailsShape(
-      { status: "completed", conclusion: null, headSha: "abc", jobs: [] },
+      { status: "in_progress", conclusion: null, headSha: "abc", jobs: [] },
       1,
     ),
   ).toMatchObject({ conclusion: null });
   expect(
-    validateReleaseRunDetailsShape({ status: "completed", headSha: "abc", jobs: [] }, 1),
-  ).toMatchObject({ status: "completed" });
+    validateReleaseRunDetailsShape({ status: "in_progress", headSha: "abc", jobs: [] }, 1),
+  ).toMatchObject({ status: "in_progress" });
 });
 
 test.each(["queued", "in_progress", "waiting", "requested", "pending"])(
@@ -38,6 +38,8 @@ test("rejects malformed run detail fields", () => {
     { ...validDetails, status: "unknown_terminal" },
     { ...validDetails, conclusion: 1 },
     { ...validDetails, conclusion: "unknown" },
+    { ...validDetails, conclusion: null },
+    { ...validDetails, conclusion: undefined },
     { ...validDetails, headSha: 1 },
     { ...validDetails, jobs: null },
   ])
