@@ -1,29 +1,23 @@
-import { readRunnerValues } from "../../../../../src/github/runs/runner/workflow/values.mjs";
+import { parseRunnerValues } from "../../../../../src/github/runs/runner/workflow/values.mjs";
 
-test("extracts inline runner labels", () => {
-  expect(readRunnerValues(["    runs-on: [self-hosted, ubuntu-latest]"])).toEqual([
+test("parses inline runner values", () => {
+  expect(parseRunnerValues({ value: "[self-hosted, ubuntu-latest]", blockLines: [] })).toEqual([
     "self-hosted",
     "ubuntu-latest",
   ]);
 });
 
-test("extracts block runner labels and stops at the next job field", () => {
+test("parses block runner values and stops at the first non-list line", () => {
   expect(
-    readRunnerValues([
-      "    runs-on:",
-      "      - self-hosted",
-      "      - windows-2025",
-      "    steps:",
-      "      - run: test",
-    ]),
+    parseRunnerValues({
+      value: "",
+      blockLines: ["      - self-hosted", "      - windows-2025", "      steps: []"],
+    }),
   ).toEqual(["self-hosted", "windows-2025"]);
 });
 
-test("returns null when a job has no runner declaration", () => {
-  expect(readRunnerValues(["    steps: []"])).toBeNull();
-});
-
-test("returns no values for empty or nested runner declarations", () => {
-  expect(readRunnerValues(["    runs-on:", "    steps: []"])).toEqual([]);
-  expect(readRunnerValues(["    runs-on:", "      group: linux"])).toEqual([]);
+test("returns no values for absent, empty, and nested declarations", () => {
+  expect(parseRunnerValues(null)).toBeNull();
+  expect(parseRunnerValues({ value: "", blockLines: [] })).toEqual([]);
+  expect(parseRunnerValues({ value: "", blockLines: ["      group: linux"] })).toEqual([]);
 });

@@ -21,12 +21,6 @@ test("returns the existing HEAD without creating another release commit", () => 
   expect(runGit).not.toHaveBeenCalledWith(expect.arrayContaining(["commit"]), expect.anything());
 });
 
-test("rejects invalid HEAD before creating a release commit", () => {
-  const runGit = jest.fn(() => "");
-  expect(() => createReleaseCommit(runGit, "1.2.3", "v1.2.3")).toThrow("valid current commit");
-  expect(runGit).toHaveBeenCalledTimes(1);
-});
-
 test.each(["", undefined])(
   "rejects invalid HEAD output %s before creating a commit or tag",
   (head) => {

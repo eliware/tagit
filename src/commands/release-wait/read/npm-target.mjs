@@ -1,4 +1,3 @@
-import { readPackageName } from "../../../registries/npm/read-package-name.mjs";
 import { validateNpmPublicationName } from "../../../registries/npm/validate/publication-name.mjs";
 
 export function readNpmPublicationTarget(fs, packageData) {
@@ -6,7 +5,10 @@ export function readNpmPublicationTarget(fs, packageData) {
   const profiles = packageData?.eliware?.apply;
   const applicable = npmWorkflow && Array.isArray(profiles) && profiles.includes("npm-published");
   const packageName = applicable
-    ? validateNpmPublicationName(readPackageName(fs), Boolean(packageData.private))
+    ? validateNpmPublicationName(
+        typeof packageData?.name === "string" ? packageData.name : null,
+        Boolean(packageData.private),
+      )
     : null;
   return { applicable, packageName };
 }

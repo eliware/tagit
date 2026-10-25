@@ -1,12 +1,10 @@
-import { reportUpstreamMergeConflict } from "./conflict/report.mjs";
-import { isUpstreamMergeConflict } from "./conflict/policy.mjs";
+import { handleUpstreamMergeConflict } from "./conflict/handler.mjs";
 
 export function mergeUpstream(execFileSync, upstreamBranch, message, log) {
   try {
     execFileSync("git", ["merge", upstreamBranch, "-m", message], { stdio: "inherit" });
   } catch (error) {
-    if (!isUpstreamMergeConflict(execFileSync)) throw error;
-    reportUpstreamMergeConflict(execFileSync, log);
+    if (!handleUpstreamMergeConflict(execFileSync, log)) throw error;
     return false;
   }
   return true;

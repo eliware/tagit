@@ -11,10 +11,17 @@ test("returns no publication workflows when package data is absent", () => {
 });
 
 test("reads an explicit npm profile when npm.yaml exists", () => {
+  let packageReads = 0;
   const fs = {
     existsSync: () => true,
-    readFileSync: () =>
-      JSON.stringify({ name: "demo", private: false, eliware: { apply: ["npm-published"] } }),
+    readFileSync: () => {
+      packageReads += 1;
+      return JSON.stringify({
+        name: "demo",
+        private: false,
+        eliware: { apply: ["npm-published"] },
+      });
+    },
   };
   expect(readPublicationTarget(fs)).toEqual({
     applicable: true,
@@ -23,6 +30,7 @@ test("reads an explicit npm profile when npm.yaml exists", () => {
     packageName: "demo",
     isPrivate: false,
   });
+  expect(packageReads).toBe(1);
 });
 
 test("skips npm publication checks for a GHCR-only profile", () => {

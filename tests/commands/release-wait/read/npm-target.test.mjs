@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { readNpmPublicationTarget } from "../../../../src/commands/release-wait/read/npm-target.mjs";
 
 function fsFor(packageName, npmWorkflow = true) {
@@ -17,6 +18,22 @@ test("does not read npm metadata when the workflow or profile does not apply", (
     applicable: false,
     packageName: null,
   });
+});
+
+test("uses the parsed package name for an applicable public target", () => {
+  const readFileSync = jest.fn();
+  const fs = {
+    existsSync: (file) => file === ".github/workflows/npm.yaml",
+    readFileSync,
+  };
+  expect(
+    readNpmPublicationTarget(fs, {
+      name: "@eliware/demo",
+      private: false,
+      eliware: { apply: ["npm-published"] },
+    }),
+  ).toEqual({ applicable: true, packageName: "@eliware/demo" });
+  expect(readFileSync).not.toHaveBeenCalled();
 });
 
 test("allows a private npm target without a package name", () => {

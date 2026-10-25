@@ -14,7 +14,7 @@ export function readPublicationTarget(fs) {
       isPrivate: null,
     };
   const npmTarget = readNpmPublicationTarget(fs, packageData);
-  const ghcrApplicable = publishesGhcr(fs);
+  const ghcrApplicable = publishesGhcr(fs, packageData);
   return {
     applicable: npmTarget.applicable,
     ghcrApplicable,

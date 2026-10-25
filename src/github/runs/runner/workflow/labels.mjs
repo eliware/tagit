@@ -1,6 +1,7 @@
 import { classifyWorkflowRunnerValues } from "./platform-policy.mjs";
-import { readRunnerValues } from "./values.mjs";
+import { parseRunnerValues } from "./values.mjs";
+import { readRunnerValueDeclaration } from "./value-reader.mjs";
 
 export function readWorkflowRunnerLabels(jobLines) {
-  return classifyWorkflowRunnerValues(readRunnerValues(jobLines));
+  return classifyWorkflowRunnerValues(parseRunnerValues(readRunnerValueDeclaration(jobLines)));
 }

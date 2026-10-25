@@ -1,18 +1,15 @@
-export function readRunnerValues(jobLines) {
-  const index = jobLines.findIndex((line) => /^\s*runs-on\s*:/.test(line));
-  if (index < 0) return null;
-  const line = jobLines[index];
-  const indent = line.length - line.trimStart().length;
-  const value = line.trim().replace(/^runs-on\s*:\s*/, "");
-  if (value) {
+export function parseRunnerValues(declaration) {
+  if (declaration === null) return null;
+  if (declaration.value) {
     const values =
-      value.startsWith("[") && value.endsWith("]") ? value.slice(1, -1).split(",") : [value];
+      declaration.value.startsWith("[") && declaration.value.endsWith("]")
+        ? declaration.value.slice(1, -1).split(",")
+        : [declaration.value];
     return values.map((item) => item.trim().replace(/^['"]|['"]$/g, ""));
   }
   const values = [];
-  for (const next of jobLines.slice(index + 1)) {
-    if (next.length - next.trimStart().length <= indent) break;
-    const item = /^\s*-\s*(.+)$/.exec(next);
+  for (const line of declaration.blockLines) {
+    const item = /^\s*-\s*(.+)$/.exec(line);
     if (!item) break;
     values.push(item[1].trim().replace(/^['"]|['"]$/g, ""));
   }

@@ -8,6 +8,15 @@ test("detects the declared GHCR publication profile", () => {
   };
   expect(publishesGhcr(fs)).toBe(true);
 });
+test("uses provided package data without reading package.json again", () => {
+  const readFileSync = jest.fn();
+  const fs = {
+    existsSync: (file) => file === ".github/workflows/ghcr.yaml",
+    readFileSync,
+  };
+  expect(publishesGhcr(fs, { eliware: { apply: ["ghcr-published"] } })).toBe(true);
+  expect(readFileSync).not.toHaveBeenCalled();
+});
 test("ignores GHCR text unless the package declares the profile", () => {
   expect(publishesGhcr({ existsSync: () => false })).toBe(false);
   expect(
