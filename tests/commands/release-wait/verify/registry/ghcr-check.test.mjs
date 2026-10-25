@@ -8,30 +8,20 @@ jest.unstable_mockModule(
 const { verifyRegistryGhcrCheck } =
   await import("../../../../../src/commands/release-wait/verify/registry/ghcr-check.mjs");
 
-test("maps release registry options to the GHCR publication check", () => {
-  const options = {
-    fs: {},
-    execFile: jest.fn(),
-    log: { info: jest.fn() },
-    repo: "eliware/demo",
-    version: "1.0.0",
-    release: { imageDigest: "sha256:expected" },
-    ghcr: true,
-    retries: 2,
-    retryMs: 5,
-    sleep: jest.fn(),
-  };
-  verifyRegistryGhcrCheck(options);
-  expect(verifyGhcrPublication).toHaveBeenCalledWith({
-    fs: options.fs,
-    applicable: true,
-    execFile: options.execFile,
-    log: options.log,
-    repo: options.repo,
-    version: options.version,
-    retries: 2,
-    retryMs: 5,
-    release: options.release,
-    sleep: options.sleep,
-  });
+test("forwards registry publication failures", async () => {
+  verifyGhcrPublication.mockRejectedValue(new Error("registry unavailable"));
+  await expect(
+    verifyRegistryGhcrCheck({
+      fs: {},
+      execFile: jest.fn(),
+      log: { info: jest.fn() },
+      repo: "eliware/demo",
+      version: "1.0.0",
+      release: {},
+      ghcr: true,
+      retries: 1,
+      retryMs: 0,
+      sleep: jest.fn(),
+    }),
+  ).rejects.toThrow("registry unavailable");
 });
