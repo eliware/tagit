@@ -24,33 +24,35 @@ Deterministic release preflight and publication verification for Eliware package
 
 ## Features
 
-Use tagit to check release readiness, CI, and applicable npm or GHCR publication.
+Check release readiness, CI, and applicable npm or GHCR publication.
 
 ## Requirements
 
-Use Node.js 26 or later, npm, Git, and GitHub CLI (`gh`). Read [requirements](docs/requirements.md) for target repository requirements.
+Use Node.js 26 or later, npm, Git, and GitHub CLI (`gh`). Read [target requirements](docs/requirements.md).
 
 ## Setup
 
-Install tagit with `npm install --global @eliware/tagit` or run `npx --yes @eliware/tagit --help`.
+Install tagit with `npm install --global @eliware/tagit` or run `npx --yes @eliware/tagit`.
 
-The package provides `tagit`, `push`, and `upstream`. Its public entrypoints are `bin/tagit-cli.mjs`, `bin/push-cli.mjs`, and `bin/upstream-cli.mjs`. The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. It excludes tests, fixtures, workflow files, lockfiles, and runtime secrets. Read [requirements](docs/requirements.md) for version rules and publication limits.
+The package provides `tagit`, `push`, and `upstream` commands. Its entrypoints are `bin/tagit-cli.mjs`, `bin/push-cli.mjs`, and `bin/upstream-cli.mjs`.
+
+The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`, `LICENSE`, and `RELEASE_NOTES.md`. It excludes tests, fixtures, workflows, lockfiles, and runtime secrets. Read [target requirements](docs/requirements.md) for version rules and publication limits.
 
 ## Usage
 
-Run commands from the target repository root. Project owners prepare changes and run `notes`, `push`, and `preflight`. DevOps runs `release` and `release-wait` after handoff. Read [operations](docs/operations.md) and [release notes](RELEASE_NOTES.md).
+Run commands from the target repository root. Project owners run `notes`, `push`, and `preflight`. DevOps runs `release` and `release-wait` after handoff. Read the [operations guide](docs/operations.md) and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
-Read [AGENTS.md](AGENTS.md) for contributor instructions. Read [docs/README.md](docs/README.md) for user guides and [specs/README.md](specs/README.md) for repository rules.
+Read [AGENTS.md](AGENTS.md), the [user guide index](docs/README.md), and the [specifications index](specs/README.md).
 
 ## Testing
 
-Run `npm test` for aggregate validation. CI runs `npm ci` and `npm test` on Ubuntu.
+Run `npm test` for aggregate validation.
 
 ## Troubleshooting
 
-Run `tagit preflight` to find release blockers. Repair each cause, wait for CI on the new commit, and run preflight again.
+Read the [troubleshooting guide](docs/troubleshooting.md).
 
 ## Security
 
@@ -58,7 +60,7 @@ Keep credentials, secrets, private data, and runtime state out of Git. Tagit red
 
 ## Configuration
 
-Tagit has no configuration file. Set `LOG_LEVEL` to change the shared logger level.
+Tagit does not require a configuration file.
 
 ## Operations
 
@@ -66,7 +68,7 @@ Follow the [owner and DevOps handoff](docs/operations.md). Tagit does not deploy
 
 ## Commands
 
-Use `notes` to inspect changes, `preflight` to check readiness, and `push` to push commits. Use `release` to create a release tag, `release-wait` to verify a release, and `upstream` to merge the upstream branch. Read the [command guide](docs/commands.md) for syntax and options.
+Use `notes` to inspect changes, `preflight` to check readiness, and `push` to push commits. Use `release` and `release-wait` for a release. Use `upstream` to merge the upstream branch. Read the [command guide](docs/commands.md) for syntax and options.
 
 ## Exit codes
 

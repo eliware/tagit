@@ -2,22 +2,19 @@
 
 ## Project
 
-Eliware owns tagit. This repository provides a CLI for release readiness and publication checks.
+See README.md for repository purpose, owner, and scope.
 
 ## Scope and boundaries
 
-Tagit checks release readiness and publication. It does not deploy applications.
+Tagit does not deploy applications.
 
 ## Layout
 
-Keep implementation in src/, launchers in bin/, tests in tests/, and fixtures in test-fixtures/.
 Use README.md and specs/README.md to find maintained files.
 
 ## Development
 
 Use Node.js 26 or later and native ESM for maintained JavaScript modules.
-Give each source and test module one cohesive purpose.
-Keep user guides current when behavior changes.
 
 ## Validation
 
@@ -33,7 +30,7 @@ Keep credentials, secrets, private data, and runtime state out of Git.
 
 ## Changes
 
-Keep requirements in their authoritative specifications.
+Keep requirements in specs/directives.yaml.
 
 ## Application
 
@@ -46,7 +43,6 @@ Run the full `npm test` suite for final validation before a commit, milestone, o
 ## CLI
 
 Keep `--help` and `--version` read-only.
-Match CLI documentation to the parser and tests.
 
 ## npm publication
 

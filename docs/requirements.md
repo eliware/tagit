@@ -51,7 +51,7 @@ The CI verification policy requires Ubuntu. It also requires each Windows job wh
 
 ## Settings and data
 
-No configuration file is required. Set the optional `LOG_LEVEL` environment variable to change the shared logger level. Tagit runs as a command and exits after it completes. It stores no database or secret data.
+No configuration file is required. Tagit uses the shared logger's default `info` level. Tagit runs as a command and exits after it completes. It stores no database or secret data.
 
 The `upstream` command also requires an `upstream` Git remote. It uses `upstream/HEAD` when Git defines it. When Git does not define that reference, tagit uses `upstream/main`.
 
