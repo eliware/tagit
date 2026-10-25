@@ -17,7 +17,7 @@ export function verifyPublicationJobs({
     if (!Array.isArray(publication.run.jobs))
       throw new Error(`Release ${target.profile} workflow returned malformed job records.`);
     const publishJobs = selectSuccessfulPublishJobs(publication.run.jobs);
-    requirePublishJob(publishJobs, {
+    requirePublishJob(publishJobs.length > 0, {
       applicable: target.profile === "ghcr" || (applicable && !isPrivate),
       packageName: target.packageName,
       isPrivate: target.isPrivate,

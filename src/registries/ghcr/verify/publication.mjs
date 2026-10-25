@@ -15,7 +15,6 @@ export async function verifyGhcrPublication(
     sleep = sleepDefault,
   },
 ) {
-  // codescope ignore: A digest is optional when the caller has no expected digest. The GHCR tag check applies.
   const [owner, imageName] = parseGhcrRepository(repository);
   return pollGhcrVisibility(execFile, log, {
     owner,

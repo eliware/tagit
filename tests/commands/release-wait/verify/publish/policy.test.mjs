@@ -3,8 +3,8 @@ import { requirePublishJob } from "../../../../../src/commands/release-wait/veri
 const publicTarget = { applicable: true, packageName: "demo", isPrivate: false };
 
 test("requires a passing job for a public npm target", () => {
-  expect(() => requirePublishJob([], publicTarget)).toThrow("passing publish job");
-  expect(() => requirePublishJob([{ name: "publish" }], publicTarget)).not.toThrow();
+  expect(() => requirePublishJob(false, publicTarget)).toThrow("passing publish job");
+  expect(() => requirePublishJob(true, publicTarget)).not.toThrow();
 });
 
 test.each([
@@ -12,5 +12,5 @@ test.each([
   [{ applicable: true, packageName: null, isPrivate: false }],
   [{ applicable: true, packageName: "demo", isPrivate: true }],
 ])("does not require a publish job for an inapplicable target: %j", (target) => {
-  expect(() => requirePublishJob([], target)).not.toThrow();
+  expect(() => requirePublishJob(false, target)).not.toThrow();
 });

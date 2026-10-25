@@ -15,7 +15,7 @@ test("finds a tagged image and returns its digest", async () => {
     ),
   ).resolves.toEqual({ imageDigest: digest });
 });
-test("flattens slurped pages and handles missing digest", async () => {
+test("flattens slurped pages and rejects missing digest", async () => {
   await expect(
     verifyGhcrPublication(
       execWith([[{ name: digest, metadata: { container: { tags: ["v2.1.0"] } } }]]),
@@ -29,7 +29,7 @@ test("flattens slurped pages and handles missing digest", async () => {
       { info: jest.fn() },
       { repository: "eliware/demo", version: "1.0.0", sleep: jest.fn() },
     ),
-  ).resolves.toEqual({ imageDigest: null });
+  ).rejects.toThrow("no valid SHA-256 digest");
 });
 test("rejects invalid repositories and digest mismatches", async () => {
   await expect(

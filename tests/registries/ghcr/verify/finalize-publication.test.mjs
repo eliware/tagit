@@ -12,12 +12,12 @@ test("validates and reports a verified GHCR image digest", () => {
   expect(log.info).toHaveBeenCalledWith(`GHCR digest: ${digest}`);
 });
 
-test("reports verified publication without a digest when none is available", () => {
+test("rejects verified publication without a digest", () => {
   const log = { info: jest.fn() };
-  expect(finalizeGhcrPublication(log, "eliware/demo", "1.0.0", null, {})).toEqual({
-    imageDigest: null,
-  });
-  expect(log.info).toHaveBeenCalledTimes(1);
+  expect(() => finalizeGhcrPublication(log, "eliware/demo", "1.0.0", null, {})).toThrow(
+    "no valid SHA-256 digest",
+  );
+  expect(log.info).not.toHaveBeenCalled();
 });
 
 test("rejects an unexpected digest before reporting success", () => {

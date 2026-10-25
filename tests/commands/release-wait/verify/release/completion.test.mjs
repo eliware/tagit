@@ -153,7 +153,16 @@ test("checks GHCR publication when ghcr.yaml and its profile apply", async () =>
     jobs,
   }));
   const execFile = jest.fn((_command, _args, _options, callback) =>
-    callback(null, JSON.stringify([{ metadata: { container: { tags: ["v1.0.0"] } } }]), ""),
+    callback(
+      null,
+      JSON.stringify([
+        {
+          name: `sha256:${"a".repeat(64)}`,
+          metadata: { container: { tags: ["v1.0.0"] } },
+        },
+      ]),
+      "",
+    ),
   );
   await expect(
     verifyReleaseCompletion({
