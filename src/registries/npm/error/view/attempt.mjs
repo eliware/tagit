@@ -1,4 +1,4 @@
-import { classifyNpmViewResult } from "./result-policy.mjs";
+import { classifyNpmViewAvailability } from "./availability-policy.mjs";
 import { readNpmViewResponse } from "./response-reader.mjs";
 import { classifyNpmViewFailure } from "./failure-policy.mjs";
 
@@ -8,6 +8,7 @@ export function classifyNpmViewAttempt(attempt) {
   return {
     type: "result",
     exists:
-      classifyNpmViewResult(readNpmViewResponse(attempt.output), attempt.version) === "available",
+      classifyNpmViewAvailability(readNpmViewResponse(attempt.output), attempt.version) ===
+      "available",
   };
 }

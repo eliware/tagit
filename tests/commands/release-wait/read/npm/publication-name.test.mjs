@@ -1,4 +1,4 @@
-import { validateNpmPublicationName } from "../../../../src/registries/npm/validate/publication-name.mjs";
+import { validateNpmPublicationName } from "../../../../../src/commands/release-wait/read/npm/publication-name.mjs";
 
 test.each(["demo", "@eliware/demo", "demo_1", "demo.name"])(
   "accepts the npm publication name %s",

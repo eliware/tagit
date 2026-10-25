@@ -1,4 +1,4 @@
-import { validateNpmPublicationName } from "../../../registries/npm/validate/publication-name.mjs";
+import { validateNpmPublicationName } from "./npm/publication-name.mjs";
 
 export function readNpmPublicationTarget(fs, packageData) {
   const npmWorkflow = fs.existsSync(".github/workflows/npm.yaml");

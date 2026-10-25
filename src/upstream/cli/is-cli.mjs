@@ -1,6 +1,6 @@
-import path from "node:path";
+import { normalizeCliExecutableName } from "../../cli/application/executable-name.mjs";
 
 export function isUpstreamCli(argv) {
-  const executable = argv[1] ? path.basename(argv[1].replaceAll("\\", "/")) : "";
+  const executable = normalizeCliExecutableName(argv[1]);
   return ["upstream", "upstream.mjs", "upstream-cli.mjs"].includes(executable);
 }
