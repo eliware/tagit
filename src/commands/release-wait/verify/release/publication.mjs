@@ -27,8 +27,6 @@ export async function verifyReleasePublication({
   verifyReleasePublicationWorkflow({
     targets,
     publicationRuns,
-    applicable: publication.applicable,
-    isPrivate: publication.isPrivate,
     repo,
     tag,
     log,

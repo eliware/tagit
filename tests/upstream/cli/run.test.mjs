@@ -36,3 +36,33 @@ test("runs the upstream command for normal arguments", () => {
     deps.log,
   );
 });
+
+test("reports upstream command failures and exits with status one", () => {
+  const deps = dependencies();
+  const error = new Error("merge failed");
+  deps.log.error = jest.fn();
+  deps.exit = jest.fn();
+  deps.runUpstream.mockImplementation(() => {
+    throw error;
+  });
+  expect(() => runUpstreamCli(["merge", "Release"], deps)).toThrow(error);
+  expect(deps.log.error).toHaveBeenCalledWith("merge failed");
+  expect(deps.exit).toHaveBeenCalledWith(1);
+});
+
+test("formats non-Error command failures", () => {
+  const deps = dependencies();
+  deps.log.error = jest.fn();
+  deps.exit = jest.fn();
+  deps.runUpstream.mockImplementation(() => {
+    throw "merge failed";
+  });
+  try {
+    runUpstreamCli(["merge", "Release"], deps);
+    throw new Error("Expected the upstream command to fail.");
+  } catch (error) {
+    expect(error).toBe("merge failed");
+  }
+  expect(deps.log.error).toHaveBeenCalledWith("merge failed");
+  expect(deps.exit).toHaveBeenCalledWith(1);
+});

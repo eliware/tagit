@@ -20,8 +20,6 @@ const base = {
     },
   ],
   runnerLabelsByJobName: {},
-  applicable: true,
-  isPrivate: false,
   repo: "eliware/demo",
   tag: "v1.0.0",
   log: { info: jest.fn() },
@@ -66,13 +64,18 @@ test("rejects malformed publication jobs", () => {
   ).toThrow("malformed job records");
 });
 
-test("requires a passing publish job for public npm targets", () => {
+test.each([
+  ["public npm", { profile: "npm", packageName: "demo", isPrivate: false }],
+  ["private unnamed npm", { profile: "npm", packageName: null, isPrivate: true }],
+  ["GHCR", { profile: "ghcr", packageName: "image", isPrivate: false }],
+])("requires a passing publish job for %s targets", (_name, target) => {
   expect(() =>
     verifyPublicationJobs({
       ...base,
+      targets: [target],
       publicationRuns: [
         {
-          profile: "npm",
+          profile: target.profile,
           run: {
             jobs: [
               {
