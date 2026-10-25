@@ -1,6 +1,5 @@
 import { selectSuccessfulPublishJobs } from "../../verify/publish/job.mjs";
 import { requirePublishJob } from "../../verify/publish/policy.mjs";
-import { reportPublicationJobLinks } from "./job-links.mjs";
 
 export function verifyPublicationJobs({
   targets,
@@ -11,6 +10,7 @@ export function verifyPublicationJobs({
   tag,
   log,
 }) {
+  const verifiedPublications = [];
   for (const target of targets) {
     const publication = publicationRuns.find((item) => item.profile === target.profile);
     if (!publication) throw new Error(`Release ${target.profile} workflow did not complete.`);
@@ -23,6 +23,7 @@ export function verifyPublicationJobs({
       isPrivate: target.isPrivate,
     });
     log.info(`Release ${target.profile} workflow verified for ${repo}@${tag}.`);
-    reportPublicationJobLinks(log, target.profile, publishJobs);
+    verifiedPublications.push({ profile: target.profile, publishJobs });
   }
+  return verifiedPublications;
 }

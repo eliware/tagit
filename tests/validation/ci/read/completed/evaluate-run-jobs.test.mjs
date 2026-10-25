@@ -1,6 +1,6 @@
 import { evaluateCompletedRunJobs } from "../../../../../src/validation/ci/read/completed/evaluate-run-jobs.mjs";
 
-test("validates jobs and applies runner metadata before policy evaluation", () => {
+test("evaluates runner metadata without changing the input job records", () => {
   const data = {
     jobs: [
       { name: "ubuntu", status: "completed", conclusion: "success" },
@@ -14,7 +14,10 @@ test("validates jobs and applies runner metadata before policy evaluation", () =
     ubuntu: true,
     windows: { passed: true, successful: true },
   });
-  expect(data.jobs.map((job) => job.labels)).toEqual([["ubuntu-latest"], ["windows-latest"]]);
+  expect(data.jobs).toEqual([
+    { name: "ubuntu", status: "completed", conclusion: "success" },
+    { name: "windows", status: "completed", conclusion: "success" },
+  ]);
 });
 
 test("uses empty runner metadata when no labels exist", () => {

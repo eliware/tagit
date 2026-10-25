@@ -27,8 +27,10 @@ const base = {
   log: { info: jest.fn() },
 };
 
-test("validates and reports each applicable publication workflow", () => {
-  expect(() => verifyPublicationJobs(base)).not.toThrow();
+test("verifies each applicable publication workflow and returns its passing jobs", () => {
+  expect(verifyPublicationJobs(base)).toEqual([
+    { profile: "npm", publishJobs: [base.publicationRuns[0].run.jobs[1]] },
+  ]);
   expect(base.log.info).toHaveBeenCalledWith(
     "Release npm workflow verified for eliware/demo@v1.0.0.",
   );

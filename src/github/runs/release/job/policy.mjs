@@ -1,9 +1,11 @@
 import { normalizeCompletedWorkflowJob } from "./status.mjs";
 import { classifyReleaseJobPlatforms } from "./platforms.mjs";
+import { addWorkflowRunnerLabels } from "./workflow-labels.mjs";
 import { enforceReleaseJobPolicy } from "./acceptance-policy.mjs";
 
 export function verifyReleaseJobs(jobs, runnerLabelsByJobName = {}, workflowRun = {}) {
   const verifiedJobs = jobs.map((job) => normalizeCompletedWorkflowJob(job, workflowRun));
-  const platforms = classifyReleaseJobPlatforms(verifiedJobs, runnerLabelsByJobName);
+  const jobsWithLabels = addWorkflowRunnerLabels(verifiedJobs, runnerLabelsByJobName);
+  const platforms = classifyReleaseJobPlatforms(jobsWithLabels);
   return enforceReleaseJobPolicy(verifiedJobs, platforms);
 }

@@ -9,16 +9,15 @@ test("classifies platforms from job labels", () => {
   });
 });
 
-test("uses workflow runner labels when job labels are absent", () => {
-  const job = { name: "validate" };
-  expect(classifyReleaseJobPlatforms([job], { validate: ["ubuntu"] })).toEqual({
-    ubuntuJobs: [job],
+test("ignores unknown runner labels", () => {
+  expect(classifyReleaseJobPlatforms([{ name: "validate", labels: ["self-hosted"] }])).toEqual({
+    ubuntuJobs: [],
     windowsJobs: [],
   });
 });
 
-test("ignores unknown runner labels", () => {
-  expect(classifyReleaseJobPlatforms([{ name: "validate", labels: ["self-hosted"] }])).toEqual({
+test("ignores jobs without label arrays", () => {
+  expect(classifyReleaseJobPlatforms([{ name: "validate" }])).toEqual({
     ubuntuJobs: [],
     windowsJobs: [],
   });
