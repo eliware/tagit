@@ -26,6 +26,7 @@
 ### Fixed
 
 - Return a nonzero exit code when release CI or publication fails.
+- Clarify push and release dry-run behavior in global help.
 - Keep release-start links separate from a workflow pass result.
 - Retry transient release details errors and reject malformed run status data.
 - Reject CI runs from `main` when release-wait checks a version tag.
