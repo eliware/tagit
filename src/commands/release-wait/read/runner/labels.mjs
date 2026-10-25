@@ -1,4 +1,4 @@
-import { parseWorkflowRunnerLabelContents } from "../../../../github/runs/runner/workflow/label-reader.mjs";
+import { parseWorkflowRunnerLabelContents } from "../../../../github/runs/runner/workflow/contents-reader.mjs";
 import { readWorkflowContentsFromGit } from "../../../../github/runs/runner/workflow/reader.mjs";
 import { selectReleaseRunnerWorkflowPaths } from "./workflow-paths.mjs";
 

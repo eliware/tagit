@@ -1,7 +1,4 @@
-import {
-  parseWorkflowRunnerLabelContents,
-  parseWorkflowRunnerLabels,
-} from "../../../../../src/github/runs/runner/workflow/label-reader.mjs";
+import { parseWorkflowRunnerLabels } from "../../../../../src/github/runs/runner/workflow/label-reader.mjs";
 
 test("maps workflow job ids and display names to runner platforms", () => {
   expect(
@@ -24,13 +21,4 @@ test("handles missing jobs, missing runners, unknown runners, and unnamed jobs",
       "jobs:\n  no_runner:\n    steps: []\n  other:\n    runs-on: self-hosted\n",
     ),
   ).toEqual({ other: [] });
-});
-
-test("combines labels from multiple workflow files", () => {
-  expect(
-    parseWorkflowRunnerLabelContents({
-      "ci.yaml": "jobs:\n  validate:\n    runs-on: ubuntu-latest",
-      "npm.yaml": "jobs:\n  publish:\n    runs-on: windows-latest",
-    }),
-  ).toEqual({ validate: ["ubuntu"], publish: ["windows"] });
 });
