@@ -1,4 +1,5 @@
 import { isReleaseVersion } from "../../../versioning/is-release-version.mjs";
+import { verifyReleaseTagStability } from "./tag-stability.mjs";
 
 export function resolveLatestReleaseTag(execFileSync) {
   const tag = execFileSync("git", ["describe", "--tags", "--abbrev=0"]).toString().trim();
@@ -8,8 +9,6 @@ export function resolveLatestReleaseTag(execFileSync) {
   const tagRef = `refs/tags/${tag}`;
   const tagObject = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
   const commitSha = execFileSync("git", ["rev-list", "-n", "1", tagObject]).toString().trim();
-  const confirmedTagObject = execFileSync("git", ["rev-parse", tagRef]).toString().trim();
-  if (tagObject !== confirmedTagObject)
-    throw new Error(`Latest tag ${tag} changed while it was being resolved.`);
+  verifyReleaseTagStability(execFileSync, tag, tagObject);
   return { version, commitSha };
 }

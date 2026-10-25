@@ -14,18 +14,8 @@ test("resolves the latest semantic release tag and commit", () => {
   expect(exec).toHaveBeenNthCalledWith(4, "git", ["rev-parse", "refs/tags/v1.2.3"]);
 });
 
-test("rejects invalid or changing latest tags", () => {
+test("rejects an invalid latest tag", () => {
   expect(() => resolveLatestReleaseTag(jest.fn(() => "v-next"))).toThrow("not a semantic");
-  let calls = 0;
-  expect(() =>
-    resolveLatestReleaseTag(
-      jest.fn((command, args) => {
-        if (args[0] === "describe") return "v1.2.3";
-        if (args[0] === "rev-list") return "commit";
-        return calls++ ? "second-tag-object" : "first-tag-object";
-      }),
-    ),
-  ).toThrow("changed");
 });
 
 test("rejects noncanonical leading-zero release tags", () => {

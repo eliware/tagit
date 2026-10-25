@@ -1,4 +1,4 @@
-import { runReleaseCommand } from "../../../commands/release/dispatch.mjs";
+import { runReleaseCommand } from "../../../commands/release/dispatch/command.mjs";
 import { helpText } from "../../guidance/help-text.mjs";
 import { ownerGuidance } from "../../../policy/owner-guidance.mjs";
 import { registerLifecycle } from "../register-lifecycle.mjs";

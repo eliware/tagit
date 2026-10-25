@@ -1,7 +1,7 @@
-import { requireExplicitReleaseVersion } from "../../policy/release-version-policy.mjs";
-import { dispatchReleaseWait } from "./dispatch/release/wait.mjs";
-import { dispatchPreflight } from "./dispatch/preflight.mjs";
-import { dispatchReleaseOperation } from "./dispatch/release/operation-dispatch.mjs";
+import { requireExplicitReleaseVersion } from "../../../policy/release-version-policy.mjs";
+import { dispatchReleaseWait } from "./release/wait.mjs";
+import { dispatchPreflight } from "./preflight.mjs";
+import { dispatchReleaseOperation } from "./release/operation-dispatch.mjs";
 
 export async function runReleaseCommand(
   options,

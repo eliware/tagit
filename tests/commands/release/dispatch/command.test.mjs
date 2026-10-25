@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runReleaseCommand } from "../../../src/commands/release/dispatch.mjs";
+import { runReleaseCommand } from "../../../../src/commands/release/dispatch/command.mjs";
 
 const base = () => ({
   fs: { existsSync: jest.fn(() => false), readFileSync: jest.fn() },
