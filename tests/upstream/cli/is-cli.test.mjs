@@ -1,4 +1,4 @@
-import { isUpstreamCli } from "../../src/upstream/cli.mjs";
+import { isUpstreamCli } from "../../../src/upstream/cli/is-cli.mjs";
 
 test("recognizes upstream executable names", () => {
   expect(isUpstreamCli(["node", "upstream-cli.mjs"])).toBe(true);
