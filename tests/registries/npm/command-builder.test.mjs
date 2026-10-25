@@ -11,6 +11,10 @@ test("builds a shell-free npm command on POSIX", () => {
   });
 });
 
+test("selects the Windows npm command when the platform is Windows", () => {
+  expect(buildNpmCommand(args, "win32")).toEqual(buildWindowsNpmCommand(args));
+});
+
 test("uses the current platform when no platform is supplied", () => {
   const expected =
     process.platform === "win32"

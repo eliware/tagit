@@ -31,6 +31,7 @@
 - Reject CI runs from `main` when release-wait checks a version tag.
 - Set no runner label for job names with conflicting labels across workflow files.
 - Preserve full Git history in CI for tag-based validation.
+- Verify Windows npm command selection on every CI platform.
 - Extend the local validation timeout to three minutes.
 
 ## 12.0.1 — 2026-10-12
