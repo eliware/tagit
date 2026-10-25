@@ -5,6 +5,7 @@ test("documents the owner and DevOps command boundary", () => {
 });
 
 test("documents dry-run behavior for push and release", () => {
+  expect(helpText()).toContain("push [--dry-run]");
   expect(helpText()).toContain("For push, skip push and CI lookup.");
   expect(helpText()).toContain("For release, run preflight and check version data.");
   expect(helpText()).toContain("Skip commit, tag, push, and publication.");

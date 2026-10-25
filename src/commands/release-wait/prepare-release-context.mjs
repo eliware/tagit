@@ -8,6 +8,6 @@ export function prepareReleaseContext(execFileSync, fs, options) {
   validateReleaseInput(version, release, maxPolls, npmRetries, pollMs, npmRetryMs);
   const context = resolveReleaseContext(execFileSync, version, release);
   const publication = readPublicationTarget(fs);
-  const runnerLabelsByJobName = readReleaseRunnerLabels(execFileSync, context.headSha, publication);
+  const runnerLabelsByJobName = readReleaseRunnerLabels(execFileSync, context.headSha);
   return { ...context, publication, runnerLabelsByJobName };
 }

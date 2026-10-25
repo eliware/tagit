@@ -9,7 +9,7 @@ export function helpText() {
     "  preflight                 Check local rules and CI for the current commit.",
     "                            Windows CI is optional.",
     "                            Require each Windows job to pass when one exists.",
-    "  push                      Push existing commits. Do not stage untracked files.",
+    "  push [--dry-run]          Push existing commits. Do not stage untracked files.",
     "                            Show CI links.",
     "  release --version X.Y.Z  Run the DevOps release workflow.",
     "  release-wait              Check the release after it starts.",
