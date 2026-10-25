@@ -4,16 +4,19 @@ const readNpmViewResponse = jest.fn();
 const classifyNpmViewAvailability = jest.fn();
 const classifyNpmViewFailure = jest.fn();
 jest.unstable_mockModule(
-  "../../../../../src/registries/npm/error/view/response-reader.mjs",
+  "../../../../../src/registries/npm/error/view/result/response-reader.mjs",
   () => ({ readNpmViewResponse }),
 );
 jest.unstable_mockModule(
-  "../../../../../src/registries/npm/error/view/availability-policy.mjs",
+  "../../../../../src/registries/npm/error/view/result/availability-policy.mjs",
   () => ({ classifyNpmViewAvailability }),
 );
-jest.unstable_mockModule("../../../../../src/registries/npm/error/view/failure-policy.mjs", () => ({
-  classifyNpmViewFailure,
-}));
+jest.unstable_mockModule(
+  "../../../../../src/registries/npm/error/view/result/failure-policy.mjs",
+  () => ({
+    classifyNpmViewFailure,
+  }),
+);
 const { classifyNpmViewAttempt } =
   await import("../../../../../src/registries/npm/error/view/attempt.mjs");
 

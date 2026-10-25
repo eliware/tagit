@@ -1,4 +1,4 @@
-import { readNpmViewResponse } from "../../../../../src/registries/npm/error/view/response-reader.mjs";
+import { readNpmViewResponse } from "../../../../../../src/registries/npm/error/view/result/response-reader.mjs";
 
 test.each([
   ['"1.0.0"', "1.0.0"],

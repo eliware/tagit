@@ -1,4 +1,4 @@
-import { classifyNpmViewAvailability } from "../../../../../src/registries/npm/error/view/availability-policy.mjs";
+import { classifyNpmViewAvailability } from "../../../../../../src/registries/npm/error/view/result/availability-policy.mjs";
 
 test("classifies a response that contains the requested version", () => {
   expect(classifyNpmViewAvailability("1.0.0", "1.0.0")).toBe("available");

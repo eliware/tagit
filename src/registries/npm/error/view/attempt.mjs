@@ -1,6 +1,6 @@
-import { classifyNpmViewAvailability } from "./availability-policy.mjs";
-import { readNpmViewResponse } from "./response-reader.mjs";
-import { classifyNpmViewFailure } from "./failure-policy.mjs";
+import { classifyNpmViewAvailability } from "./result/availability-policy.mjs";
+import { readNpmViewResponse } from "./result/response-reader.mjs";
+import { classifyNpmViewFailure } from "./result/failure-policy.mjs";
 
 export function classifyNpmViewAttempt(attempt) {
   const failure = classifyNpmViewFailure(attempt);

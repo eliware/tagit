@@ -1,4 +1,4 @@
-import { classifyNpmViewFailure } from "../../../../../src/registries/npm/error/view/failure-policy.mjs";
+import { classifyNpmViewFailure } from "../../../../../../src/registries/npm/error/view/result/failure-policy.mjs";
 
 test("returns the command failure without changing its error", () => {
   const error = { code: "EAI_AGAIN" };
