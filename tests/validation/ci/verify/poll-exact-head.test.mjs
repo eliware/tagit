@@ -23,10 +23,16 @@ test.each([
   expect(retry).not.toHaveBeenCalled();
 });
 
-test("polls the pending run and increments the retry attempt", () => {
-  const execFileSync = jest.fn(() => {
-    throw new Error("The run remains active.");
-  });
+test.each([
+  [
+    "while the run remains active",
+    () => {
+      throw new Error("The run remains active.");
+    },
+  ],
+  ["after a successful watch", () => "completed"],
+])("polls the pending run and increments the retry attempt %s", (_label, watch) => {
+  const execFileSync = jest.fn(watch);
   const retry = jest.fn((attempt) => attempt);
   expect(
     pollExactHeadCi({

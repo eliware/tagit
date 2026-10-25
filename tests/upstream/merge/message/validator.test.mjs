@@ -1,4 +1,4 @@
-import { validateMergeMessage } from "../../../../src/upstream/merge/message/policy.mjs";
+import { validateMergeMessage } from "../../../../src/upstream/merge/message/validator.mjs";
 
 test("accepts messages at the length limit", () => {
   expect(() => validateMergeMessage("x".repeat(500))).not.toThrow();

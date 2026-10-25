@@ -1,4 +1,4 @@
-import { validateMergeMessage } from "./policy.mjs";
+import { validateMergeMessage } from "./validator.mjs";
 import { createDefaultMergeMessage } from "./default.mjs";
 
 export function mergeMessage(args = [], now) {

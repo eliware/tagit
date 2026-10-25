@@ -1,4 +1,4 @@
-import { classifyWorkflowRunnerValues } from "../../../../../src/github/runs/runner/workflow/platform-policy.mjs";
+import { classifyWorkflowRunnerValues } from "../../../../../src/github/runs/runner/workflow/platform-classifier.mjs";
 
 test("classifies supported runner platforms", () => {
   expect(classifyWorkflowRunnerValues(["ubuntu-latest"])).toEqual(["ubuntu"]);

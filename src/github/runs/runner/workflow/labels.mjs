@@ -1,4 +1,4 @@
-import { classifyWorkflowRunnerValues } from "./platform-policy.mjs";
+import { classifyWorkflowRunnerValues } from "./platform-classifier.mjs";
 import { parseRunnerValues } from "./values.mjs";
 import { readRunnerValueDeclaration } from "./value-reader.mjs";
 
