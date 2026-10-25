@@ -1,5 +1,6 @@
-import { npmViewHasVersion } from "../../view-response.mjs";
-
-export function classifyNpmViewResult(output, version) {
-  return npmViewHasVersion(output, version) ? "available" : "not-found";
+export function classifyNpmViewResult(response, version) {
+  const available = Array.isArray(response)
+    ? response.length === 1 && response[0] === version
+    : response === version;
+  return available ? "available" : "not-found";
 }

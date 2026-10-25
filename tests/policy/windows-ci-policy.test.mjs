@@ -1,4 +1,5 @@
 import { windowsCiPolicy } from "../../src/policy/windows-ci-policy.mjs";
+import { enforceReleaseJobPolicy } from "../../src/github/runs/release/job/acceptance-policy.mjs";
 
 const successful = (job) => job.status === "completed" && job.conclusion === "success";
 test("treats absent Windows CI as optional", () => {
@@ -24,6 +25,11 @@ test("requires present Windows jobs to pass", () => {
     passed: true,
     successful: true,
   });
+  const ubuntu = { name: "test", status: "completed", conclusion: "success" };
+  const windows = { name: "windows", status: "completed", conclusion: "failure" };
+  expect(() =>
+    enforceReleaseJobPolicy([ubuntu, windows], { ubuntuJobs: [ubuntu], windowsJobs: [windows] }),
+  ).toThrow("failing Windows");
 });
 
 test("uses preclassified Windows jobs when runner metadata supplied the platform", () => {
