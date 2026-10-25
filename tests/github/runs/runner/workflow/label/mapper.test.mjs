@@ -22,3 +22,14 @@ test("records prototype-named job ids as own properties", () => {
 test("ignores jobs without runner labels", () => {
   expect(mapWorkflowJobRunnerLabels(new Map([["job", ["    steps: []"]]]))).toEqual({});
 });
+
+test("marks a job identity collision with different labels as unknown", () => {
+  expect(
+    mapWorkflowJobRunnerLabels(
+      new Map([
+        ["shared", ["    name: collision", "    runs-on: ubuntu-latest"]],
+        ["collision", ["    name: second", "    runs-on: windows-latest"]],
+      ]),
+    ),
+  ).toMatchObject({ collision: [] });
+});

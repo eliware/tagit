@@ -1,4 +1,4 @@
-import { lookupGhcrVisibleImage } from "./verify/visibility-lookup.mjs";
+import { readGhcrVisibilityAttempt } from "./poll/attempt.mjs";
 
 export async function pollGhcrVisibility(
   execFile,
@@ -6,13 +6,13 @@ export async function pollGhcrVisibility(
   { owner, imageName, version, retries, retryMs, sleep, onVisible = (image) => image },
 ) {
   for (let attempt = 0; attempt < retries; attempt += 1) {
-    let image;
-    try {
-      log.info(`GHCR check ${attempt + 1}/${retries} for ${owner}/${imageName}:${version}.`);
-      image = await lookupGhcrVisibleImage(execFile, { owner, imageName, version });
-    } catch (error) {
-      log.debug?.(`GHCR check ${attempt + 1}/${retries} failed: ${String(error).slice(0, 300)}`);
-    }
+    const image = await readGhcrVisibilityAttempt(execFile, log, {
+      owner,
+      imageName,
+      version,
+      attempt,
+      retries,
+    });
     if (image) return onVisible(image);
     if (attempt + 1 < retries) await sleep(retryMs);
   }

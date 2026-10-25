@@ -1,21 +1,11 @@
 import { parseWorkflowRunnerLabels } from "./label/reader.mjs";
+import { mergeWorkflowRunnerLabelEntries } from "./label/merge.mjs";
 
 export function parseWorkflowRunnerLabelContents(contentsByPath) {
-  const labelsByName = Object.create(null);
-  const conflicts = new Set();
+  const entries = [];
   for (const content of Object.values(contentsByPath)) {
     const workflowLabels = parseWorkflowRunnerLabels(content);
-    for (const [name, labels] of Object.entries(workflowLabels)) {
-      if (conflicts.has(name)) continue;
-      if (!Object.hasOwn(labelsByName, name)) {
-        labelsByName[name] = labels;
-        continue;
-      }
-      if (JSON.stringify(labelsByName[name]) !== JSON.stringify(labels)) {
-        labelsByName[name] = [];
-        conflicts.add(name);
-      }
-    }
+    entries.push(...Object.entries(workflowLabels).map(([name, labels]) => ({ name, labels })));
   }
-  return labelsByName;
+  return mergeWorkflowRunnerLabelEntries(entries);
 }
