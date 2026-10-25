@@ -1,5 +1,5 @@
 import { verifyNpmRegistry } from "../registries/npm-check.mjs";
-import { verifyGhcrPublication } from "../registries/ghcr-check.mjs";
+import { verifyRegistryGhcrCheck } from "./ghcr-check.mjs";
 
 export async function verifyRegistryChecks({
   fs,
@@ -28,9 +28,9 @@ export async function verifyRegistryChecks({
       sleep,
     });
   }
-  const ghcrResult = await verifyGhcrPublication({
+  const ghcrResult = await verifyRegistryGhcrCheck({
     fs,
-    applicable: ghcr,
+    ghcr,
     execFile,
     log,
     repo,

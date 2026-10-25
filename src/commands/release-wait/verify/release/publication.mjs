@@ -1,5 +1,5 @@
 import { verifyReleasePublicationWorkflow } from "./publication/workflow.mjs";
-import { verifyPublicationRegistries } from "../../release/publication/registries.mjs";
+import { verifyReleasePublicationRegistries } from "./publication/registries.mjs";
 import { buildReleasePublicationPlan } from "./publication/plan.mjs";
 
 export async function verifyReleasePublication({
@@ -33,24 +33,23 @@ export async function verifyReleasePublication({
     tag,
     log,
   });
-  if (!publicationApplies) return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
-  return verifyPublicationRegistries({
-    fs,
-    execFile,
-    log,
-    repo,
-    tag,
-    headSha,
-    version,
-    release,
-    applicable: publication.applicable,
-    packageName: publication.packageName,
-    isPrivate: publication.isPrivate,
-    ghcrApplicable,
-    maxPolls,
-    npmRetries,
-    pollMs,
-    npmRetryMs,
-    sleep,
-  });
+  return verifyReleasePublicationRegistries(
+    {
+      fs,
+      execFile,
+      log,
+      repo,
+      tag,
+      headSha,
+      version,
+      release,
+      publication,
+      maxPolls,
+      npmRetries,
+      pollMs,
+      npmRetryMs,
+      sleep,
+    },
+    { applicable: publicationApplies, ghcrApplicable },
+  );
 }
