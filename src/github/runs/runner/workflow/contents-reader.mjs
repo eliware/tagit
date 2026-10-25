@@ -1,4 +1,4 @@
-import { parseWorkflowRunnerLabels } from "./label-reader.mjs";
+import { parseWorkflowRunnerLabels } from "./label/reader.mjs";
 
 export function parseWorkflowRunnerLabelContents(contentsByPath) {
   const labelsByName = Object.create(null);

@@ -117,6 +117,7 @@
     ".": "./bin/tagit-cli.mjs",
     "./tagit": "./bin/tagit.mjs",
     "./push": "./bin/push.mjs",
-    "./upstream": "./bin/upstream.mjs"
+    "./upstream": "./bin/upstream.mjs",
+    "./cli": "./src/cli/application/public-api.mjs"
   }
 }

@@ -1,4 +1,4 @@
-import { parseWorkflowRunnerLabels } from "./workflow/label-reader.mjs";
+import { parseWorkflowRunnerLabels } from "./workflow/label/reader.mjs";
 
 export function readWorkflowRunnerLabelsFile(fs, workflowPath) {
   if (!fs?.existsSync(workflowPath)) return {};

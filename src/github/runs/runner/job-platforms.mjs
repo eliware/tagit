@@ -1,4 +1,4 @@
-export function classifyReleaseJobPlatforms(jobs) {
+export function classifyJobsByPlatform(jobs) {
   const labels = (job) => (Array.isArray(job.labels) ? job.labels : []);
   return {
     ubuntuJobs: jobs.filter((job) => labels(job).some((label) => /ubuntu/i.test(label))),
