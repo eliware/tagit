@@ -12,6 +12,18 @@ test("accepts successful Ubuntu and optional Windows jobs from labels and runner
   expect(result.windowsJobs).toHaveLength(1);
 });
 
+test("uses workflow runner metadata when GitHub returns an empty labels array", () => {
+  expect(() =>
+    verifyReleaseJobs(
+      [
+        { name: "test", labels: ["ubuntu-latest"], status: "completed", conclusion: "success" },
+        { name: "windows", labels: [], status: "completed", conclusion: "failure" },
+      ],
+      { windows: ["windows-latest"] },
+    ),
+  ).toThrow("Release CI has a failing Windows job.");
+});
+
 test("accepts successful steps when a completed workflow has stale job status", () => {
   const result = verifyReleaseJobs(
     [

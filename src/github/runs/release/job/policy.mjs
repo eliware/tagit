@@ -7,5 +7,5 @@ export function verifyReleaseJobs(jobs, runnerLabelsByJobName = {}, workflowRun 
   const verifiedJobs = jobs.map((job) => normalizeCompletedWorkflowJob(job, workflowRun));
   const jobsWithLabels = addWorkflowRunnerLabels(verifiedJobs, runnerLabelsByJobName);
   const platforms = classifyJobsByPlatform(jobsWithLabels);
-  return enforceReleaseJobPolicy(verifiedJobs, platforms);
+  return enforceReleaseJobPolicy(jobsWithLabels, platforms);
 }
