@@ -40,7 +40,7 @@ The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`
 
 ## Usage
 
-Run commands from the target repository root. Project owners run `notes`, `push`, and `preflight`. DevOps runs `release` and `release-wait` after handoff. Read the [operations guide](docs/operations.md) and [release notes](RELEASE_NOTES.md).
+Run commands from the target repository root. Read the [release notes](RELEASE_NOTES.md) for release history.
 
 ## Development
 
@@ -64,7 +64,7 @@ Tagit does not require a configuration file.
 
 ## Operations
 
-Follow the [owner and DevOps handoff](docs/operations.md). Tagit does not deploy applications.
+Follow the [owner and DevOps handoff](docs/operations.md) before a release. Tagit does not deploy applications.
 
 ## Commands
 
