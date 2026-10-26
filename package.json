@@ -55,7 +55,7 @@
     "@eliware/common": "^15.0.0"
   },
   "devDependencies": {
-    "@eliware/test": "^15.0.0"
+    "@eliware/test": "^15.0.1"
   },
   "jest": {
     "testEnvironment": "node",

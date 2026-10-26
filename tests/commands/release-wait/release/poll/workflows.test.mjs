@@ -31,3 +31,25 @@ test("polls each workflow with shared options and returns its run", async () => 
 test("returns no runs when no workflow applies", async () => {
   await expect(pollReleaseWorkflows(jest.fn(), {}, [])).resolves.toEqual([]);
 });
+
+test("checks each workflow start without waiting for another workflow poll", async () => {
+  let resolveCi;
+  const ciRun = new Promise((resolve) => {
+    resolveCi = resolve;
+  });
+  const poll = jest.fn(({ workflowPath }) =>
+    workflowPath.endsWith("ci.yaml") ? ciRun : Promise.resolve({ databaseId: 2 }),
+  );
+  const workflows = [
+    { workflowPath: ".github/workflows/ci.yaml", profile: "CI" },
+    { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },
+  ];
+
+  const results = pollReleaseWorkflows(poll, {}, workflows);
+  expect(poll).toHaveBeenCalledTimes(2);
+  resolveCi({ databaseId: 1 });
+  await expect(results).resolves.toEqual([
+    { workflow: workflows[0], run: { databaseId: 1 } },
+    { workflow: workflows[1], run: { databaseId: 2 } },
+  ]);
+});
