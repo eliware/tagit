@@ -1,12 +1,27 @@
 # Release Notes
 
-## 15.0.1 — 2026-10-25
+## 15.0.1 — 2026-10-26
+
+### Changed
+
+- Accept `main` CI runs only for the exact commit behind a release tag. Keep publication runs tied to the release tag.
+- Check CI and applicable publication runs at the same time after the release push. Report their links without waiting for those runs to pass.
+- Check completed CI jobs before `tagit release` reports a completed run. Keep full CI, publication, and registry checks in `tagit release-wait`.
+- Check personal GHCR packages when the organization package endpoint returns 404.
+- Use Eliware Test v15.0.1 and refresh the dependency lockfile.
+- Expand setup, command, release, and troubleshooting guides. Align repository guidance with the v15 conventions.
+- Split release checks, workflow parsing, registry handling, and CLI policies into focused modules.
 
 ### Fixed
 
 - Describe that `push --dry-run` skips the push and CI lookup.
 - Describe that `release --dry-run` checks version data and skips preflight, commit, tag, push, and publication.
-- Accept `main` CI runs for the exact commit behind a release tag.
+- Require valid conclusions for completed CI runs and require each applicable publication workflow to have a passing publish job.
+- Use CI workflow labels to classify CI jobs. Use workflow runner metadata when GitHub returns an empty labels array.
+- Skip missing optional workflows when Git reports the missing path in standard output.
+- Redact recognized credentials from GHCR error diagnostics.
+- Return errors when upstream checks or conflict inspections fail.
+- Show the `push --dry-run` syntax in CLI help.
 
 ## 15.0.0 — 2026-10-25
 
