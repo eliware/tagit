@@ -27,7 +27,7 @@ Use the exact version from `package.json`. Tagit runs preflight on the current c
 
 Tagit pushes the commit and tag to `main` in one atomic operation. The operation updates both refs or leaves both unchanged.
 
-Tagit waits until GitHub Actions starts CI and each applicable publication workflow. It reports the workflow links and exits. A workflow link means that the run started. It does not mean that the run passed. If no publication workflow applies, tagit waits for CI to start.
+Tagit checks for CI and each applicable publication run after it pushes the release commit and tag. It reports links after GitHub lists the runs, then exits. It does not wait for the workflows to pass or for registry visibility. A workflow link means that the run started. It does not mean that the run passed.
 
 Use `tagit release --version X.Y.Z --dry-run` to run preflight and check the package version without creating a release commit or tag. The dry run does not push refs or wait for publication.
 
@@ -39,7 +39,7 @@ After tagit reports workflow links, run:
 tagit release-wait
 ```
 
-Tagit checks CI for the exact commit that the latest release tag identifies. It checks the npm or GHCR workflow only when the matching `eliware.apply` profile and workflow both exist. It also confirms registry visibility when publication applies. If no publication profile and matching workflow apply, release-wait ends after CI passes.
+Run `tagit release-wait` after the release command reports workflow links. Tagit checks CI for the exact commit that the latest release tag identifies. It checks the npm or GHCR workflow only when the matching `eliware.apply` profile and workflow both exist. It also confirms registry visibility when publication applies. If no publication profile and matching workflow apply, release-wait ends after CI passes.
 
 ## Understand command roles
 
@@ -56,7 +56,7 @@ These roles describe the organization process. Tagit does not authenticate opera
 5. Wait for CI on the new commit.
 6. Run `tagit preflight` again.
 
-If a tag operation fails after a remote action, inspect the local and remote tag before you retry. Do not move or delete a release tag. Ask the release owner to reconcile the observed state.
+If a release command fails after a remote action, inspect the local and remote branch and tag before you retry. Do not run the release command again until you confirm if the first command pushed its commit and tag. Do not move or delete a release tag. Ask the release owner to reconcile the observed state.
 
 ## Use a template repository
 

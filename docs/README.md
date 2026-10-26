@@ -1,6 +1,14 @@
 # tagit user guides
 
-Use these guides to install tagit, check a repository, and run a release.
+Use these guides to set up a target, check release readiness, and verify a release.
+
+## Start here
+
+1. Read the requirements guide before you install tagit.
+2. Configure the target repository to satisfy those requirements.
+3. Run `tagit preflight` from the target repository root.
+4. Follow the operations guide to prepare a release and request release approval.
+5. Read the command guide for command results and options.
 
 ## Guides
 
@@ -11,10 +19,10 @@ Use these guides to install tagit, check a repository, and run a release.
 
 ## Scope
 
-Run tagit from the root of the repository that you want to check. Tagit supports packages, workspaces, infrastructure repositories, documentation repositories, and applications that do not publish packages.
+Run tagit from the root of the repository that you want to check. Tagit supports packages, workspaces, infrastructure, documentation, and applications that do not publish packages.
 
-Each target needs `package.json`, `@eliware/test`, an `npm test` script that runs `eliware-test`, and the required CI workflow. A publication workflow is optional.
+Each target needs `package.json`, `@eliware/test` as a development dependency, and an `npm test` script that runs `eliware-test`. Each target also needs `.github/workflows/ci.yaml`. Publication workflows are optional.
 
-Tagit checks release readiness and applicable publication. It does not deploy applications or edit GitOps repositories.
+Tagit checks release readiness and applicable publication. It does not deploy applications or edit GitOps repositories. A workflow link from `tagit release` means that the workflow started. It does not mean that the workflow passed.
 
-Tagit relies on the installed `@eliware/test` package for repository convention checks. Tagit also checks Git state and GitHub Actions results for the exact current commit or release tag.
+Tagit relies on the installed `@eliware/test` package for repository convention checks. Tagit also checks Git state and GitHub Actions results for the exact commit or release tag.
