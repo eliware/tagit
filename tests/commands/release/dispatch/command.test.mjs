@@ -67,6 +67,16 @@ test("runs the prepared release transaction and verifies its tag", async () => {
   );
 });
 
+test("release dry-run validates the version without running preflight", async () => {
+  const deps = base();
+  deps.fs.existsSync.mockImplementation((file) => file === "package.json");
+  deps.fs.readFileSync.mockReturnValue(JSON.stringify({ version: "1.2.3" }));
+  await runReleaseCommand({ command: "release", version: "1.2.3", dryRun: true }, deps);
+  expect(deps.runPreflight).not.toHaveBeenCalled();
+  expect(deps.gitOperations).not.toHaveBeenCalled();
+  expect(deps.startReleaseVerification).not.toHaveBeenCalled();
+});
+
 test("blocks a package version mismatch and skips tag creation", async () => {
   const deps = base();
   deps.fs.existsSync.mockImplementation((file) => file === "package.json");

@@ -29,7 +29,7 @@ Tagit pushes the commit and tag to `main` in one atomic operation. The operation
 
 Tagit checks for CI and each applicable publication run after it pushes the release commit and tag. It reports links after GitHub lists the runs, then exits. It does not wait for the workflows to pass or for registry visibility. A workflow link means that the run started. It does not mean that the run passed.
 
-Use `tagit release --version X.Y.Z --dry-run` to run preflight and check the package version without creating a release commit or tag. The dry run does not push refs or wait for publication.
+Use `tagit release --version X.Y.Z --dry-run` to check that the package version matches. The command skips preflight, the release commit, the tag, the push, and publication.
 
 ## Check the release
 

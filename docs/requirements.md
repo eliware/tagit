@@ -51,7 +51,7 @@ For GHCR publication, the active Eliware Test conventions define the required wo
 
 Before release, set `package.json` to the intended version and complete the owner handoff. Run `tagit release --version X.Y.Z` with the same version. Tagit runs preflight first. If preflight passes, tagit creates an empty commit, adds the `vX.Y.Z` tag, and pushes both refs to `main` atomically.
 
-Run `tagit release --version X.Y.Z --dry-run` to run preflight and check the package version without creating a release commit or tag. The dry run does not push refs or wait for publication.
+Run `tagit release --version X.Y.Z --dry-run` to check that the package version matches. The command skips preflight, the release commit, the tag, the push, and publication.
 
 Tagit checks for CI and each applicable publication workflow after it pushes the release commit and tag. It reports each workflow link after GitHub lists the run. The links do not confirm that the workflows passed. Run `tagit release-wait` to verify that workflows pass and check each applicable registry. When no publication workflow applies, release-wait ends after tagged-commit CI passes.
 

@@ -26,7 +26,9 @@ export async function runReleaseCommand(
     return;
   }
   requireExplicitReleaseVersion(options);
-  dispatchPreflight(options, { runPreflight, execFileSync, fs, log, output }, false);
+  if (!options.dryRun) {
+    dispatchPreflight(options, { runPreflight, execFileSync, fs, log, output }, false);
+  }
   await dispatchReleaseOperation(options, {
     fs,
     execFileSync,

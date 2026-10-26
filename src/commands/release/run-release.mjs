@@ -17,9 +17,7 @@ export async function runReleaseCommand({
     return;
   }
   if (policyResult === "dry-run") {
-    log.info(
-      "Dry run passed: release versioning, commit, tag, push, and publication were skipped.",
-    );
+    log.info("Dry run passed: preflight, release commit, tag, push, and publication were skipped.");
     return;
   }
   const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
