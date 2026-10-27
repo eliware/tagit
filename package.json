@@ -52,7 +52,7 @@
     "node": ">=26"
   },
   "dependencies": {
-    "@eliware/common": "^15.0.0"
+    "@eliware/common": "^15.0.1"
   },
   "devDependencies": {
     "@eliware/test": "^15.0.1"
