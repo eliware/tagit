@@ -12,7 +12,6 @@ test("returns release start links as links-only verification evidence", async ()
     maxPolls: 1,
     sleep: jest.fn(),
     log: { info: jest.fn() },
-    checkPublish: false,
     poll,
   });
   expect(result).toEqual({

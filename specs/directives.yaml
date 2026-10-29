@@ -28,7 +28,8 @@ directives:
           - >-
             Require release to add an empty versioned commit after preflight and push main with its
             tag.
-          - Require release to report workflow links after applicable workflows start.
+          - Require release to report exact-tag CI links after CI starts and exit.
+          - Do not wait for publication workflow discovery during release.
           - >-
             Require release-wait to check tagged commit CI and applicable npm.yaml or ghcr.yaml
             publication.

@@ -38,18 +38,18 @@ test("throws a named release error for a failed run", () => {
   }
 });
 
-test("rejects a failed run in links-only mode", () => {
+test("reports links for a failed run in links-only mode", () => {
   const details = { ...baseDetails, conclusion: "failure", url: "run-url" };
-  expect(() =>
+  expect(
     applyReleaseCiResultPolicy(candidate, details, {
       linksOnly: true,
       log: { info: jest.fn() },
     }),
-  ).toThrow("Release CI failed: failure");
+  ).toMatchObject({ databaseId: 7, url: "run-url", linksOnly: true });
 });
 
-test("checks CI jobs before reporting a completed run in links-only mode", () => {
-  expect(() =>
+test("does not check completed CI jobs in links-only mode", () => {
+  expect(
     applyReleaseCiResultPolicy(
       candidate,
       {
@@ -63,7 +63,7 @@ test("checks CI jobs before reporting a completed run in links-only mode", () =>
         runnerLabelsByJobName: { validate: ["ubuntu"] },
       },
     ),
-  ).toThrow("Release CI failed: validate: failure");
+  ).toMatchObject({ databaseId: 7, linksOnly: true });
 });
 
 test("reports a pending run and returns pending state", () => {

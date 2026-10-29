@@ -19,7 +19,6 @@ test("runs the tag operation and release verification", async () => {
   });
   expect(deps.startReleaseVerification).toHaveBeenCalledWith(
     expect.anything(),
-    deps.fs,
     deps.log,
     expect.objectContaining({ version: "1.2.3" }),
   );

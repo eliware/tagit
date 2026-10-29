@@ -21,7 +21,7 @@ export async function runReleaseCommand({
     return;
   }
   const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
-  await startReleaseVerification(execFileSync, fs, log, {
+  await startReleaseVerification(execFileSync, log, {
     version: options.version,
     release,
     execFile,

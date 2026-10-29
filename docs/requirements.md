@@ -53,7 +53,7 @@ Before release, set `package.json` to the intended version and complete the owne
 
 Run `tagit release --version X.Y.Z --dry-run` to check that the package version matches. The command skips preflight, the release commit, the tag, the push, and publication.
 
-Tagit checks for CI and each applicable publication workflow after it pushes the release commit and tag. It reports each workflow link after GitHub lists the run. The links do not confirm that the workflows passed. Run `tagit release-wait` to verify that workflows pass and check each applicable registry. When no publication workflow applies, release-wait ends after tagged-commit CI passes.
+Tagit checks for the exact-tag CI run after it pushes the release commit and tag. It reports CI and job links after GitHub lists the run. It does not check publication workflows or registry visibility. The links do not confirm that CI passed. Run `tagit release-wait` to verify CI, applicable publication workflows, and registry visibility. When no publication workflow applies, release-wait ends after tagged-commit CI passes.
 
 If `.notag` exists, the release command reports that it skipped release actions. It does not create a release commit or tag, push release refs, or verify publication.
 

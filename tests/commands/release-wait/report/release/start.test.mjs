@@ -24,11 +24,12 @@ test("reports the CI run after it starts", async () => {
   expect(log.info).toHaveBeenCalledWith("CI: [ci-url](ci-url)");
 });
 
-test("reports CI and publication runs when publication applies", async () => {
-  const poll = jest
-    .fn()
-    .mockResolvedValueOnce({ databaseId: 1, url: "ci-url", jobs: [] })
-    .mockResolvedValueOnce({ databaseId: 2, url: "publish-url", jobs: [] });
+test.each([
+  ["npm", [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }]],
+  ["GHCR", [{ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" }]],
+  ["no publication", []],
+])("reports only the CI run during release start for %s", async (_target, workflows) => {
+  const poll = jest.fn(async () => ({ databaseId: 1, url: "ci-url", jobs: [] }));
   const log = { info: jest.fn() };
   await expect(
     reportReleaseStart({
@@ -40,13 +41,15 @@ test("reports CI and publication runs when publication applies", async () => {
       maxPolls: 2,
       sleep: jest.fn(),
       log,
-      checkPublish: true,
-      publicationWorkflows: [{ workflowPath: ".github/workflows/npm.yaml", profile: "npm" }],
+      checkPublish: workflows.length > 0,
+      publicationWorkflows: workflows,
       poll,
     }),
-  ).resolves.toEqual({ ciRunId: 1, publishRunId: 2 });
-  expect(poll.mock.calls[1][0]).toEqual(
-    expect.objectContaining({ workflowPath: ".github/workflows/npm.yaml", linksOnly: true }),
+  ).resolves.toEqual({ ciRunId: 1, publishRunId: null });
+  expect(poll).toHaveBeenCalledTimes(1);
+  expect(poll).toHaveBeenCalledWith(
+    expect.objectContaining({ workflowPath: ".github/workflows/ci.yaml", linksOnly: true }),
   );
-  expect(log.info).toHaveBeenCalledWith("npm: [publish-url](publish-url)");
+  expect(log.info).toHaveBeenCalledWith("CI: [ci-url](ci-url)");
+  expect(log.info).not.toHaveBeenCalledWith(expect.stringMatching(/^(npm|ghcr):/));
 });

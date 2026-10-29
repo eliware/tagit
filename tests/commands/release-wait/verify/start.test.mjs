@@ -4,14 +4,8 @@ const { startReleaseVerification } =
 
 const log = { info: jest.fn() };
 const input = { version: "1.0.0", release: { commitSha: "abc" }, pollMs: 0, maxPolls: 1 };
-const baseFs = () => ({
-  existsSync: (file) => file === "package.json",
-  readFileSync: () => JSON.stringify({ name: "demo", private: false }),
-});
-
 function execFileSync(_command, args) {
   if (args[0] === "remote") return "git@github.com:eliware/demo.git";
-  if (args[0] === "show") return "jobs:\n  validate:\n    runs-on: ubuntu-latest\n";
   return "abc";
 }
 
@@ -44,10 +38,10 @@ function releasePoller() {
 
 beforeEach(() => log.info.mockClear());
 
-test("starts CI link checks for the prepared release", async () => {
+test("starts CI link checks for the release without checking publication", async () => {
   const execFile = releasePoller();
   await expect(
-    startReleaseVerification(execFileSync, baseFs(), log, { ...input, execFile }),
+    startReleaseVerification(execFileSync, log, { ...input, execFile }),
   ).resolves.toMatchObject({
     repo: "eliware/demo",
     tag: "v1.0.0",
@@ -61,33 +55,20 @@ test("starts CI link checks for the prepared release", async () => {
   );
 });
 
-test("starts publication link checks when an npm workflow applies", async () => {
-  const fs = baseFs();
-  fs.existsSync = (file) => file === "package.json" || file === ".github/workflows/npm.yaml";
-  fs.readFileSync = (file) =>
-    file === "package.json"
-      ? JSON.stringify({
-          name: "@eliware/demo",
-          private: false,
-          eliware: { apply: ["npm-published"] },
-        })
-      : "publish";
-  const execFile = releasePoller();
-  await expect(
-    startReleaseVerification(execFileSync, fs, log, {
-      version: input.version,
-      release: input.release,
-      maxPolls: 1,
-      execFile,
-    }),
-  ).resolves.toMatchObject({ ciRunId: 101, publishRunId: 102, linksOnly: true });
-  expect(log.info).toHaveBeenCalledWith(
-    "npm: [https://example.test/runs/102](https://example.test/runs/102)",
-  );
-});
+test.each(["npm", "ghcr", "none"])(
+  "does not check %s publication during release start",
+  async () => {
+    const execFile = releasePoller();
+    await expect(
+      startReleaseVerification(execFileSync, log, { ...input, execFile }),
+    ).resolves.toMatchObject({ ciRunId: 101, publishRunId: null, linksOnly: true });
+    expect(execFile.mock.calls.filter(([, args]) => args[1] === "list")).toHaveLength(1);
+    expect(execFile.mock.calls[0][1]).toContain(".github/workflows/ci.yaml");
+  },
+);
 
 test("rejects omitted options before inspecting the repository", async () => {
   const inspect = jest.fn();
-  await expect(startReleaseVerification(inspect, baseFs(), log)).rejects.toThrow();
+  await expect(startReleaseVerification(inspect, log)).rejects.toThrow();
   expect(inspect).not.toHaveBeenCalled();
 });

@@ -1,35 +1,23 @@
 import { execFile as defaultExecFile } from "node:child_process";
 import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
-import { prepareReleaseContext } from "../prepare-release-context.mjs";
+import { resolveReleaseContext } from "../resolve/release-context.mjs";
+import { validateReleaseInput } from "../validate/input.mjs";
 import { reportReleaseVerificationStart } from "../report/release/start-verification.mjs";
 
 export async function startReleaseVerification(
   execFileSync,
-  fs,
   log,
   {
     version,
     release,
     pollMs = 10000,
     maxPolls = 30,
-    npmRetries = maxPolls,
-    npmRetryMs = pollMs,
     sleep = sleepDefault,
     execFile = defaultExecFile,
   } = {},
 ) {
-  const { repo, tag, headSha, publication, runnerLabelsByJobName } = prepareReleaseContext(
-    execFileSync,
-    fs,
-    {
-      version,
-      release,
-      maxPolls,
-      npmRetries,
-      pollMs,
-      npmRetryMs,
-    },
-  );
+  validateReleaseInput(version, release, maxPolls, maxPolls, pollMs, pollMs);
+  const { repo, tag, headSha } = resolveReleaseContext(execFileSync, version, release);
   return reportReleaseVerificationStart({
     execFile,
     repo,
@@ -39,8 +27,5 @@ export async function startReleaseVerification(
     maxPolls,
     sleep,
     log,
-    checkPublish: publication.workflows.length > 0,
-    publicationWorkflows: publication.workflows,
-    runnerLabelsByJobName,
   });
 }

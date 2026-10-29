@@ -12,9 +12,6 @@ export async function reportReleaseStart({
   maxPolls,
   sleep,
   log,
-  checkPublish,
-  publicationWorkflows = [],
-  runnerLabelsByJobName = {},
   poll = pollReleaseCi,
 }) {
   const common = buildReleaseCiPollOptions({
@@ -28,16 +25,9 @@ export async function reportReleaseStart({
     linksOnly: true,
     log,
   });
-  const workflows = [
+  const [{ run: ciRun }] = await pollReleaseWorkflows(poll, common, [
     { workflowPath: ".github/workflows/ci.yaml", profile: "CI" },
-    ...(checkPublish ? publicationWorkflows : []),
-  ];
-  common.runnerLabelsByJobName = runnerLabelsByJobName;
-  const results = await pollReleaseWorkflows(poll, common, workflows);
-  for (const { workflow, run } of results)
-    reportReleaseLinks(log, repo, tag, run, workflow.profile);
-  const [ciResult, ...publishResults] = results;
-  const ciRun = ciResult.run;
-  const publishRun = publishResults.at(-1)?.run;
-  return { ciRunId: ciRun.databaseId, publishRunId: publishRun?.databaseId ?? null };
+  ]);
+  reportReleaseLinks(log, repo, tag, ciRun, "CI");
+  return { ciRunId: ciRun.databaseId, publishRunId: null };
 }

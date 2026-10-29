@@ -62,7 +62,6 @@ test("runs the prepared release transaction and verifies its tag", async () => {
   expect(deps.startReleaseVerification).toHaveBeenCalledWith(
     expect.anything(),
     expect.anything(),
-    expect.anything(),
     expect.objectContaining({ version: "1.2.3" }),
   );
 });

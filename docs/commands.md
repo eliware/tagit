@@ -68,7 +68,7 @@ Replace `X.Y.Z` with the exact three-part version in `package.json`. The command
 
 The command runs preflight on the current commit. It then checks that `package.json` has the requested version. If both checks pass, tagit creates an empty release commit with the version and date. It adds the `vX.Y.Z` tag to that commit.
 
-Tagit pushes `main` and the tag to `origin` in one atomic operation. The operation updates both refs or leaves both unchanged. Tagit checks for CI and each applicable publication run at 10-second intervals, for 30 attempts maximum. It reports each link after GitHub lists the run, then exits without waiting for the workflows to pass or for registry visibility. Run `tagit release-wait` to check those results.
+Tagit pushes `main` and the tag to `origin` in one atomic operation. The operation updates both refs or leaves both unchanged. Tagit checks for the exact-tag CI run at 10-second intervals, for 30 attempts maximum. It reports the CI and job links after GitHub lists the run, then exits. It does not check publication workflows or registry visibility. Run `tagit release-wait` to check CI, applicable publication workflows, and registry visibility.
 
 Use `--dry-run` to check that the requested version matches `package.json`. A release dry run skips preflight, the release commit, the tag, the push, and publication. Use the waiver options only with approved, documented waivers. A repository with a `.notag` file skips release actions.
 

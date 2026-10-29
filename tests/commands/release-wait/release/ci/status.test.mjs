@@ -47,7 +47,7 @@ test("returns links-only evidence without waiting for completion", async () => {
   ).resolves.toMatchObject({ databaseId: 2 });
 });
 
-test("rejects a completed failed run during links-only polling", async () => {
+test("reports a completed failed run link without checking its result during release start", async () => {
   const run = { databaseId: 9, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
   const details = {
     databaseId: 9,
@@ -63,7 +63,7 @@ test("rejects a completed failed run during links-only polling", async () => {
       maxPolls: 1,
       linksOnly: true,
     }),
-  ).rejects.toThrow("Release CI failed: failure");
+  ).resolves.toMatchObject({ databaseId: 9 });
 });
 
 test("reports malformed list data and exhausted inspection", async () => {
