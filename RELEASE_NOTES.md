@@ -1,12 +1,12 @@
 # Release Notes
 
-## 15.0.2 — 2026-10-28
+## 15.1.0 — 2026-11-03
 
 ### Changed
 
-- Check only for the exact-tag CI run during `tagit release`. Report its links and exit without checking publication workflows or registries.
-- Keep CI result checks, applicable npm or GHCR publication checks, and registry validation in `tagit release-wait`.
-- Update `@eliware/common` to 15.0.1 and refresh compatible dependencies in the lockfile.
+- Check only for the exact-tag CI run during `tagit release`. Report CI and job links, then exit. Keep CI results, publication workflow checks, and registry checks in `tagit release-wait`.
+- Mark the `tagit`, `push`, and `upstream` CLI files executable.
+- Update `@eliware/common` to 15.0.1 and `@eliware/test` to 15.1.0. Refresh compatible dependencies in the lockfile.
 
 ## 15.0.1 — 2026-10-26
 
