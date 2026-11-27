@@ -46,3 +46,12 @@ test("coordinates a prepared merge dry run without changing remote or worktree s
   );
   expect(exec).not.toHaveBeenCalledWith("git", ["push"], expect.anything());
 });
+
+test.each([
+  [["sync", "--dry-run"], "must appear before the merge message"],
+  [["--dru-run", "sync"], "Unknown upstream option"],
+])("rejects unsafe upstream options before invoking Git", (args, message) => {
+  const exec = jest.fn();
+  expect(() => runUpstream(args, exec, new Date("2026-07-29T18:07:59Z"))).toThrow(message);
+  expect(exec).not.toHaveBeenCalled();
+});

@@ -28,6 +28,6 @@ test("collects commits, changed files, and bounded source diff", () => {
       ":!**/.jest-result",
       ":!**/.jest.result",
     ],
-    { encoding: "utf8" },
+    { encoding: "utf8", maxBuffer: 48000 },
   );
 });
