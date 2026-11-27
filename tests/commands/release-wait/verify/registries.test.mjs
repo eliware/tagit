@@ -35,25 +35,18 @@ const options = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  selectRegistryPolicy.mockReturnValue({ npm: false, ghcr: false });
+  selectRegistryPolicy.mockImplementation((value) => ({ ...value, npm: false, ghcr: false }));
   verifyRegistryChecks.mockResolvedValue({ npm: false, ghcr: false });
 });
 
-test("selects registry policy before delegating checks", async () => {
+test("coordinates policy selection and registry checks", async () => {
   await expect(verifyRegistries(options)).resolves.toEqual({ npm: false, ghcr: false });
-  expect(selectRegistryPolicy).toHaveBeenCalledWith(
-    options.fs,
-    options.log,
-    { applicable: true, packageName: "demo", isPrivate: false },
-    true,
-  );
-  expect(verifyRegistryChecks).toHaveBeenCalledWith(
-    expect.objectContaining({ ...options, npm: false, ghcr: false }),
-  );
+  expect(selectRegistryPolicy).toHaveBeenCalledWith(options);
+  expect(verifyRegistryChecks).toHaveBeenCalledWith({ ...options, npm: false, ghcr: false });
 });
 
 test("returns the combined registry result from the check coordinator", async () => {
-  selectRegistryPolicy.mockReturnValue({ npm: true, ghcr: true });
+  selectRegistryPolicy.mockImplementation((value) => ({ ...value, npm: true, ghcr: true }));
   verifyRegistryChecks.mockResolvedValue({ npm: true, ghcr: true, imageDigest: "sha256:release" });
   await expect(verifyRegistries(options)).resolves.toEqual({
     npm: true,

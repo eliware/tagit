@@ -1,8 +1,13 @@
-import createReleaseCiListArgs from "../../../../../src/commands/release-wait/read/release-ci/command.mjs";
-import createReleaseCiViewArgs from "../../../../../src/commands/release-wait/read/release-ci/view-command.mjs";
+import buildReleaseCiArgs from "../../../../../src/commands/release-wait/read/release-ci/command.mjs";
 
 test("builds arguments to list release CI runs", () => {
-  expect(createReleaseCiListArgs("eliware/demo", "abc", ".github/workflows/ci.yaml")).toEqual([
+  expect(
+    buildReleaseCiArgs("eliware/demo", {
+      action: "list",
+      headSha: "abc",
+      workflowPath: ".github/workflows/ci.yaml",
+    }),
+  ).toEqual([
     "run",
     "list",
     "--repo",
@@ -19,7 +24,7 @@ test("builds arguments to list release CI runs", () => {
 });
 
 test("builds arguments to read release CI details", () => {
-  expect(createReleaseCiViewArgs("eliware/demo", 7)).toEqual([
+  expect(buildReleaseCiArgs("eliware/demo", { action: "view", databaseId: 7 })).toEqual([
     "run",
     "view",
     "7",

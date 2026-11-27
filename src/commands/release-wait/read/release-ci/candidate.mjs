@@ -1,6 +1,6 @@
 import selectReleaseRun from "../../../../github/runs/release/run/selection.mjs";
 import readReleaseCiJson from "./json.mjs";
-import createReleaseCiListArgs from "./command.mjs";
+import buildReleaseCiArgs from "./command.mjs";
 
 export default async function readReleaseCiCandidate(
   execFile,
@@ -11,7 +11,10 @@ export default async function readReleaseCiCandidate(
 ) {
   let runs;
   try {
-    runs = await readReleaseCiJson(execFile, createReleaseCiListArgs(repo, headSha, workflowPath));
+    runs = await readReleaseCiJson(
+      execFile,
+      buildReleaseCiArgs(repo, { action: "list", headSha, workflowPath }),
+    );
   } catch (error) {
     if (error instanceof SyntaxError) error.code = "ERR_RELEASE_CI_LIST_JSON";
     throw error;

@@ -1,4 +1,4 @@
-import resolveUpstreamBranch from "../branch.mjs";
+import resolveUpstreamBranch from "./resolve-branch.mjs";
 import mergeUpstream from "./upstream.mjs";
 
 export default function executeUpstreamMerge(execFileSync, message, log) {

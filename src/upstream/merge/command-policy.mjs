@@ -1,4 +1,4 @@
-import resolveUpstreamBranch from "../branch.mjs";
+import resolveUpstreamBranch from "./resolve-branch.mjs";
 import reportUpstreamDryRun from "./dry/run.mjs";
 
 export default function handleUpstreamDryRun(execFileSync, log, dryRun, message) {

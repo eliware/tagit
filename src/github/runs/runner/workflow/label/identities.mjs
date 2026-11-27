@@ -1,12 +1,12 @@
-import jobValue from "../../../../../repository/metadata/workflow/job/value.mjs";
 import readWorkflowRunnerLabels from "../labels.mjs";
+import resolveWorkflowJobName from "./identity.mjs";
 
 export default function readWorkflowJobLabelEntries(jobs) {
   const entries = [];
   for (const [jobId, jobLines] of jobs) {
     const labels = readWorkflowRunnerLabels(jobLines);
     if (labels === null) continue;
-    const displayName = (jobValue(jobLines, "name") ?? jobId).replaceAll(/["']/g, "");
+    const displayName = resolveWorkflowJobName(jobId, jobLines);
     entries.push({ name: displayName, labels }, { name: jobId, labels });
   }
   return entries;
