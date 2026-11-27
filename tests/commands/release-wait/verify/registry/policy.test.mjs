@@ -36,33 +36,20 @@ test("reports when npm and GHCR checks do not apply", () => {
   expect(log.info).toHaveBeenNthCalledWith(2, "GHCR verification: not applicable.");
 });
 
-test("does not trust a stale GHCR profile decision when discovery no longer applies", () => {
+test("uses the GHCR applicability snapshot from publication planning", () => {
   const log = { info: jest.fn() };
   expect(
     selectRegistryPolicy({
-      fs: fsWithGhcr(false),
+      fs: { existsSync: jest.fn() },
       log,
       applicable: false,
       packageName: null,
       isPrivate: false,
       ghcrApplicable: true,
     }),
-  ).toMatchObject({ npm: false, ghcr: false });
+  ).toMatchObject({ npm: false, ghcr: true });
   expect(log.info).toHaveBeenCalledWith("npm verification: not applicable.");
-  expect(log.info).toHaveBeenCalledWith("GHCR verification: not applicable.");
-});
-
-test("uses current GHCR discovery when the supplied decision is stale", () => {
-  expect(
-    selectRegistryPolicy({
-      fs: fsWithGhcr(true),
-      log: { info: jest.fn() },
-      applicable: false,
-      packageName: null,
-      isPrivate: false,
-      ghcrApplicable: false,
-    }).ghcr,
-  ).toBe(true);
+  expect(log.info).not.toHaveBeenCalledWith("GHCR verification: not applicable.");
 });
 
 test.each([

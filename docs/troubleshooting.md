@@ -24,7 +24,7 @@ Set `package.json` to the version that you pass to `tagit release --version X.Y.
 
 Run `git tag --list` to inspect local tags. Run `git fetch --tags origin` to fetch tags from `origin`, then retry `tagit release-wait`.
 
-Tagit checks the latest Git tag. It requires a three-part semantic version, such as `v1.2.3`.
+Tagit checks the highest reachable three-part semantic release tag, such as `v1.2.3`. It skips prerelease and non-version tags.
 
 ## Release does not find a workflow run
 
