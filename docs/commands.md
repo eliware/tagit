@@ -20,11 +20,7 @@ The package provides `tagit`, `push`, and `upstream` commands. The `push` comman
 
 Run `tagit <command>` for `notes`, `preflight`, `push`, `release`, and `release-wait`. Run `upstream` as its own command.
 
-## Show help or version
-
-Run `tagit --help` or `tagit -h` to show command help. Run `tagit --version` or `tagit -v` to show the installed version. Do not combine help and version options.
-
-Put the command before its options. Use `--dry-run` only with `push`, `release`, or `upstream`.
+Read the [CLI reference](cli-reference.md) for help, version, option, error, and exit-code rules.
 
 ## Report changes
 
@@ -95,9 +91,3 @@ This command fetches the configured `upstream` remote, merges its default branch
 Pass a merge message after the options. If you omit the message, tagit uses the current UTC time in `YYYY-MM-DD HH:mm:ss` format. Use a maximum of 500 characters. Do not use control characters.
 
 Use `--dry-run` to show the branch and message without fetch, merge, or push actions. This command requires an `upstream` remote.
-
-## Errors and exit codes
-
-Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. Tagit redacts recognized credentials and limits long error output.
-
-A bad option, repeated option, unknown argument, or missing required value returns `1`. The `release` command requires `--version X.Y.Z`, which must match `package.json`. The version query accepts no value. `release-wait` always uses the latest semantic release tag.

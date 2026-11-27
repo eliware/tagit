@@ -14,6 +14,7 @@ Use these guides to set up a target, check release readiness, and verify a relea
 
 - Read [requirements](requirements.md) before you install tagit or check a repository.
 - Read [commands](commands.md) for command names, options, results, and exit codes.
+- Read the [CLI reference](cli-reference.md) for help, version, option, and error behavior.
 - Read [operations](operations.md) for the owner handoff and DevOps release process.
 - Read [troubleshooting](troubleshooting.md) to resolve common setup and check failures.
 

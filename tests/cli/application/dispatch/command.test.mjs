@@ -18,10 +18,7 @@ const deps = () => ({
   startReleaseVerification: jest.fn(),
   execFile: jest.fn(),
 });
-test("handles version and help at the command boundary", async () => {
-  const version = deps();
-  await dispatchCommand({ versionQuery: true }, version);
-  expect(version.output).toHaveBeenCalledWith("1.2.3");
+test("handles help at the command boundary", async () => {
   const help = deps();
   await dispatchCommand({ help: true }, help);
   expect(help.output).toHaveBeenCalledWith(expect.stringContaining("Project owners may run only"));

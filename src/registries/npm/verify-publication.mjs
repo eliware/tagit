@@ -1,6 +1,6 @@
 import validateNpmViewCommandInputs from "./validate/view-command.mjs";
 import buildNpmViewArguments from "./build-view-command.mjs";
-import buildNpmCommand from "./command-builder.mjs";
+import buildPlatformNpmCommand from "./platform-command.mjs";
 import pollNpmPublication from "./poll.mjs";
 
 export default async function verifyNpmPublication(
@@ -9,7 +9,7 @@ export default async function verifyNpmPublication(
   { packageName, version, retries, retryMs, sleep },
 ) {
   validateNpmViewCommandInputs(packageName, version);
-  const command = buildNpmCommand(buildNpmViewArguments(packageName, version));
+  const command = buildPlatformNpmCommand(buildNpmViewArguments(packageName, version));
   return pollNpmPublication(execFile, log, {
     command,
     packageName,
