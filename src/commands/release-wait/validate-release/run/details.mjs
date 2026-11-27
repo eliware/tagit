@@ -2,15 +2,9 @@ import validateJobRecords from "../../../../validation/ci/validate/job-records.m
 import validateReleaseRunDetailsShape from "./details-shape.mjs";
 import validateReleaseRunIdentity from "./identity.mjs";
 
-export default function validateReleaseRunDetails(
-  details,
-  candidate,
-  headSha,
-  tag,
-  workflowPath = ".github/workflows/ci.yaml",
-) {
+export default function validateReleaseRunDetails(details, candidate, headSha, tag) {
   validateReleaseRunDetailsShape(details, candidate.databaseId);
-  validateReleaseRunIdentity(details, candidate, headSha, tag, workflowPath);
+  validateReleaseRunIdentity(details, candidate, headSha, tag);
   validateJobRecords(details.jobs, candidate.databaseId);
   return details;
 }

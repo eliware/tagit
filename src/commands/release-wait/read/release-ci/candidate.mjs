@@ -19,5 +19,5 @@ export default async function readReleaseCiCandidate(
     if (error instanceof SyntaxError) error.code = "ERR_RELEASE_CI_LIST_JSON";
     throw error;
   }
-  return selectReleaseRun(runs, headSha, tag, workflowPath);
+  return selectReleaseRun(runs, headSha, tag);
 }

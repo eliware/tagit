@@ -12,20 +12,22 @@ test("selects the newest exact release tag and commit", () => {
     ).databaseId,
   ).toBe(2);
 });
-test("selects the main CI run for the tagged commit", () => {
+test("does not select a main branch CI run for the tagged commit", () => {
   expect(
     selectReleaseRun([{ databaseId: 4, headSha: "abc", headBranch: "main" }], "abc", "v1.0.0"),
-  ).toMatchObject({ databaseId: 4 });
+  ).toBeUndefined();
 });
-test("does not select a main branch run for a publication workflow", () => {
+test("selects a tagged CI run when a main run also exists for the commit", () => {
   expect(
     selectReleaseRun(
-      [{ databaseId: 4, headSha: "abc", headBranch: "main" }],
+      [
+        { databaseId: 4, headSha: "abc", headBranch: "main" },
+        { databaseId: 5, headSha: "abc", headBranch: "v1.0.0" },
+      ],
       "abc",
       "v1.0.0",
-      ".github/workflows/npm.yaml",
     ),
-  ).toBeUndefined();
+  ).toMatchObject({ databaseId: 5 });
 });
 test("rejects ambiguous incomplete release evidence", () => {
   expect(() =>
