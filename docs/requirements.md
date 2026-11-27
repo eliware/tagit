@@ -43,7 +43,7 @@ Publication is optional. Tagit checks a registry only when the package profile a
 | `npm-published`           | `.github/workflows/npm.yaml`  | Check the publish job and confirm the exact package version appears in npm. |
 | `ghcr-published`          | `.github/workflows/ghcr.yaml` | Check the publish job and confirm the exact image tag and digest in GHCR.   |
 
-If a profile or its workflow does not exist, tagit skips that registry. A repository does not require a publication workflow. Tagit skips public npm visibility checks for private packages. An npm-published public package requires a valid package name.
+If a profile or its workflow does not exist, tagit skips that registry. A repository does not require a publication workflow. Check the npm publish job for private packages when their profile and workflow apply. Tagit skips public npm visibility checks for private packages. An npm-published public package requires a valid package name.
 
 For GHCR publication, the active Eliware Test conventions define the required workflow trigger, environment, and image push steps. Inspect those conventions when you add or change the workflow. Tagit checks that the published image has the expected version tag and digest.
 

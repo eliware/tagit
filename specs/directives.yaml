@@ -33,6 +33,7 @@ directives:
           - >-
             Require release-wait to check tagged commit CI and applicable npm.yaml or ghcr.yaml
             publication.
+          - Check the npm publish job for private packages when their profile and workflow apply.
           - Require each npm visibility check to report one concise status line.
           - >-
             Require environment example files only when a repository declares runtime environment
