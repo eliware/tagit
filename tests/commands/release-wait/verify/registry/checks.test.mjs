@@ -37,11 +37,16 @@ beforeEach(() => {
   verifyGhcrPublication.mockResolvedValue({ ghcr: false });
 });
 
-test("skips npm and returns an unverified GHCR result when neither check applies", async () => {
-  await expect(verifyRegistryChecks(options)).resolves.toEqual({ npm: false, ghcr: false });
+test("runs GHCR without npm when only GHCR applies", async () => {
+  verifyGhcrPublication.mockResolvedValue({ ghcr: true, imageDigest: "sha256:release" });
+  await expect(verifyRegistryChecks({ ...options, npm: false, ghcr: true })).resolves.toEqual({
+    npm: false,
+    ghcr: true,
+    imageDigest: "sha256:release",
+  });
   expect(verifyNpmRegistry).not.toHaveBeenCalled();
   expect(verifyGhcrPublication).toHaveBeenCalledWith(
-    expect.objectContaining({ fs: options.fs, applicable: false, retries: 2 }),
+    expect.objectContaining({ applicable: true, repo: options.repo, retryMs: options.pollMs }),
   );
 });
 

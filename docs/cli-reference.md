@@ -1,6 +1,6 @@
 # CLI reference
 
-Use this guide for command help, version queries, option rules, errors, and exit codes.
+Use this guide for command help, version queries, option rules, and exit codes.
 
 ## Help and version
 
@@ -14,10 +14,12 @@ The `release` command requires `--version X.Y.Z`, which must match `package.json
 
 ## Errors and exit codes
 
-Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors. Tagit redacts recognized credentials and limits long error output.
+Commands return `0` when they pass. They return `1` for invalid input, failed checks, or operating errors.
 
 A bad option, repeated option, unknown argument, or missing required value returns `1`.
 
 ## Test coverage
 
 The [option validation tests](../tests/cli/arguments/validate-options.test.mjs) cover command option rules. The [CLI boundary tests](../tests/cli/application/run/cli-boundary.test.mjs) cover error handling and exit behavior.
+
+Read the [error output guide](error-output.md) for credential redaction and output limits.
