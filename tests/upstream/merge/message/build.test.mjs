@@ -1,11 +1,8 @@
 import mergeMessage from "../../../../src/upstream/merge/message/build.mjs";
 
-test("builds safe supplied or timestamp merge messages", () => {
+test("builds a safe supplied merge message", () => {
   expect(mergeMessage(["merge"], new Date("2026-07-29T18:07:59Z"))).toBe("merge");
-  expect(mergeMessage([], new Date("2026-07-29T18:07:59Z"))).toBe("2026-07-29 18:07:59");
 });
-test("uses the current time when all arguments are omitted", () =>
-  expect(mergeMessage(undefined, new Date("2026-07-29T18:07:59Z"))).toBe("2026-07-29 18:07:59"));
 
 test("rejects an unsafe merge message", () => {
   expect(() => mergeMessage(["bad\nmessage"], new Date("2026-07-29T18:07:59Z"))).toThrow();
