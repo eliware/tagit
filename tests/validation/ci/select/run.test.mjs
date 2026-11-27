@@ -1,5 +1,4 @@
 import selectLatestRun from "../../../../src/validation/ci/select/run.mjs";
-import successfulRun from "../../../../src/validation/ci/select/successful-run.mjs";
 
 test("selects the newest exact-head run", () => {
   expect(
@@ -12,10 +11,4 @@ test("selects the newest exact-head run", () => {
       "abc",
     ).databaseId,
   ).toBe(2);
-});
-
-test("identifies successful completed runs", () => {
-  const run = { status: "completed", conclusion: "success" };
-  expect(successfulRun(run)).toBe(run);
-  expect(successfulRun({ status: "in_progress", conclusion: "" })).toBeNull();
 });

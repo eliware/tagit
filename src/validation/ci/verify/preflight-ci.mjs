@@ -1,4 +1,4 @@
-import verifyLatestCi from "./exact-head.mjs";
+import verifyLatestCi from "./exact/head.mjs";
 import readWorkflowRunnerLabelsFile from "../../../github/runs/runner/file-reader.mjs";
 
 export default function verifyPreflightCi(execFileSync, log, status, fs = null) {

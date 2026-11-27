@@ -1,4 +1,4 @@
-import resolvePersonalGhcrVersionsPath from "../../../../src/registries/ghcr/verify/endpoint-fallback.mjs";
+import resolvePersonalGhcrVersionsPath from "../../../../../src/registries/ghcr/verify/endpoint/fallback.mjs";
 
 test("selects the encoded personal account endpoint after a 404", () => {
   const error = Object.assign(new Error("HTTP 404"), { stderr: "" });
