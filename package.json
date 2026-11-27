@@ -1,6 +1,6 @@
 {
   "name": "@eliware/tagit",
-  "version": "15.2.1",
+  "version": "15.2.2",
   "type": "module",
   "description": "Deterministic release preflight and publication verification for Eliware packages.",
   "keywords": [

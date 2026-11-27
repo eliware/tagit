@@ -1,14 +1,6 @@
 import evaluateReleasePolicy from "./policy.mjs";
 
-export default async function runReleaseCommand({
-  options,
-  fs,
-  execFileSync,
-  execFile,
-  log,
-  gitOperations,
-  startReleaseVerification,
-}) {
+export default async function runReleaseCommand({ options, fs, execFileSync, log, gitOperations }) {
   const policyResult = evaluateReleasePolicy(fs, options);
   if (policyResult === "template") {
     log.info(
@@ -20,12 +12,7 @@ export default async function runReleaseCommand({
     log.info("Dry run passed: preflight, release commit, tag, push, and publication were skipped.");
     return;
   }
-  const release = gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
-  await startReleaseVerification(execFileSync, log, {
-    version: options.version,
-    release,
-    execFile,
-  });
+  gitOperations(execFileSync, fs, log, options.version, { dryRun: options.dryRun });
   log.info(
     `Run tagit release-wait to check CI and applicable publication for v${options.version}.`,
   );

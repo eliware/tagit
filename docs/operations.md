@@ -27,19 +27,19 @@ Use the exact version from `package.json`. Tagit runs preflight on the current c
 
 Tagit pushes the commit and tag to `main` in one atomic operation. The operation updates both refs or leaves both unchanged.
 
-Tagit checks for the exact-tag CI run after it pushes the release commit and tag. It reports the CI and job links after GitHub lists the run, then exits. It does not check publication workflows or registry visibility. A workflow link means that the run started. It does not mean that the run passed.
+The release command exits after it pushes the release commit and tag. It does not wait for or inspect CI, publication workflows, or registry visibility.
 
 Use `tagit release --version X.Y.Z --dry-run` to check that the package version matches. The command skips preflight, the release commit, the tag, the push, and publication.
 
 ## Check the release
 
-After tagit reports workflow links, run:
+After the release command exits, run:
 
 ```text
 tagit release-wait
 ```
 
-Run `tagit release-wait` after the release command reports CI links. Tagit checks CI for the exact commit that the latest release tag identifies. It checks the npm or GHCR workflow only when the matching `eliware.apply` profile and workflow both exist. It also confirms registry visibility when publication applies. If no publication profile and matching workflow apply, release-wait ends after CI passes.
+Run `tagit release-wait` to check CI for the exact commit that the latest release tag identifies. It checks the npm or GHCR workflow only when the matching `eliware.apply` profile and workflow both exist. It also confirms registry visibility when publication applies. If no publication profile and matching workflow apply, release-wait ends after CI passes.
 
 ## Understand command roles
 

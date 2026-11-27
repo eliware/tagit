@@ -7,7 +7,6 @@ const options = {
   tag: "v1.0.0",
   pollMs: 0,
   sleep: jest.fn(),
-  linksOnly: false,
   log: { info: jest.fn() },
 };
 
@@ -31,39 +30,6 @@ test("selects and returns a completed release workflow", async () => {
   ).resolves.toMatchObject({
     databaseId: 1,
   });
-});
-
-test("returns links-only evidence without waiting for completion", async () => {
-  const run = { databaseId: 2, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
-  const details = {
-    databaseId: 2,
-    status: "in_progress",
-    conclusion: null,
-    headSha: "abc",
-    jobs: [],
-  };
-  await expect(
-    pollReleaseCi({ ...options, execFile: executor([run], details), maxPolls: 1, linksOnly: true }),
-  ).resolves.toMatchObject({ databaseId: 2 });
-});
-
-test("reports a completed failed run link without checking its result during release start", async () => {
-  const run = { databaseId: 9, createdAt: "2026-01-01", headSha: "abc", headBranch: "v1.0.0" };
-  const details = {
-    databaseId: 9,
-    status: "completed",
-    conclusion: "failure",
-    headSha: "abc",
-    jobs: [],
-  };
-  await expect(
-    pollReleaseCi({
-      ...options,
-      execFile: executor([run], details),
-      maxPolls: 1,
-      linksOnly: true,
-    }),
-  ).resolves.toMatchObject({ databaseId: 9 });
 });
 
 test("reports malformed list data and exhausted inspection", async () => {

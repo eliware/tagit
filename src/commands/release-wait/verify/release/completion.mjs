@@ -30,7 +30,6 @@ export default async function verifyReleaseCompletion({
     pollMs,
     maxPolls,
     sleep,
-    linksOnly: false,
     log,
   });
   await checkReleaseCi({

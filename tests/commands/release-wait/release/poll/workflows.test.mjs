@@ -6,7 +6,7 @@ test("polls each workflow with shared options and returns its run", async () => 
     .fn()
     .mockResolvedValueOnce({ databaseId: 1 })
     .mockResolvedValueOnce({ databaseId: 2 });
-  const common = { repo: "eliware/demo", linksOnly: true };
+  const common = { repo: "eliware/demo" };
   const workflows = [
     { workflowPath: ".github/workflows/ci.yaml", profile: "CI" },
     { workflowPath: ".github/workflows/npm.yaml", profile: "npm" },

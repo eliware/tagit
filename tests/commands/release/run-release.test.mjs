@@ -8,19 +8,16 @@ const base = () => ({
   execFile: jest.fn(),
   log: { info: jest.fn() },
   gitOperations: jest.fn(() => ({ commitSha: "abc" })),
-  startReleaseVerification: jest.fn(),
 });
 
-test("runs the tag operation and release verification", async () => {
+test("runs the tag operation and directs workflow checks to release-wait", async () => {
   const deps = base();
   await runReleaseCommand(deps);
   expect(deps.gitOperations).toHaveBeenCalledWith(expect.anything(), deps.fs, deps.log, "1.2.3", {
     dryRun: false,
   });
-  expect(deps.startReleaseVerification).toHaveBeenCalledWith(
-    expect.anything(),
-    deps.log,
-    expect.objectContaining({ version: "1.2.3" }),
+  expect(deps.log.info).toHaveBeenCalledWith(
+    "Run tagit release-wait to check CI and applicable publication for v1.2.3.",
   );
 });
 test("keeps dry-run and template releases non-mutating", async () => {

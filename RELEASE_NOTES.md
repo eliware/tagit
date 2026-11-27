@@ -1,5 +1,11 @@
 # Release Notes
 
+## 15.2.2 — 2026-11-27
+
+### Changed
+
+- Make `tagit release` exit after the atomic push. Run CI, publication, and registry checks with `tagit release-wait`.
+
 ## 15.2.1 — 2026-11-27
 
 ### Fixed

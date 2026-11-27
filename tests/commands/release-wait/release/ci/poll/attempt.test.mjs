@@ -11,7 +11,6 @@ const base = {
   repo: "eliware/demo",
   headSha: "abc",
   tag: "v1.0.0",
-  linksOnly: false,
   log: { info: jest.fn() },
 };
 

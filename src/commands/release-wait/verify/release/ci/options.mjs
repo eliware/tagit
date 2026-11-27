@@ -6,8 +6,7 @@ export default function buildReleaseCiPollOptions({
   pollMs,
   maxPolls,
   sleep,
-  linksOnly,
   log,
 }) {
-  return { execFile, repo, headSha, tag, pollMs, maxPolls, sleep, linksOnly, log };
+  return { execFile, repo, headSha, tag, pollMs, maxPolls, sleep, log };
 }

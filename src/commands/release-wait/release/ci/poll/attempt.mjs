@@ -8,7 +8,6 @@ export default async function runReleaseCiPollAttempt({
   repo,
   headSha,
   tag,
-  linksOnly,
   log,
   workflowPath,
   workflowLabel,
@@ -19,7 +18,6 @@ export default async function runReleaseCiPollAttempt({
   const details = await readReleaseCiDetails(execFile, repo, candidate.databaseId);
   validateReleaseRunDetails(details, candidate, headSha, tag);
   return applyReleaseCiResultPolicy(candidate, details, {
-    linksOnly,
     log,
     workflowLabel,
     workflowPath,

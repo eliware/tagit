@@ -11,7 +11,6 @@ const base = () => ({
   gitOperations: jest.fn(),
   runPreflight: jest.fn(() => ({ test: { passed: true } })),
   verifyRelease: jest.fn(),
-  startReleaseVerification: jest.fn(),
 });
 
 test("requires an explicit release version", async () => {
@@ -44,7 +43,7 @@ test("does not require a release version for release-wait", async () => {
   await expect(runReleaseCommand({ command: "release-wait" }, deps)).resolves.toBeUndefined();
 });
 
-test("runs the prepared release transaction and verifies its tag", async () => {
+test("runs the prepared release transaction without waiting for workflow checks", async () => {
   const deps = base();
   deps.fs.existsSync.mockImplementation((file) => file === "package.json");
   deps.fs.readFileSync.mockReturnValue(JSON.stringify({ version: "1.2.3" }));
@@ -59,11 +58,6 @@ test("runs the prepared release transaction and verifies its tag", async () => {
       dryRun: undefined,
     },
   );
-  expect(deps.startReleaseVerification).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.anything(),
-    expect.objectContaining({ version: "1.2.3" }),
-  );
 });
 
 test("release dry-run validates the version without running preflight", async () => {
@@ -73,7 +67,6 @@ test("release dry-run validates the version without running preflight", async ()
   await runReleaseCommand({ command: "release", version: "1.2.3", dryRun: true }, deps);
   expect(deps.runPreflight).not.toHaveBeenCalled();
   expect(deps.gitOperations).not.toHaveBeenCalled();
-  expect(deps.startReleaseVerification).not.toHaveBeenCalled();
 });
 
 test("blocks a package version mismatch and skips tag creation", async () => {
@@ -98,7 +91,6 @@ test.each(["--ignore-100x4", "--ignore-monolith-limits"])(
         {
           gitOperations,
           runPreflight,
-          startReleaseVerification: jest.fn(),
           exit,
           log,
           registerHandlersFn: jest.fn(),

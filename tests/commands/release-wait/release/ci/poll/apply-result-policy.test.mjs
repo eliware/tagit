@@ -13,7 +13,6 @@ const baseDetails = {
 test("returns merged details for a completed run", () => {
   expect(
     applyReleaseCiResultPolicy(candidate, baseDetails, {
-      linksOnly: false,
       log: { info: jest.fn() },
     }),
   ).toMatchObject({ databaseId: 7, headSha: "abc", headBranch: "v1.2.3" });
@@ -27,7 +26,6 @@ test("throws a named release error for a failed run", () => {
   };
   try {
     applyReleaseCiResultPolicy(candidate, details, {
-      linksOnly: false,
       log: { info: jest.fn() },
       workflowLabel: "npm",
     });
@@ -38,34 +36,6 @@ test("throws a named release error for a failed run", () => {
   }
 });
 
-test("reports links for a failed run in links-only mode", () => {
-  const details = { ...baseDetails, conclusion: "failure", url: "run-url" };
-  expect(
-    applyReleaseCiResultPolicy(candidate, details, {
-      linksOnly: true,
-      log: { info: jest.fn() },
-    }),
-  ).toMatchObject({ databaseId: 7, url: "run-url", linksOnly: true });
-});
-
-test("does not check completed CI jobs in links-only mode", () => {
-  expect(
-    applyReleaseCiResultPolicy(
-      candidate,
-      {
-        ...baseDetails,
-        jobs: [{ name: "validate", status: "completed", conclusion: "failure" }],
-      },
-      {
-        linksOnly: true,
-        log: { info: jest.fn() },
-        workflowPath: ".github/workflows/ci.yaml",
-        runnerLabelsByJobName: { validate: ["ubuntu"] },
-      },
-    ),
-  ).toMatchObject({ databaseId: 7, linksOnly: true });
-});
-
 test("reports a pending run and returns pending state", () => {
   const log = { info: jest.fn() };
   expect(
@@ -73,7 +43,6 @@ test("reports a pending run and returns pending state", () => {
       candidate,
       { ...baseDetails, status: "in_progress" },
       {
-        linksOnly: false,
         log,
       },
     ),

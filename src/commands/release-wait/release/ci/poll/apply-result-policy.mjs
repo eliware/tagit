@@ -1,19 +1,7 @@
 import mergeReleaseRun from "../../../merge-release-run.mjs";
 import formatReleasePollFailure from "./failure-message.mjs";
 
-export default function applyReleaseCiResultPolicy(
-  candidate,
-  details,
-  { linksOnly, log, workflowLabel },
-) {
-  if (linksOnly) {
-    return {
-      ...candidate,
-      url: details.url,
-      jobs: details.jobs,
-      linksOnly: true,
-    };
-  }
+export default function applyReleaseCiResultPolicy(candidate, details, { log, workflowLabel }) {
   const failure = formatReleasePollFailure(details, workflowLabel);
   if (failure) {
     const error = new Error(failure);

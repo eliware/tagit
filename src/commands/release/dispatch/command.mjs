@@ -13,7 +13,6 @@ export default async function runReleaseCommand(
     gitOperations,
     runPreflight,
     verifyRelease,
-    startReleaseVerification,
     output = console.log,
   },
 ) {
@@ -32,9 +31,7 @@ export default async function runReleaseCommand(
   await dispatchReleaseOperation(options, {
     fs,
     execFileSync,
-    execFile,
     log,
     gitOperations,
-    startReleaseVerification,
   });
 }

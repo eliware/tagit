@@ -26,7 +26,7 @@ Run `git tag --list` to inspect local tags. Run `git fetch --tags origin` to fet
 
 Tagit checks the highest reachable three-part semantic release tag, such as `v1.2.3`. It skips prerelease and non-version tags.
 
-## Release does not find a workflow run
+## Release wait does not find a workflow run
 
 Check if the release commit and tag reached `origin` before you retry the release command. Run `git log -1 --oneline` and `git ls-remote --tags origin vX.Y.Z` to check the pushed refs.
 

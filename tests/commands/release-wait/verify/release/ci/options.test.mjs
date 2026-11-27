@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import buildReleaseCiPollOptions from "../../../../../../src/commands/release-wait/verify/release/ci/options.mjs";
 
-test.each([true, false])("builds shared CI poll options with linksOnly=%s", (linksOnly) => {
+test("builds shared CI poll options", () => {
   const options = {
     execFile: jest.fn(),
     repo: "eliware/demo",
@@ -10,7 +10,6 @@ test.each([true, false])("builds shared CI poll options with linksOnly=%s", (lin
     pollMs: 10,
     maxPolls: 3,
     sleep: jest.fn(),
-    linksOnly,
     log: { info: jest.fn() },
   };
   expect(buildReleaseCiPollOptions(options)).toEqual(options);
