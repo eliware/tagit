@@ -5,6 +5,7 @@ test("builds arguments to list release CI runs", () => {
     buildReleaseCiArgs("eliware/demo", {
       action: "list",
       headSha: "abc",
+      tag: "v1.0.0",
       workflowPath: ".github/workflows/ci.yaml",
     }),
   ).toEqual([
@@ -14,6 +15,8 @@ test("builds arguments to list release CI runs", () => {
     "eliware/demo",
     "--commit",
     "abc",
+    "--branch",
+    "v1.0.0",
     "--workflow",
     ".github/workflows/ci.yaml",
     "--limit",

@@ -13,7 +13,7 @@ export default async function readReleaseCiCandidate(
   try {
     runs = await readReleaseCiJson(
       execFile,
-      buildReleaseCiArgs(repo, { action: "list", headSha, workflowPath }),
+      buildReleaseCiArgs(repo, { action: "list", headSha, tag, workflowPath }),
     );
   } catch (error) {
     if (error instanceof SyntaxError) error.code = "ERR_RELEASE_CI_LIST_JSON";
