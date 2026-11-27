@@ -1,6 +1,12 @@
-import { readCompletedRun } from "../read/completed/run.mjs";
+import readCompletedRun from "../read/completed/run.mjs";
 
-export function verifyCompletedRun(execFileSync, log, run, headSha, runnerLabelsByJobName = {}) {
+export default function verifyCompletedRun(
+  execFileSync,
+  log,
+  run,
+  headSha,
+  runnerLabelsByJobName = {},
+) {
   const result = readCompletedRun(execFileSync, run.databaseId, headSha, runnerLabelsByJobName);
   if (result.passed) {
     log.info(`GitHub Actions CI verified for ${headSha}: ${result.platforms}.`);

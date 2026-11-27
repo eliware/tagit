@@ -1,5 +1,5 @@
-import { validateGhcrRepository } from "./validate-repository.mjs";
+import validateGhcrRepository from "./validate-repository.mjs";
 
-export function parseGhcrRepository(repository) {
+export default function parseGhcrRepository(repository) {
   return validateGhcrRepository(repository).split("/");
 }

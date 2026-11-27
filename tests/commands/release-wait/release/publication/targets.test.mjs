@@ -1,4 +1,4 @@
-import { selectReleasePublicationTargets } from "../../../../../src/commands/release-wait/release/publication/targets.mjs";
+import selectReleasePublicationTargets from "../../../../../src/commands/release-wait/release/publication/targets.mjs";
 
 test("selects applicable npm and GHCR publication targets", () => {
   expect(

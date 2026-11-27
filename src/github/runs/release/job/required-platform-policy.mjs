@@ -1,6 +1,6 @@
-import { hasAcceptedWorkflowJobStatus } from "../../job-status-policy.mjs";
+import hasAcceptedWorkflowJobStatus from "../../job-status-policy.mjs";
 
-export function enforceRequiredPlatformPolicy(jobs, ubuntuJobs, successful) {
+export default function enforceRequiredPlatformPolicy(jobs, ubuntuJobs, successful) {
   const failed = jobs.filter((job) => !hasAcceptedWorkflowJobStatus(job));
   if (failed.length)
     throw new Error(

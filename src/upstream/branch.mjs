@@ -1,4 +1,4 @@
-export function resolveUpstreamBranch(execFileSync) {
+export default function resolveUpstreamBranch(execFileSync) {
   try {
     return (
       execFileSync("git", ["symbolic-ref", "--short", "refs/remotes/upstream/HEAD"], {

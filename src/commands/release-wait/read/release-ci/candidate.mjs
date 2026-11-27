@@ -1,8 +1,8 @@
-import { selectReleaseRun } from "../../../../github/runs/release/run/selection.mjs";
-import { readReleaseCiJson } from "./json.mjs";
-import { createReleaseCiListArgs } from "./command.mjs";
+import selectReleaseRun from "../../../../github/runs/release/run/selection.mjs";
+import readReleaseCiJson from "./json.mjs";
+import createReleaseCiListArgs from "./command.mjs";
 
-export async function readReleaseCiCandidate(
+export default async function readReleaseCiCandidate(
   execFile,
   repo,
   headSha,

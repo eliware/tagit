@@ -1,4 +1,4 @@
-export function verifyReleaseTagStability(execFileSync, tag, tagObject) {
+export default function verifyReleaseTagStability(execFileSync, tag, tagObject) {
   const confirmedTagObject = execFileSync("git", ["rev-parse", `refs/tags/${tag}`])
     .toString()
     .trim();

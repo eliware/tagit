@@ -1,10 +1,10 @@
 import { execFile as defaultExecFile } from "node:child_process";
-import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
-import { resolveReleaseContext } from "../resolve/release-context.mjs";
-import { validateReleaseInput } from "../validate/input.mjs";
-import { reportReleaseVerificationStart } from "../report/release/start-verification.mjs";
+import sleepDefault from "../../../process/timing/sleep.mjs";
+import resolveReleaseContext from "../resolve/release-context.mjs";
+import validateReleaseInput from "../validate/input.mjs";
+import reportReleaseVerificationStart from "../report/release/start-verification.mjs";
 
-export async function startReleaseVerification(
+export default async function startReleaseVerification(
   execFileSync,
   log,
   {

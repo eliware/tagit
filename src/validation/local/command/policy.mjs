@@ -1,6 +1,6 @@
-import { hasInstalledSharedHarness } from "../installed-harness.mjs";
+import hasInstalledSharedHarness from "../installed-harness.mjs";
 
-export function validateTestCommand(packageData, fs) {
+export default function validateTestCommand(packageData, fs) {
   if (!packageData.scripts?.test) return "missing";
   const validScript =
     packageData.name === "@eliware/test"

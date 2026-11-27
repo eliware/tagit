@@ -1,4 +1,4 @@
-import { satisfiesDeclaredRange } from "../../../src/validation/local/satisfies-declared-range.mjs";
+import satisfiesDeclaredRange from "../../../src/validation/local/satisfies-declared-range.mjs";
 
 test("checks exact and tilde ranges", () => {
   expect(satisfiesDeclaredRange("4.0.1", "4.0.1")).toBe(true);

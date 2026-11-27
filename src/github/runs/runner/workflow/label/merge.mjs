@@ -1,4 +1,4 @@
-export function mergeWorkflowRunnerLabelEntries(entries) {
+export default function mergeWorkflowRunnerLabelEntries(entries) {
   const labelsByName = Object.create(null);
   const conflicts = new Set();
   for (const { name, labels } of entries) {

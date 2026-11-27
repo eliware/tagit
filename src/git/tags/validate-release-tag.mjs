@@ -1,4 +1,4 @@
-export function validateCurrentHead(head, tag) {
+export default function validateCurrentHead(head, tag) {
   const currentHead = String(head ?? "").trim();
   if (!/^[0-9a-f]{3,64}$/i.test(currentHead))
     throw new Error("Cannot release without a valid current commit SHA.");

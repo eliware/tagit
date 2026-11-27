@@ -1,7 +1,7 @@
-import { verifyNpmRegistry } from "../registries/npm-check.mjs";
-import { verifyRegistryGhcrCheck } from "./ghcr-check.mjs";
+import verifyNpmRegistry from "../registries/npm-check.mjs";
+import verifyRegistryGhcrCheck from "./ghcr-check.mjs";
 
-export async function verifyRegistryChecks({
+export default async function verifyRegistryChecks({
   fs,
   execFile,
   log,

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportReleaseStart } from "../../../../../src/commands/release-wait/report/release/start.mjs";
+import reportReleaseStart from "../../../../../src/commands/release-wait/report/release/start.mjs";
 
 test("reports the CI run after it starts", async () => {
   const poll = jest.fn(async () => ({ databaseId: 1, url: "ci-url", jobs: [] }));

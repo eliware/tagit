@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { mergeUpstream } from "../../../src/upstream/merge/upstream.mjs";
+import mergeUpstream from "../../../src/upstream/merge/upstream.mjs";
 
 test("merges successfully", () => {
   const exec = jest.fn();

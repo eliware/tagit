@@ -1,5 +1,5 @@
-import { windowsCiPolicy } from "../../src/policy/windows-ci-policy.mjs";
-import { enforceReleaseJobPolicy } from "../../src/github/runs/release/job/acceptance-policy.mjs";
+import windowsCiPolicy from "../../src/policy/windows-ci-policy.mjs";
+import enforceReleaseJobPolicy from "../../src/github/runs/release/job/acceptance-policy.mjs";
 
 const successful = (job) => job.status === "completed" && job.conclusion === "success";
 test("treats absent Windows CI as optional", () => {

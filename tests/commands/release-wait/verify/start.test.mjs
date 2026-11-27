@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-const { startReleaseVerification } =
+const { default: startReleaseVerification } =
   await import("../../../../src/commands/release-wait/verify/start.mjs");
 
 const log = { info: jest.fn() };

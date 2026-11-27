@@ -1,4 +1,4 @@
-export function mergeReleaseRun(candidate, details) {
+export default function mergeReleaseRun(candidate, details) {
   return {
     ...candidate,
     ...details,

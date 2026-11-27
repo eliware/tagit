@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { dispatchPreflight } from "../../../../src/commands/release/dispatch/preflight.mjs";
+import dispatchPreflight from "../../../../src/commands/release/dispatch/preflight.mjs";
 
 test("builds preflight options at the dispatch boundary", () => {
   const runPreflight = jest.fn();

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runGit } from "../../../src/git/commands/run-git.mjs";
+import runGit from "../../../src/git/commands/run-git.mjs";
 
 test("runs git with forwarded arguments and options", () => {
   const exec = jest.fn();

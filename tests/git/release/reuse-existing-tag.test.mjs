@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reuseExistingReleaseTag } from "../../../src/git/release/reuse-existing-tag.mjs";
+import reuseExistingReleaseTag from "../../../src/git/release/reuse-existing-tag.mjs";
 
 test("returns null when the release tag does not exist", () => {
   const runGit = jest.fn(() => "");

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportGhcrPublication } from "../../../../src/registries/ghcr/verify/report-publication.mjs";
+import reportGhcrPublication from "../../../../src/registries/ghcr/verify/report-publication.mjs";
 
 test("reports publication success and the image digest", () => {
   const log = { info: jest.fn() };

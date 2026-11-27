@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runTagit } from "../../../../src/cli/application/run/tagit.mjs";
+import runTagit from "../../../../src/cli/application/run/tagit.mjs";
 import packageData from "../../../../package.json" with { type: "json" };
 
 const noop = jest.fn();

@@ -1,7 +1,7 @@
-import { validateCurrentHead } from "../tags/validate-release-tag.mjs";
-import { reuseExistingReleaseTag } from "./reuse-existing-tag.mjs";
+import validateCurrentHead from "../tags/validate-release-tag.mjs";
+import reuseExistingReleaseTag from "./reuse-existing-tag.mjs";
 
-export function createReleaseCommit(runGit, version, tag, date = new Date()) {
+export default function createReleaseCommit(runGit, version, tag, date = new Date()) {
   const { currentHead: head } = validateCurrentHead(
     runGit(["rev-parse", "HEAD"], { encoding: "utf8" }),
     null,

@@ -1,4 +1,4 @@
-export function addWorkflowRunnerLabels(jobs, runnerLabelsByJobName = {}) {
+export default function addWorkflowRunnerLabels(jobs, runnerLabelsByJobName = {}) {
   return jobs.map((job) => {
     const labels = Array.isArray(job.labels) ? job.labels : [];
     return {

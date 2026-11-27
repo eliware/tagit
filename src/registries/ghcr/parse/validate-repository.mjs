@@ -1,4 +1,4 @@
-export function validateGhcrRepository(repository) {
+export default function validateGhcrRepository(repository) {
   const part = /^[A-Za-z0-9](?:[A-Za-z0-9_.-]*[A-Za-z0-9])?$/;
   if (
     !repository ||

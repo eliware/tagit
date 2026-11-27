@@ -1,6 +1,6 @@
-import { validateCiRunRecords } from "./validate-ci-run-records.mjs";
+import validateCiRunRecords from "./validate-ci-run-records.mjs";
 
-export function readCiRuns(execFileSync, repo, headSha) {
+export default function readCiRuns(execFileSync, repo, headSha) {
   const parsed = JSON.parse(
     execFileSync(
       "gh",

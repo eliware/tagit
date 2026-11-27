@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { dispatchUpstreamInformation } from "../../../../src/upstream/cli/information/dispatch.mjs";
+import dispatchUpstreamInformation from "../../../../src/upstream/cli/information/dispatch.mjs";
 
 test("dispatches selected help information", () => {
   const log = { log: jest.fn() };

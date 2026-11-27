@@ -1,8 +1,8 @@
-import { validateJobRecords } from "../../../../validation/ci/validate/job-records.mjs";
-import { validateReleaseRunDetailsShape } from "./details-shape.mjs";
-import { validateReleaseRunIdentity } from "./identity.mjs";
+import validateJobRecords from "../../../../validation/ci/validate/job-records.mjs";
+import validateReleaseRunDetailsShape from "./details-shape.mjs";
+import validateReleaseRunIdentity from "./identity.mjs";
 
-export function validateReleaseRunDetails(
+export default function validateReleaseRunDetails(
   details,
   candidate,
   headSha,

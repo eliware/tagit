@@ -1,4 +1,4 @@
-export function readGhcrPublication(fs) {
+export default function readGhcrPublication(fs) {
   if (!fs.existsSync("package.json")) return null;
   return JSON.parse(fs.readFileSync("package.json", "utf8"));
 }

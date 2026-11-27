@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { dispatchReleaseOperation } from "../../../../../src/commands/release/dispatch/release/operation-dispatch.mjs";
+import dispatchReleaseOperation from "../../../../../src/commands/release/dispatch/release/operation-dispatch.mjs";
 
 test("forwards release options and dependencies to the release command", async () => {
   const options = { version: "1.0.0" };

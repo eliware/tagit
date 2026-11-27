@@ -1,4 +1,4 @@
-import { readNpmErrorDetail } from "../../../../src/registries/npm/error/detail.mjs";
+import readNpmErrorDetail from "../../../../src/registries/npm/error/detail.mjs";
 
 test("prefers stderr over stdout and message", () => {
   expect(readNpmErrorDetail({ stderr: "stderr", stdout: "stdout", message: "message" })).toBe(

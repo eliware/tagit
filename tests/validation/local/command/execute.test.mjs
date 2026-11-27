@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { buildTestCheck } from "../../../../src/validation/local/command/execute.mjs";
+import buildTestCheck from "../../../../src/validation/local/command/execute.mjs";
 
 const fs = {
   existsSync: jest.fn(() => true),

@@ -1,4 +1,4 @@
-export function assertUnambiguousReleaseRunTimestamps(eligibleRuns, tag) {
+export default function assertUnambiguousReleaseRunTimestamps(eligibleRuns, tag) {
   if (
     eligibleRuns.length > 1 &&
     eligibleRuns.some((item) => !item.createdAt) &&

@@ -1,10 +1,10 @@
-import { publishesGhcr } from "../../../registries/ghcr/discover-publication.mjs";
-import { readPackageData } from "./package-data.mjs";
-import { noPublicationTarget } from "./no-publication-target.mjs";
-import { readNpmPublicationTarget } from "./npm-target.mjs";
-import { buildPublicationWorkflowTargets } from "./workflow-targets.mjs";
+import publishesGhcr from "../../../registries/ghcr/discover-publication.mjs";
+import readPackageData from "./package-data.mjs";
+import noPublicationTarget from "./no-publication-target.mjs";
+import readNpmPublicationTarget from "./npm-target.mjs";
+import buildPublicationWorkflowTargets from "./workflow-targets.mjs";
 
-export function readPublicationTarget(fs) {
+export default function readPublicationTarget(fs) {
   const packageData = readPackageData(fs);
   if (packageData === null) return noPublicationTarget();
   const npmTarget = readNpmPublicationTarget(fs, packageData);

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { gitOperations } from "../../../src/git/release/operate-release.mjs";
+import gitOperations from "../../../src/git/release/operate-release.mjs";
 
 const log = () => ({ info: jest.fn(), error: jest.fn() });
 

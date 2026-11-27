@@ -1,4 +1,4 @@
-import { resolveExecutable } from "../../../src/process/commands/resolve-executable.mjs";
+import resolveExecutable from "../../../src/process/commands/resolve-executable.mjs";
 
 test("resolves Windows command shims only where required", () => {
   expect(resolveExecutable("npm", "win32")).toBe("npm.cmd");

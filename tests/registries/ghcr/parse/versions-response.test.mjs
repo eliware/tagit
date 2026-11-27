@@ -1,4 +1,4 @@
-import { parseGhcrVersionsResponse } from "../../../../src/registries/ghcr/parse/versions-response.mjs";
+import parseGhcrVersionsResponse from "../../../../src/registries/ghcr/parse/versions-response.mjs";
 
 test("selects the image with the requested version tag", () => {
   const image = { name: "image", metadata: { container: { tags: ["v2.0.0"] } } };

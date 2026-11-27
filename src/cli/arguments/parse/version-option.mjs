@@ -1,6 +1,6 @@
-import { isReleaseVersion } from "../../../versioning/is-release-version.mjs";
+import isReleaseVersion from "../../../versioning/is-release-version.mjs";
 
-export function parseVersionOption(argv, { required = false } = {}) {
+export default function parseVersionOption(argv, { required = false } = {}) {
   const index = argv.findIndex((argument) => argument === "--version");
   if (index === -1) {
     if (required) throw new Error("A release version is required.");

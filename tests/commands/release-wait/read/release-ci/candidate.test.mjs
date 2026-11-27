@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readReleaseCiCandidate } from "../../../../../src/commands/release-wait/read/release-ci/candidate.mjs";
+import readReleaseCiCandidate from "../../../../../src/commands/release-wait/read/release-ci/candidate.mjs";
 
 test("reads and selects the release workflow candidate", async () => {
   const execFile = jest.fn((_command, _args, _options, callback) =>

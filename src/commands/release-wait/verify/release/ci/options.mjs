@@ -1,4 +1,4 @@
-export function buildReleaseCiPollOptions({
+export default function buildReleaseCiPollOptions({
   execFile,
   repo,
   headSha,

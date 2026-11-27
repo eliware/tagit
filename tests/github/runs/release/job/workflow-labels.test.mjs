@@ -1,4 +1,4 @@
-import { addWorkflowRunnerLabels } from "../../../../../src/github/runs/release/job/workflow-labels.mjs";
+import addWorkflowRunnerLabels from "../../../../../src/github/runs/release/job/workflow-labels.mjs";
 
 test("adds workflow labels only when a job has no direct labels", () => {
   const jobs = [{ name: "validate" }, { name: "publish", labels: ["windows-latest"] }];

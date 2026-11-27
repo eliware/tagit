@@ -1,4 +1,4 @@
-import { evaluateJobPolicy } from "../../../src/validation/ci/evaluate-job-policy.mjs";
+import evaluateJobPolicy from "../../../src/validation/ci/evaluate-job-policy.mjs";
 
 const success = (job) => job.status === "completed" && job.conclusion === "success";
 

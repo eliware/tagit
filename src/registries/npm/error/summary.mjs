@@ -1,6 +1,6 @@
-import { classifyNpmError } from "./classification.mjs";
-import { classifyNpmErrorSummary } from "./summary/classify.mjs";
+import classifyNpmError from "./classification.mjs";
+import classifyNpmErrorSummary from "./summary/classify.mjs";
 
-export function npmErrorSummary(error) {
+export default function npmErrorSummary(error) {
   return classifyNpmErrorSummary(classifyNpmError(error));
 }

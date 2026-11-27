@@ -1,4 +1,4 @@
-export function reportReleaseFailure(log, error, remoteSideEffects) {
+export default function reportReleaseFailure(log, error, remoteSideEffects) {
   log.error(
     remoteSideEffects
       ? "Atomic release push failed. Check the remote branch and tag before retrying."

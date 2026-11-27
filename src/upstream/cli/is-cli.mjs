@@ -1,6 +1,6 @@
-import { normalizeCliExecutableName } from "../../cli/application/executable-name.mjs";
+import normalizeCliExecutableName from "../../cli/application/executable-name.mjs";
 
-export function isUpstreamCli(argv) {
+export default function isUpstreamCli(argv) {
   const executable = normalizeCliExecutableName(argv[1]);
   return ["upstream", "upstream.mjs", "upstream-cli.mjs"].includes(executable);
 }

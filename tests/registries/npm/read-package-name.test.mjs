@@ -1,4 +1,4 @@
-import { readPackageName } from "../../../src/registries/npm/read-package-name.mjs";
+import readPackageName from "../../../src/registries/npm/read-package-name.mjs";
 
 test("reads a package name when package metadata exists", () => {
   expect(readPackageName({ existsSync: () => true, readFileSync: () => '{"name":"demo"}' })).toBe(

@@ -1,4 +1,4 @@
-import { throwPreflightFailures } from "../../../src/validation/preflight/report.mjs";
+import throwPreflightFailures from "../../../src/validation/preflight/report.mjs";
 
 test("does nothing when preflight has no failures", () => {
   expect(() => throwPreflightFailures([])).not.toThrow();

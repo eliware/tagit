@@ -1,7 +1,7 @@
-import { pushExistingCommits } from "./existing-commits.mjs";
-import { reportPushResult } from "./report-result.mjs";
+import pushExistingCommits from "./existing-commits.mjs";
+import reportPushResult from "./report-result.mjs";
 
-export function runPushCommand({ execFileSync, reportCiLinks, log, exit, dryRun }) {
+export default function runPushCommand({ execFileSync, reportCiLinks, log, exit, dryRun }) {
   if (dryRun) {
     log.info("Dry run: no commits were pushed and no CI lookup was performed.");
     return;

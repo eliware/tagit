@@ -1,3 +1,3 @@
-export function buildNpmViewArguments(packageName, version) {
+export default function buildNpmViewArguments(packageName, version) {
   return ["view", `${packageName}@${version}`, "version", "--json"];
 }

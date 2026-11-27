@@ -1,4 +1,4 @@
-import { processOptions } from "../../../../src/validation/local/process/options.mjs";
+import processOptions from "../../../../src/validation/local/process/options.mjs";
 
 test("keeps Windows command execution shell-free", () => {
   expect(processOptions("cmd.exe", 120000)).toEqual({

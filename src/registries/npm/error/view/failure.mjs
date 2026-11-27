@@ -1,5 +1,5 @@
-import { npmErrorSummary } from "../summary.mjs";
+import npmErrorSummary from "../summary.mjs";
 
-export function reportNpmViewFailure(log, status, error) {
+export default function reportNpmViewFailure(log, status, error) {
   log.info?.(`${status}: failed (${npmErrorSummary(error)}).`);
 }

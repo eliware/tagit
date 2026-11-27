@@ -1,7 +1,14 @@
-import { verifyReleaseCi } from "../ci.mjs";
-import { reportReleaseCiLinks } from "./links.mjs";
+import verifyReleaseCi from "../ci.mjs";
+import reportReleaseCiLinks from "./links.mjs";
 
-export async function checkReleaseCi({ poll, common, log, repo, tag, runnerLabelsByJobName }) {
+export default async function checkReleaseCi({
+  poll,
+  common,
+  log,
+  repo,
+  tag,
+  runnerLabelsByJobName,
+}) {
   const run = await poll({
     ...common,
     workflowPath: ".github/workflows/ci.yaml",

@@ -1,4 +1,4 @@
-import { buildCompletedRunResult } from "../../../../../src/validation/ci/read/completed/run-result.mjs";
+import buildCompletedRunResult from "../../../../../src/validation/ci/read/completed/run-result.mjs";
 
 const data = { status: "completed", conclusion: "success", headSha: "abc" };
 const policy = {

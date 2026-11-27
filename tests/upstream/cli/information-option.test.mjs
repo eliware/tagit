@@ -1,4 +1,4 @@
-import { selectInformationOption } from "../../../src/upstream/cli/information-option.mjs";
+import selectInformationOption from "../../../src/upstream/cli/information-option.mjs";
 
 test.each([
   ["--help", "help"],

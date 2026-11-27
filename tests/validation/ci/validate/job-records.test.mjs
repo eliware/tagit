@@ -1,4 +1,4 @@
-import { validateJobRecords } from "../../../../src/validation/ci/validate/job-records.mjs";
+import validateJobRecords from "../../../../src/validation/ci/validate/job-records.mjs";
 
 test("accepts valid jobs", () => {
   const jobs = [{ name: "ubuntu", status: "completed", conclusion: "success" }];

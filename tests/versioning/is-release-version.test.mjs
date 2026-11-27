@@ -1,4 +1,4 @@
-import { isReleaseVersion } from "../../src/versioning/is-release-version.mjs";
+import isReleaseVersion from "../../src/versioning/is-release-version.mjs";
 
 test.each(["0.0.0", "1.2.3", "12.30.400"])("accepts numeric release version %s", (version) => {
   expect(isReleaseVersion(version)).toBe(true);

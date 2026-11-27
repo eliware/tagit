@@ -1,4 +1,4 @@
-export function runProcess(execFileSync, executable, args = [], options = {}) {
+export default function runProcess(execFileSync, executable, args = [], options = {}) {
   if (typeof execFileSync !== "function")
     throw new TypeError("A synchronous process runner is required.");
   if (typeof executable !== "string" || !executable)

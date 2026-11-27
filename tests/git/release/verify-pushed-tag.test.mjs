@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyPushedTag } from "../../../src/git/release/verify-pushed-tag.mjs";
+import verifyPushedTag from "../../../src/git/release/verify-pushed-tag.mjs";
 
 test("reads and verifies the remote release tag", () => {
   const git = jest.fn(() => "tag-object\trefs/tags/v1.0.0\nabc\trefs/tags/v1.0.0^{}\n");

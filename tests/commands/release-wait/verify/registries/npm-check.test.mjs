@@ -2,10 +2,10 @@ import { jest } from "@jest/globals";
 
 const verifyNpmPublication = jest.fn(async () => {});
 jest.unstable_mockModule("../../../../../src/registries/npm/verify-publication.mjs", () => ({
-  verifyNpmPublication,
+  default: verifyNpmPublication,
 }));
 
-const { verifyNpmRegistry } =
+const { default: verifyNpmRegistry } =
   await import("../../../../../src/commands/release-wait/verify/registries/npm-check.mjs");
 
 beforeEach(() => jest.clearAllMocks());

@@ -1,4 +1,4 @@
-import { validateReleaseRunDetailsShape } from "../../../../../src/commands/release-wait/validate-release/run/details-shape.mjs";
+import validateReleaseRunDetailsShape from "../../../../../src/commands/release-wait/validate-release/run/details-shape.mjs";
 
 const validDetails = {
   databaseId: 1,

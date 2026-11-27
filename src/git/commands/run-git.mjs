@@ -1,3 +1,3 @@
-export function runGit(execFileSync, args, options = {}) {
+export default function runGit(execFileSync, args, options = {}) {
   return execFileSync("git", args, options);
 }

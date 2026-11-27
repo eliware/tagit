@@ -1,6 +1,6 @@
-import { selectReleasePublicationTargets } from "../../../release/publication/targets.mjs";
+import selectReleasePublicationTargets from "../../../release/publication/targets.mjs";
 
-export function buildReleasePublicationPlan(publication) {
+export default function buildReleasePublicationPlan(publication) {
   const selection = selectReleasePublicationTargets(publication);
   return {
     ...selection,

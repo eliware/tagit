@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyReleasePublicationWorkflow } from "../../../../../../src/commands/release-wait/verify/release/publication/workflow.mjs";
+import verifyReleasePublicationWorkflow from "../../../../../../src/commands/release-wait/verify/release/publication/workflow.mjs";
 
 test("verifies publication workflow jobs and reports links", () => {
   const log = { info: jest.fn() };

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runProcess } from "../../../src/process/sync/run-process.mjs";
+import runProcess from "../../../src/process/sync/run-process.mjs";
 
 test("runs an injected synchronous process without shell parsing", () => {
   const exec = jest.fn(() => "output");

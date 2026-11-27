@@ -1,4 +1,4 @@
-export async function runProcessAsync(execFile, executable, args = [], options = {}) {
+export default async function runProcessAsync(execFile, executable, args = [], options = {}) {
   if (typeof execFile !== "function")
     throw new TypeError("An asynchronous process runner is required.");
   if (typeof executable !== "string" || !executable)

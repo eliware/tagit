@@ -1,6 +1,6 @@
 {
   "name": "@eliware/tagit",
-  "version": "15.1.0",
+  "version": "15.2.0",
   "type": "module",
   "description": "Deterministic release preflight and publication verification for Eliware packages.",
   "keywords": [
@@ -55,7 +55,7 @@
     "@eliware/common": "^15.0.1"
   },
   "devDependencies": {
-    "@eliware/test": "^15.1.0"
+    "@eliware/test": "^15.2.0"
   },
   "jest": {
     "testEnvironment": "node",

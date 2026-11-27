@@ -1,7 +1,7 @@
-import { execFileCommand } from "../../process/async/exec-file-command.mjs";
-import { reportNpmViewAttempt } from "./error/view/report-attempt.mjs";
+import execFileCommand from "../../process/async/exec-file-command.mjs";
+import reportNpmViewAttempt from "./error/view/report-attempt.mjs";
 
-export async function checkNpmPublicationAttempt(
+export default async function checkNpmPublicationAttempt(
   execFile,
   log,
   { command, packageName, version, attempt, retries },

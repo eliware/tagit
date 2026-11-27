@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyReleaseTagStability } from "../../../../src/commands/release-wait/resolve/tag-stability.mjs";
+import verifyReleaseTagStability from "../../../../src/commands/release-wait/resolve/tag-stability.mjs";
 
 test("confirms that a tag object remains unchanged", () => {
   const execFileSync = jest.fn(() => "tag-object\n");

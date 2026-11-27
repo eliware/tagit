@@ -1,4 +1,4 @@
-import { noPublicationTarget } from "../../../../src/commands/release-wait/read/no-publication-target.mjs";
+import noPublicationTarget from "../../../../src/commands/release-wait/read/no-publication-target.mjs";
 
 test("returns the empty publication target result", () => {
   expect(noPublicationTarget()).toEqual({

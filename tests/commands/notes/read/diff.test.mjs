@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readNotesDiff } from "../../../../src/commands/notes/read/diff.mjs";
+import readNotesDiff from "../../../../src/commands/notes/read/diff.mjs";
 
 test("reads and trims the source diff without generated files", () => {
   const execFileSync = jest.fn(() => "+change\n");

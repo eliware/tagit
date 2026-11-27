@@ -1,8 +1,8 @@
-import { hasGhcrPublicationProfile } from "./publication/policy.mjs";
-import { readGhcrPublication } from "./publication/reader.mjs";
-import { hasGhcrPublicationWorkflow } from "./publication/workflow-policy.mjs";
+import hasGhcrPublicationProfile from "./publication/policy.mjs";
+import readGhcrPublication from "./publication/reader.mjs";
+import hasGhcrPublicationWorkflow from "./publication/workflow-policy.mjs";
 
-export function publishesGhcr(fs, providedPackageData = undefined) {
+export default function publishesGhcr(fs, providedPackageData = undefined) {
   const packageData =
     providedPackageData === undefined ? readGhcrPublication(fs) : providedPackageData;
   return (

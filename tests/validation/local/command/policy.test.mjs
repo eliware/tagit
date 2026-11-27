@@ -1,4 +1,4 @@
-import { validateTestCommand } from "../../../../src/validation/local/command/policy.mjs";
+import validateTestCommand from "../../../../src/validation/local/command/policy.mjs";
 
 const fs = {
   existsSync: () => true,

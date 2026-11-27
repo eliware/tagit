@@ -1,9 +1,9 @@
-import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
-import { parseGhcrRepository } from "../parse/repository.mjs";
-import { pollGhcrVisibility } from "../poll-visibility.mjs";
-import { finalizeGhcrPublication } from "./finalize-publication.mjs";
+import sleepDefault from "../../../process/timing/sleep.mjs";
+import parseGhcrRepository from "../parse/repository.mjs";
+import pollGhcrVisibility from "../poll-visibility.mjs";
+import finalizeGhcrPublication from "./finalize-publication.mjs";
 
-export async function verifyGhcrPublication(
+export default async function verifyGhcrPublication(
   execFile,
   log,
   {

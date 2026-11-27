@@ -1,4 +1,4 @@
-import { normalizeCliExecutableName } from "../../../src/cli/application/executable-name.mjs";
+import normalizeCliExecutableName from "../../../src/cli/application/executable-name.mjs";
 
 test.each([
   ["/opt/tagit/bin/tagit.mjs", "tagit.mjs"],

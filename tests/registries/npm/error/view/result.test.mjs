@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportNpmViewResult } from "../../../../../src/registries/npm/error/view/result.mjs";
+import reportNpmViewResult from "../../../../../src/registries/npm/error/view/result.mjs";
 
 test("reports available and missing npm versions", () => {
   const log = { info: jest.fn() };

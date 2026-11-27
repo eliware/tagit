@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pushTag } from "../../../src/git/tags/push-tag.mjs";
+import pushTag from "../../../src/git/tags/push-tag.mjs";
 
 test("pushes only the release tag to origin", () => {
   const runGit = jest.fn();

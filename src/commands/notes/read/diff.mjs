@@ -1,4 +1,4 @@
-export function readNotesDiff(execFileSync, tag) {
+export default function readNotesDiff(execFileSync, tag) {
   return execFileSync(
     "git",
     [

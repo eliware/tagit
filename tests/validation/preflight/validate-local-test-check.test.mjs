@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { validateLocalTestCheck } from "../../../src/validation/preflight/validate-local-test-check.mjs";
+import validateLocalTestCheck from "../../../src/validation/preflight/validate-local-test-check.mjs";
 
 test("builds the authoritative shared-harness check with requested waivers", () => {
   const fs = {

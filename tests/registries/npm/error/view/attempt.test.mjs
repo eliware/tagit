@@ -5,19 +5,19 @@ const classifyNpmViewAvailability = jest.fn();
 const classifyNpmViewFailure = jest.fn();
 jest.unstable_mockModule(
   "../../../../../src/registries/npm/error/view/result/response-reader.mjs",
-  () => ({ readNpmViewResponse }),
+  () => ({ default: readNpmViewResponse }),
 );
 jest.unstable_mockModule(
   "../../../../../src/registries/npm/error/view/result/availability-policy.mjs",
-  () => ({ classifyNpmViewAvailability }),
+  () => ({ default: classifyNpmViewAvailability }),
 );
 jest.unstable_mockModule(
   "../../../../../src/registries/npm/error/view/result/failure-policy.mjs",
   () => ({
-    classifyNpmViewFailure,
+    default: classifyNpmViewFailure,
   }),
 );
-const { classifyNpmViewAttempt } =
+const { default: classifyNpmViewAttempt } =
   await import("../../../../../src/registries/npm/error/view/attempt.mjs");
 
 beforeEach(() => {

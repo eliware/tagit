@@ -4,10 +4,10 @@ const verifyReleasePublication = jest.fn();
 
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/release/publication.mjs",
-  () => ({ verifyReleasePublication }),
+  () => ({ default: verifyReleasePublication }),
 );
 
-const { checkReleasePublication } =
+const { default: checkReleasePublication } =
   await import("../../../../../src/commands/release-wait/verify/release/publication-check.mjs");
 
 test("forwards polled publication runs and target data to verification", async () => {

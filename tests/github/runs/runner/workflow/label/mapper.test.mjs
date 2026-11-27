@@ -1,4 +1,4 @@
-import { mapWorkflowJobRunnerLabels } from "../../../../../../src/github/runs/runner/workflow/label/mapper.mjs";
+import mapWorkflowJobRunnerLabels from "../../../../../../src/github/runs/runner/workflow/label/mapper.mjs";
 
 test("maps parsed job ids and display names to runner labels", () => {
   expect(

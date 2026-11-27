@@ -1,7 +1,7 @@
-import { selectSuccessfulPublishJobs } from "../../verify/publish/job.mjs";
-import { requirePublishJob } from "../../verify/publish/policy.mjs";
+import selectSuccessfulPublishJobs from "../../verify/publish/job.mjs";
+import requirePublishJob from "../../verify/publish/policy.mjs";
 
-export function verifyPublicationJobs({ targets, publicationRuns, repo, tag, log }) {
+export default function verifyPublicationJobs({ targets, publicationRuns, repo, tag, log }) {
   const verifiedPublications = [];
   for (const target of targets) {
     const publication = publicationRuns.find((item) => item.profile === target.profile);

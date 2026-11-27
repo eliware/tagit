@@ -1,9 +1,9 @@
-import { readReleaseCiCandidate } from "../../../read/release-ci/candidate.mjs";
-import { readReleaseCiDetails } from "../../../read/release-ci/details.mjs";
-import { validateReleaseRunDetails } from "../../../validate-release/run/details.mjs";
-import { applyReleaseCiResultPolicy } from "./result.mjs";
+import readReleaseCiCandidate from "../../../read/release-ci/candidate.mjs";
+import readReleaseCiDetails from "../../../read/release-ci/details.mjs";
+import validateReleaseRunDetails from "../../../validate-release/run/details.mjs";
+import applyReleaseCiResultPolicy from "./result.mjs";
 
-export async function runReleaseCiPollAttempt({
+export default async function runReleaseCiPollAttempt({
   execFile,
   repo,
   headSha,

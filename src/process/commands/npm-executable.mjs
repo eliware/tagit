@@ -1,3 +1,3 @@
-export function npmExecutable(platform = process.platform) {
+export default function npmExecutable(platform = process.platform) {
   return platform === "win32" ? "npm.cmd" : "npm";
 }

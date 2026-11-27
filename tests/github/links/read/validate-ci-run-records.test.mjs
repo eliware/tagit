@@ -1,4 +1,4 @@
-import { validateCiRunRecords } from "../../../../src/github/links/read/validate-ci-run-records.mjs";
+import validateCiRunRecords from "../../../../src/github/links/read/validate-ci-run-records.mjs";
 
 test("accepts an array of valid CI run link records", () => {
   const runs = [{ databaseId: 1, url: "run", headSha: "abc" }];

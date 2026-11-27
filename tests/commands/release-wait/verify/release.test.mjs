@@ -3,10 +3,11 @@ import { jest } from "@jest/globals";
 const verifyReleaseCompletion = jest.fn(async () => ({ ci: true }));
 jest.unstable_mockModule(
   "../../../../src/commands/release-wait/verify/release/completion.mjs",
-  () => ({ verifyReleaseCompletion }),
+  () => ({ default: verifyReleaseCompletion }),
 );
 
-const { verifyRelease } = await import("../../../../src/commands/release-wait/verify/release.mjs");
+const { default: verifyRelease } =
+  await import("../../../../src/commands/release-wait/verify/release.mjs");
 
 const log = { info: jest.fn() };
 const input = {

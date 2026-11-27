@@ -1,6 +1,6 @@
-import { readNpmErrorDetail } from "./detail.mjs";
+import readNpmErrorDetail from "./detail.mjs";
 
-export function classifyNpmError(error) {
+export default function classifyNpmError(error) {
   const detail = readNpmErrorDetail(error);
   if (/\b404\b|E404|Not Found/i.test(detail)) return { type: "not-found" };
   if (error.code) return { type: "code", code: String(error.code) };

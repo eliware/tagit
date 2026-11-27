@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportCiResult } from "../../../../src/commands/release-wait/report/ci-result.mjs";
+import reportCiResult from "../../../../src/commands/release-wait/report/ci-result.mjs";
 
 test("reports links-only CI results", () => {
   const log = { info: jest.fn() };

@@ -1,4 +1,4 @@
-import { validateCompletedConclusion } from "../../../../src/validation/ci/validate/completed-conclusion.mjs";
+import validateCompletedConclusion from "../../../../src/validation/ci/validate/completed-conclusion.mjs";
 
 test("accepts successful and pending conclusions", () => {
   expect(() =>

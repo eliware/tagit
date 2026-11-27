@@ -1,6 +1,6 @@
-import { verifyGhcrPublication } from "../registries/ghcr-check.mjs";
+import verifyGhcrPublication from "../registries/ghcr-check.mjs";
 
-export function verifyRegistryGhcrCheck({
+export default function verifyRegistryGhcrCheck({
   fs,
   execFile,
   log,

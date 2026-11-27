@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { collectNotesChanges } from "../../../src/commands/notes/collect-changes.mjs";
+import collectNotesChanges from "../../../src/commands/notes/collect-changes.mjs";
 
 test("collects commits, changed files, and bounded source diff", () => {
   const exec = jest.fn((command, args) =>

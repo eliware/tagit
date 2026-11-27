@@ -1,12 +1,12 @@
-import { runReleaseCommand } from "../../../commands/release/dispatch/command.mjs";
-import { helpText } from "../../guidance/help-text.mjs";
-import { ownerGuidance } from "../../../policy/owner-guidance.mjs";
-import { registerLifecycle } from "../register-lifecycle.mjs";
-import { dispatchSimpleCommand } from "./simple-command.mjs";
+import runReleaseCommand from "../../../commands/release/dispatch/command.mjs";
+import helpText from "../../guidance/help-text.mjs";
+import ownerGuidance from "../../../policy/owner-guidance.mjs";
+import registerLifecycle from "../register-lifecycle.mjs";
+import dispatchSimpleCommand from "./simple-command.mjs";
 
-export const operatorBoundary = ownerGuidance;
+const operatorBoundary = ownerGuidance;
 
-export async function dispatchCommand(options, deps) {
+export default async function dispatchCommand(options, deps) {
   const { output = console.log } = deps;
   if (options.versionQuery) {
     output(deps.packageVersion);

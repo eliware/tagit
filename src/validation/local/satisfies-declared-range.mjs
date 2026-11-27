@@ -1,4 +1,4 @@
-import { parseSemver } from "../../versioning/parse-semver.mjs";
+import parseSemver from "../../versioning/parse-semver.mjs";
 
 function compareVersion(actual, declared) {
   for (let index = 0; index < actual.length; index += 1) {
@@ -7,7 +7,7 @@ function compareVersion(actual, declared) {
   return 0;
 }
 
-export function satisfiesDeclaredRange(version, range) {
+export default function satisfiesDeclaredRange(version, range) {
   const match = /^(\^|~)?((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/.exec(range ?? "");
   if (!match) return false;
   let actual;

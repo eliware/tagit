@@ -1,4 +1,4 @@
-export function releaseGuide() {
+export default function releaseGuide() {
   return [
     "Release checklist:",
     "- Complete the owner handoff.",

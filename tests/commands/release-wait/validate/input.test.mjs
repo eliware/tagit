@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
-import { validateReleaseInput } from "../../../../src/commands/release-wait/validate/input.mjs";
-import { prepareReleaseContext } from "../../../../src/commands/release-wait/prepare-release-context.mjs";
-import { verifyRelease } from "../../../../src/commands/release-wait/verify/release.mjs";
+import validateReleaseInput from "../../../../src/commands/release-wait/validate/input.mjs";
+import prepareReleaseContext from "../../../../src/commands/release-wait/prepare-release-context.mjs";
+import verifyRelease from "../../../../src/commands/release-wait/verify/release.mjs";
 
 test("accepts valid release input and polling settings", () =>
   expect(() =>

@@ -1,4 +1,4 @@
-export function readRunnerValueDeclaration(jobLines) {
+export default function readRunnerValueDeclaration(jobLines) {
   const index = jobLines.findIndex((line) => /^\s*runs-on\s*:/.test(line));
   if (index < 0) return null;
   const line = jobLines[index];

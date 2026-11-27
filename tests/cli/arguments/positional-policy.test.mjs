@@ -1,4 +1,4 @@
-import { validatePositionals } from "../../../src/cli/arguments/positional-policy.mjs";
+import validatePositionals from "../../../src/cli/arguments/positional-policy.mjs";
 
 test.each([
   [["release", "--version", "1.2.3"], "release"],

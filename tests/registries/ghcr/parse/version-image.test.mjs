@@ -1,4 +1,4 @@
-import { findGhcrVersionImage } from "../../../../src/registries/ghcr/parse/version-image.mjs";
+import findGhcrVersionImage from "../../../../src/registries/ghcr/parse/version-image.mjs";
 
 test("selects an image with the requested version tag", () => {
   const image = { metadata: { container: { tags: ["v2.0.0"] } } };

@@ -1,7 +1,7 @@
-import { jobValue } from "../../../../../repository/metadata/workflow/job-rules.mjs";
-import { readWorkflowRunnerLabels } from "../labels.mjs";
+import jobValue from "../../../../../repository/metadata/workflow/job/value.mjs";
+import readWorkflowRunnerLabels from "../labels.mjs";
 
-export function readWorkflowJobLabelEntries(jobs) {
+export default function readWorkflowJobLabelEntries(jobs) {
   const entries = [];
   for (const [jobId, jobLines] of jobs) {
     const labels = readWorkflowRunnerLabels(jobLines);

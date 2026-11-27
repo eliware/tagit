@@ -1,4 +1,4 @@
-import { parseWorkflowRunnerLabelContents } from "../../../../../src/github/runs/runner/workflow/contents-reader.mjs";
+import parseWorkflowRunnerLabelContents from "../../../../../src/github/runs/runner/workflow/contents-reader.mjs";
 
 test("combines labels from multiple workflow files", () => {
   expect(

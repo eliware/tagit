@@ -1,6 +1,6 @@
-import { successfulRun } from "./run.mjs";
+import successfulRun from "./successful-run.mjs";
 
-export function selectCiCandidate(runs, headSha) {
+export default function selectCiCandidate(runs, headSha) {
   const matching = runs
     .filter((run) => run.headSha === headSha)
     .sort((left, right) => Number(right.databaseId) - Number(left.databaseId));

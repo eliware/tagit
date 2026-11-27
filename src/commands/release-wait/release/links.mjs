@@ -1,4 +1,4 @@
-export function releaseLinks(run, windowsJobs, publishJobs) {
+export default function releaseLinks(run, windowsJobs, publishJobs) {
   const ubuntuJob = run.jobs.find(
     (job) =>
       job.labels?.some((label) => /ubuntu/i.test(label)) &&

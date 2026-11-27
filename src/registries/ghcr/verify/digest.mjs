@@ -1,3 +1,3 @@
-export function imageDigest(image) {
+export default function imageDigest(image) {
   return /^sha256:[a-f0-9]{64}$/.test(image?.name ?? "") ? image.name : null;
 }

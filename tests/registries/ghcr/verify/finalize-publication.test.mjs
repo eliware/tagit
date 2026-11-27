@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { finalizeGhcrPublication } from "../../../../src/registries/ghcr/verify/finalize-publication.mjs";
+import finalizeGhcrPublication from "../../../../src/registries/ghcr/verify/finalize-publication.mjs";
 
 const digest = `sha256:${"a".repeat(64)}`;
 

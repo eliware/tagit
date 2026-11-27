@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runPreflight } from "../../../../src/validation/preflight/run/checks.mjs";
+import runPreflight from "../../../../src/validation/preflight/run/checks.mjs";
 const packageFs = (
   packageJson = {
     name: "demo",

@@ -2,9 +2,9 @@ import { jest } from "@jest/globals";
 
 const lookupGhcrVisibleImage = jest.fn();
 jest.unstable_mockModule("../../../../src/registries/ghcr/verify/visibility-lookup.mjs", () => ({
-  lookupGhcrVisibleImage,
+  default: lookupGhcrVisibleImage,
 }));
-const { readGhcrVisibilityAttempt } =
+const { default: readGhcrVisibilityAttempt } =
   await import("../../../../src/registries/ghcr/poll/attempt.mjs");
 
 beforeEach(() => jest.clearAllMocks());

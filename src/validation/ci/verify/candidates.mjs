@@ -1,6 +1,6 @@
-import { verifyCompletedRun } from "./completed-run.mjs";
+import verifyCompletedRun from "./completed-run.mjs";
 
-export function verifyCiCandidates(
+export default function verifyCiCandidates(
   execFileSync,
   log,
   candidates,

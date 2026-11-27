@@ -1,4 +1,4 @@
-import { validateReleaseRunDetails } from "../../../../../src/commands/release-wait/validate-release/run/details.mjs";
+import validateReleaseRunDetails from "../../../../../src/commands/release-wait/validate-release/run/details.mjs";
 
 test("coordinates release identity and job validation", () => {
   const details = {

@@ -2,9 +2,10 @@ import { jest } from "@jest/globals";
 
 const readJobLinks = jest.fn();
 jest.unstable_mockModule("../../../../src/github/links/report-ci/read-job-links.mjs", () => ({
-  readJobLinks,
+  default: readJobLinks,
 }));
-const { reportCiJobLinks } = await import("../../../../src/github/links/report-ci/job-links.mjs");
+const { default: reportCiJobLinks } =
+  await import("../../../../src/github/links/report-ci/job-links.mjs");
 
 beforeEach(() => jest.clearAllMocks());
 

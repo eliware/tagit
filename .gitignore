@@ -52,7 +52,8 @@ test-results/
 
 # dotenv environment variable files
 .env*
-!.env*.example
+!.env.example
+!**/.env.example
 
 # Jest
 

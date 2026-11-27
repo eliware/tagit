@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyPublicationJobs } from "../../../../../src/commands/release-wait/release/publication/jobs.mjs";
+import verifyPublicationJobs from "../../../../../src/commands/release-wait/release/publication/jobs.mjs";
 
 const base = {
   targets: [{ profile: "npm", packageName: "demo", isPrivate: false }],

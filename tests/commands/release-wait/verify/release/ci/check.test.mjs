@@ -4,14 +4,14 @@ const reportReleaseCiLinks = jest.fn();
 
 jest.unstable_mockModule(
   "../../../../../../src/commands/release-wait/verify/release/ci.mjs",
-  () => ({ verifyReleaseCi }),
+  () => ({ default: verifyReleaseCi }),
 );
 jest.unstable_mockModule(
   "../../../../../../src/commands/release-wait/verify/release/ci/links.mjs",
-  () => ({ reportReleaseCiLinks }),
+  () => ({ default: reportReleaseCiLinks }),
 );
 
-const { checkReleaseCi } =
+const { default: checkReleaseCi } =
   await import("../../../../../../src/commands/release-wait/verify/release/ci/check.mjs");
 
 beforeEach(() => {

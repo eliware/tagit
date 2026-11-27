@@ -1,6 +1,6 @@
 const commands = ["notes", "preflight", "push", "release", "release-wait"];
 
-export function classifyCommand(argv) {
+export default function classifyCommand(argv) {
   if (argv[0]?.startsWith("-") && argv.some((argument) => commands.includes(argument))) {
     throw new Error("Put the command before its options.");
   }
@@ -9,5 +9,3 @@ export function classifyCommand(argv) {
   if (command && !commands.includes(command)) throw new Error(`Unknown command: ${command}`);
   return command;
 }
-
-export { commands };

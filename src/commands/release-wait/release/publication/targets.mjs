@@ -1,4 +1,4 @@
-export function selectReleasePublicationTargets(publication) {
+export default function selectReleasePublicationTargets(publication) {
   const ghcrApplicable = publication.ghcrApplicable;
   const targets = [
     ...(publication.applicable

@@ -1,6 +1,6 @@
-import { publishesGhcr } from "../../../../registries/ghcr/discover-publication.mjs";
+import publishesGhcr from "../../../../registries/ghcr/discover-publication.mjs";
 
-export function selectRegistryPolicy(
+export default function selectRegistryPolicy(
   fs,
   log,
   { applicable, packageName, isPrivate },

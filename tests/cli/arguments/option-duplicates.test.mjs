@@ -1,4 +1,4 @@
-import { validateOptionDuplicates } from "../../../src/cli/arguments/option-duplicates.mjs";
+import validateOptionDuplicates from "../../../src/cli/arguments/option-duplicates.mjs";
 
 test("coordinates the option duplicate policies", () => {
   expect(() =>

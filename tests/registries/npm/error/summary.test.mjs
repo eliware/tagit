@@ -1,4 +1,4 @@
-import { npmErrorSummary } from "../../../../src/registries/npm/error/summary.mjs";
+import npmErrorSummary from "../../../../src/registries/npm/error/summary.mjs";
 
 test.each([
   [{ stderr: "HTTP 404" }, "404 not found"],

@@ -1,9 +1,9 @@
-import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
-import { reportCiRunLinks } from "./run-links.mjs";
-import { waitSync as waitSyncDefault } from "../../../process/timing/wait-sync.mjs";
-import { readCiRunsWithRetry } from "./retry-policy.mjs";
+import readRepositoryName from "../../../repository/repository-name/read-repository-name.mjs";
+import reportCiRunLinks from "./run-links.mjs";
+import waitSyncDefault from "../../../process/timing/wait-sync.mjs";
+import readCiRunsWithRetry from "./retry-policy.mjs";
 
-export function reportCiLinks(
+export default function reportCiLinks(
   execFileSync,
   log,
   headSha,

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runPreflightCommand } from "../../../src/commands/preflight/run-preflight.mjs";
+import runPreflightCommand from "../../../src/commands/preflight/run-preflight.mjs";
 
 test("runs and reports exact-HEAD preflight checks", () => {
   const output = jest.fn();

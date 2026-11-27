@@ -1,4 +1,4 @@
-import { validateRepository } from "../../../src/repository/validate/repository.mjs";
+import validateRepository from "../../../src/repository/validate/repository.mjs";
 
 test("reports a detached worktree explicitly", () => {
   const failures = [];

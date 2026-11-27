@@ -1,4 +1,4 @@
-export function runNotesCommand({ execFileSync, buildNotesReport, output }) {
+export default function runNotesCommand({ execFileSync, buildNotesReport, output }) {
   const report = buildNotesReport(execFileSync);
   output(report);
   return report;

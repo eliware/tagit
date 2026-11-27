@@ -1,4 +1,4 @@
-export function buildCiVerificationFailure(candidates, headSha) {
+export default function buildCiVerificationFailure(candidates, headSha) {
   const matching = candidates.filter((run) => run.headSha === headSha);
   const details = matching
     .map((run) => `run ${run.databaseId} [${run.status}/${run.conclusion}]`)

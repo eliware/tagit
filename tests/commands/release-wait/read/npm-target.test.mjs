@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readNpmPublicationTarget } from "../../../../src/commands/release-wait/read/npm-target.mjs";
+import readNpmPublicationTarget from "../../../../src/commands/release-wait/read/npm-target.mjs";
 
 test("uses the parsed package name for an applicable public target", () => {
   const readFileSync = jest.fn();

@@ -1,4 +1,4 @@
-import { formatDiffExcerpt } from "../../../../src/commands/notes/format/diff-excerpt.mjs";
+import formatDiffExcerpt from "../../../../src/commands/notes/format/diff-excerpt.mjs";
 
 test("keeps diff excerpts at the configured limit", () => {
   const diff = "x".repeat(12000);

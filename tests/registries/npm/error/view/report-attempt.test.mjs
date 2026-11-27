@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportNpmViewAttempt } from "../../../../../src/registries/npm/error/view/report-attempt.mjs";
+import reportNpmViewAttempt from "../../../../../src/registries/npm/error/view/report-attempt.mjs";
 
 test("reports available and missing npm results", () => {
   const log = { info: jest.fn() };

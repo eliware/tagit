@@ -1,4 +1,4 @@
-import { classifyNpmError } from "../../../../src/registries/npm/error/classification.mjs";
+import classifyNpmError from "../../../../src/registries/npm/error/classification.mjs";
 
 test.each([
   [{ stderr: "HTTP 404" }, { type: "not-found" }],

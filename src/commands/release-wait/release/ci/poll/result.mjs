@@ -1,7 +1,11 @@
-import { mergeReleaseRun } from "../../../merge-release-run.mjs";
-import { formatReleasePollFailure } from "./failure-message.mjs";
+import mergeReleaseRun from "../../../merge-release-run.mjs";
+import formatReleasePollFailure from "./failure-message.mjs";
 
-export function applyReleaseCiResultPolicy(candidate, details, { linksOnly, log, workflowLabel }) {
+export default function applyReleaseCiResultPolicy(
+  candidate,
+  details,
+  { linksOnly, log, workflowLabel },
+) {
   if (linksOnly) {
     return {
       ...candidate,

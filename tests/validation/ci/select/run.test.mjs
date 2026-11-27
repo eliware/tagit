@@ -1,4 +1,5 @@
-import { selectLatestRun, successfulRun } from "../../../../src/validation/ci/select/run.mjs";
+import selectLatestRun from "../../../../src/validation/ci/select/run.mjs";
+import successfulRun from "../../../../src/validation/ci/select/successful-run.mjs";
 
 test("selects the newest exact-head run", () => {
   expect(

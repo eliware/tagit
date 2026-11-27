@@ -2,10 +2,10 @@ import { jest } from "@jest/globals";
 
 const verifyGhcrPublication = jest.fn(async () => ({ imageDigest: "sha256:release" }));
 jest.unstable_mockModule("../../../../../src/registries/ghcr/verify/publication.mjs", () => ({
-  verifyGhcrPublication,
+  default: verifyGhcrPublication,
 }));
 
-const { verifyGhcrRegistry } =
+const { default: verifyGhcrRegistry } =
   await import("../../../../../src/commands/release-wait/verify/registries/ghcr.mjs");
 
 beforeEach(() => jest.clearAllMocks());

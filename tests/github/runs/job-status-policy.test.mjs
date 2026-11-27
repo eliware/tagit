@@ -1,4 +1,4 @@
-import { hasAcceptedWorkflowJobStatus } from "../../../src/github/runs/job-status-policy.mjs";
+import hasAcceptedWorkflowJobStatus from "../../../src/github/runs/job-status-policy.mjs";
 
 test.each(["success", "skipped", "neutral"])("accepts completed %s jobs", (conclusion) => {
   expect(hasAcceptedWorkflowJobStatus({ status: "completed", conclusion })).toBe(true);

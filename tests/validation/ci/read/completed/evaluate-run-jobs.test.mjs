@@ -1,4 +1,4 @@
-import { evaluateCompletedRunJobs } from "../../../../../src/validation/ci/read/completed/evaluate-run-jobs.mjs";
+import evaluateCompletedRunJobs from "../../../../../src/validation/ci/read/completed/evaluate-run-jobs.mjs";
 
 test("evaluates runner metadata without changing the input job records", () => {
   const data = {

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runReleaseTagTransaction } from "../../../src/git/release/run-release-tag-transaction.mjs";
+import runReleaseTagTransaction from "../../../src/git/release/run-release-tag-transaction.mjs";
 
 test("runs the release tag transaction and returns the exact head", () => {
   const log = { info: jest.fn(), error: jest.fn() };

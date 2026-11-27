@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { lookupGhcrVisibleImage } from "../../../../src/registries/ghcr/verify/visibility-lookup.mjs";
+import lookupGhcrVisibleImage from "../../../../src/registries/ghcr/verify/visibility-lookup.mjs";
 
 test("requests and parses the image versions for the encoded owner and image name", async () => {
   const image = { name: "tagit", metadata: { container: { tags: ["v2.0.0"] } } };

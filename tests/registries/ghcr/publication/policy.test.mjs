@@ -1,4 +1,4 @@
-import { hasGhcrPublicationProfile } from "../../../../src/registries/ghcr/publication/policy.mjs";
+import hasGhcrPublicationProfile from "../../../../src/registries/ghcr/publication/policy.mjs";
 
 test("accepts the declared GHCR publication profile", () => {
   expect(hasGhcrPublicationProfile({ eliware: { apply: ["ghcr-published"] } })).toBe(true);

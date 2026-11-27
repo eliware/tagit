@@ -1,7 +1,7 @@
-import { runNotesCommand } from "../../../commands/notes/run-notes.mjs";
-import { runPushCommand } from "../../../commands/push/run-push.mjs";
+import runNotesCommand from "../../../commands/notes/run-notes.mjs";
+import runPushCommand from "../../../commands/push/run-push.mjs";
 
-export function dispatchSimpleCommand(command, options, deps, output) {
+export default function dispatchSimpleCommand(command, options, deps, output) {
   if (command === "notes") {
     runNotesCommand({
       execFileSync: deps.execFileSync,

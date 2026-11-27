@@ -3,9 +3,9 @@ import { jest } from "@jest/globals";
 const verifyGhcrPublication = jest.fn();
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/registries/ghcr-check.mjs",
-  () => ({ verifyGhcrPublication }),
+  () => ({ default: verifyGhcrPublication }),
 );
-const { verifyRegistryGhcrCheck } =
+const { default: verifyRegistryGhcrCheck } =
   await import("../../../../../src/commands/release-wait/verify/registry/ghcr-check.mjs");
 
 test("forwards registry publication failures", async () => {

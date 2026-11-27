@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readReleaseCiJson } from "../../../../../src/commands/release-wait/read/release-ci/json.mjs";
+import readReleaseCiJson from "../../../../../src/commands/release-wait/read/release-ci/json.mjs";
 
 test("reads and parses GitHub release CI JSON", async () => {
   const execFile = jest.fn((_command, _args, _options, callback) =>

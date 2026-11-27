@@ -1,4 +1,4 @@
-import { readWorkflowJobs } from "../../../../../../src/github/runs/runner/workflow/label/jobs-reader.mjs";
+import readWorkflowJobs from "../../../../../../src/github/runs/runner/workflow/label/jobs-reader.mjs";
 
 test("reads job blocks from a workflow document", () => {
   expect(readWorkflowJobs("jobs:\n  validate:\n    runs-on: ubuntu-latest\n")).toEqual(

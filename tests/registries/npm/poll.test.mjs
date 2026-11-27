@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollNpmPublication } from "../../../src/registries/npm/poll.mjs";
+import pollNpmPublication from "../../../src/registries/npm/poll.mjs";
 
 test("retries npm visibility until the requested version appears", async () => {
   let attempts = 0;

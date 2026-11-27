@@ -1,4 +1,4 @@
-import { buildReleasePublicationPlan } from "../../../../../../src/commands/release-wait/verify/release/publication/plan.mjs";
+import buildReleasePublicationPlan from "../../../../../../src/commands/release-wait/verify/release/publication/plan.mjs";
 
 test("returns an empty plan when publication does not apply", () => {
   expect(

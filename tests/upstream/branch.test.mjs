@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { resolveUpstreamBranch } from "../../src/upstream/branch.mjs";
+import resolveUpstreamBranch from "../../src/upstream/branch.mjs";
 
 test("resolves advertised or fallback upstream branches", () => {
   expect(resolveUpstreamBranch(jest.fn(() => "upstream/trunk\n"))).toBe("upstream/trunk");

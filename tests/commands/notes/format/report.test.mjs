@@ -1,4 +1,4 @@
-import { formatNotesReport } from "../../../../src/commands/notes/format/report.mjs";
+import formatNotesReport from "../../../../src/commands/notes/format/report.mjs";
 
 test("formats notes sections and empty values", () => {
   expect(formatNotesReport("v1.0.0", { commits: "", files: "", excerpt: "" })).toContain("(none)");

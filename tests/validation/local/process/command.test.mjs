@@ -1,4 +1,4 @@
-import { processCommand } from "../../../../src/validation/local/process/command.mjs";
+import processCommand from "../../../../src/validation/local/process/command.mjs";
 
 test("resolves platform command wrappers while preserving arguments", () => {
   expect(processCommand("npm", ["test"], "win32")).toEqual([

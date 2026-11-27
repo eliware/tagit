@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyNpmPublication } from "../../../src/registries/npm/verify-publication.mjs";
+import verifyNpmPublication from "../../../src/registries/npm/verify-publication.mjs";
 
 test("waits for npm visibility and succeeds at the expected version", async () => {
   let attempts = 0;

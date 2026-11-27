@@ -2,7 +2,7 @@ function indentation(line) {
   return line.length - line.trimStart().length;
 }
 
-export function parseJobs(lines) {
+export default function parseJobs(lines) {
   const jobs = new Map();
   for (let index = 0; index < lines.length; index += 1) {
     if (indentation(lines[index]) !== 2 || !lines[index].trimEnd().endsWith(":")) continue;

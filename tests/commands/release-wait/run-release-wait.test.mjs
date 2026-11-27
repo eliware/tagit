@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import { PassThrough } from "node:stream";
-import { runReleaseWaitCommand } from "../../../src/commands/release-wait/run-release-wait.mjs";
+import runReleaseWaitCommand from "../../../src/commands/release-wait/run-release-wait.mjs";
 
 test("verifies the latest release tag", async () => {
   const execFileSync = jest.fn((command, args) => (args[0] === "describe" ? "v1.2.3\n" : "abc\n"));

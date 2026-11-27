@@ -1,8 +1,8 @@
-import { verifyReleasePublicationWorkflow } from "./publication/workflow.mjs";
-import { verifyReleasePublicationRegistries } from "./publication/registries.mjs";
-import { buildReleasePublicationPlan } from "./publication/plan.mjs";
+import verifyReleasePublicationWorkflow from "./publication/workflow.mjs";
+import verifyReleasePublicationRegistries from "./publication/registries.mjs";
+import buildReleasePublicationPlan from "./publication/plan.mjs";
 
-export async function verifyReleasePublication({
+export default async function verifyReleasePublication({
   fs,
   execFile,
   log,

@@ -1,4 +1,4 @@
-import { validateCommandPolicy } from "../../../src/cli/arguments/command-policy.mjs";
+import validateCommandPolicy from "../../../src/cli/arguments/command-policy.mjs";
 
 test.each([
   [["notes", "--ignore-100x4"], "notes", "requires preflight"],

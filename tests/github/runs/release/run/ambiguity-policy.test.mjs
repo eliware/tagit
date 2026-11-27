@@ -1,4 +1,4 @@
-import { assertUnambiguousReleaseRunTimestamps } from "../../../../../src/github/runs/release/run/ambiguity-policy.mjs";
+import assertUnambiguousReleaseRunTimestamps from "../../../../../src/github/runs/release/run/ambiguity-policy.mjs";
 
 test.each([
   [[]],

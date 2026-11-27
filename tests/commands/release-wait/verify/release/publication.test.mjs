@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyReleasePublication } from "../../../../../src/commands/release-wait/verify/release/publication.mjs";
+import verifyReleasePublication from "../../../../../src/commands/release-wait/verify/release/publication.mjs";
 
 const base = {
   fs: { existsSync: () => false },

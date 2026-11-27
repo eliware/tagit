@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { isUpstreamMergeConflict } from "../../../../src/upstream/merge/conflict/policy.mjs";
+import isUpstreamMergeConflict from "../../../../src/upstream/merge/conflict/policy.mjs";
 
 test.each([
   ["file names", "src/file.mjs\n", true],

@@ -1,9 +1,9 @@
-import { pollReleaseCi } from "../../release/ci/status.mjs";
-import { pollReleaseWorkflows } from "../../release/poll/workflows.mjs";
-import { buildReleaseCiPollOptions } from "../../verify/release/ci/options.mjs";
-import { reportReleaseLinks } from "./links.mjs";
+import pollReleaseCi from "../../release/ci/status.mjs";
+import pollReleaseWorkflows from "../../release/poll/workflows.mjs";
+import buildReleaseCiPollOptions from "../../verify/release/ci/options.mjs";
+import reportReleaseLinks from "./links.mjs";
 
-export async function reportReleaseStart({
+export default async function reportReleaseStart({
   execFile,
   repo,
   headSha,

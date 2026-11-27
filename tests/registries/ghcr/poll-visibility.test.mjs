@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollGhcrVisibility } from "../../../src/registries/ghcr/poll-visibility.mjs";
+import pollGhcrVisibility from "../../../src/registries/ghcr/poll-visibility.mjs";
 
 function execWith(value) {
   return (command, args, options, callback) => callback(null, JSON.stringify(value), "");

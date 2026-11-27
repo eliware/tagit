@@ -1,4 +1,4 @@
-export function validateRunRecords(runs, headSha) {
+export default function validateRunRecords(runs, headSha) {
   if (!Array.isArray(runs)) throw new Error("GitHub CI run response must be an array.");
   const malformed = runs
     .map((run, index) => ({ run, index }))

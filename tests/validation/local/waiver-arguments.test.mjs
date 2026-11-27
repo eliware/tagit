@@ -1,4 +1,4 @@
-import { testWaiverArguments } from "../../../src/validation/local/waiver-arguments.mjs";
+import testWaiverArguments from "../../../src/validation/local/waiver-arguments.mjs";
 
 test.each([
   [undefined, []],

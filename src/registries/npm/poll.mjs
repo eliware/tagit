@@ -1,6 +1,6 @@
-import { checkNpmPublicationAttempt } from "./poll-publication.mjs";
+import checkNpmPublicationAttempt from "./poll-publication.mjs";
 
-export async function pollNpmPublication(
+export default async function pollNpmPublication(
   execFile,
   log,
   { command, packageName, version, retries, retryMs, sleep },

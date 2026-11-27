@@ -1,3 +1,3 @@
-export function hasGhcrPublicationWorkflow(fs) {
+export default function hasGhcrPublicationWorkflow(fs) {
   return fs.existsSync(".github/workflows/ghcr.yaml");
 }

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readCiRunsWithRetry } from "../../../../src/github/links/report-ci/retry-policy.mjs";
+import readCiRunsWithRetry from "../../../../src/github/links/report-ci/retry-policy.mjs";
 
 test("retries exact-head lookups until a run appears", () => {
   let lookups = 0;

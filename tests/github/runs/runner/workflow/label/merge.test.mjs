@@ -1,4 +1,4 @@
-import { mergeWorkflowRunnerLabelEntries } from "../../../../../../src/github/runs/runner/workflow/label/merge.mjs";
+import mergeWorkflowRunnerLabelEntries from "../../../../../../src/github/runs/runner/workflow/label/merge.mjs";
 
 test("keeps labels when repeated identities agree", () => {
   expect(

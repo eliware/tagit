@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runLocalTestCommand } from "../../../../../src/validation/preflight/run/local/test-command.mjs";
+import runLocalTestCommand from "../../../../../src/validation/preflight/run/local/test-command.mjs";
 
 test("returns a passing result for a successful command", () => {
   expect(runLocalTestCommand(jest.fn(), ["test", ["npm", ["test"]]], 1000)).toEqual({

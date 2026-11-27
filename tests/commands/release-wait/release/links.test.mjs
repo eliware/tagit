@@ -1,4 +1,4 @@
-import { releaseLinks } from "../../../../src/commands/release-wait/release/links.mjs";
+import releaseLinks from "../../../../src/commands/release-wait/release/links.mjs";
 
 test("formats workflow, platform, and publication links", () => {
   expect(

@@ -1,5 +1,5 @@
-import { classifyRunnerPlatforms } from "../platforms.mjs";
+import classifyRunnerPlatforms from "../platforms.mjs";
 
-export function classifyWorkflowRunnerValues(values) {
+export default function classifyWorkflowRunnerValues(values) {
   return values === null ? null : classifyRunnerPlatforms(values);
 }

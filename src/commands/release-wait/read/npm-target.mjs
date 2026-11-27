@@ -1,6 +1,6 @@
-import { validateNpmPublicationName } from "./npm/publication-name.mjs";
+import validateNpmPublicationName from "./npm/publication-name.mjs";
 
-export function readNpmPublicationTarget(fs, packageData) {
+export default function readNpmPublicationTarget(fs, packageData) {
   const npmWorkflow = fs.existsSync(".github/workflows/npm.yaml");
   const profiles = packageData?.eliware?.apply;
   const applicable = npmWorkflow && Array.isArray(profiles) && profiles.includes("npm-published");

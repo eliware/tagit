@@ -1,7 +1,7 @@
-import { dispatchUpstreamInformation } from "./information/dispatch.mjs";
-import { handleCliError } from "../../cli/application/handle-cli-error.mjs";
+import dispatchUpstreamInformation from "./information/dispatch.mjs";
+import handleCliError from "../../cli/application/handle-cli-error.mjs";
 
-export function runUpstreamCli(
+export default function runUpstreamCli(
   args,
   { execFileSync, readFileSync, now, log, runUpstream, exit = process.exit },
 ) {

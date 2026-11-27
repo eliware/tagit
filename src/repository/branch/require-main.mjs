@@ -1,4 +1,4 @@
-export function requireMain(branch) {
+export default function requireMain(branch) {
   return branch === "main"
     ? null
     : branch

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readGithubJson } from "../../../src/github/cli/read-json.mjs";
+import readGithubJson from "../../../src/github/cli/read-json.mjs";
 
 test("reads JSON from the GitHub command adapter", async () => {
   const execFile = jest.fn((executable, args, options, callback) =>

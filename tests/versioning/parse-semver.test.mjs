@@ -1,4 +1,4 @@
-import { parseSemver } from "../../src/versioning/parse-semver.mjs";
+import parseSemver from "../../src/versioning/parse-semver.mjs";
 
 test("parses a three-part semantic version", () => {
   expect(parseSemver("2.5.0")).toEqual([2, 5, 0]);

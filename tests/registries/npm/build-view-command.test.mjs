@@ -1,4 +1,4 @@
-import { buildNpmViewArguments } from "../../../src/registries/npm/build-view-command.mjs";
+import buildNpmViewArguments from "../../../src/registries/npm/build-view-command.mjs";
 
 test("builds npm view arguments from the package and version", () => {
   expect(buildNpmViewArguments("demo", "1.0.0")).toEqual([

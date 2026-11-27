@@ -1,4 +1,4 @@
-import { mergeReleaseRun } from "../../../src/commands/release-wait/merge-release-run.mjs";
+import mergeReleaseRun from "../../../src/commands/release-wait/merge-release-run.mjs";
 
 test("merges candidate identity with workflow details", () => {
   expect(

@@ -1,4 +1,4 @@
-import { buildNotesReport } from "../../../src/commands/notes/build-report.mjs";
+import buildNotesReport from "../../../src/commands/notes/build-report.mjs";
 
 test("composes the tag range, change collection, and formatter", () => {
   const exec = (_command, args) =>

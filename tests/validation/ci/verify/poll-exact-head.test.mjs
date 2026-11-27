@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollExactHeadCi } from "../../../../src/validation/ci/verify/poll-exact-head.mjs";
+import pollExactHeadCi from "../../../../src/validation/ci/verify/poll-exact-head.mjs";
 
 const pending = { databaseId: 2, url: "https://github.com/eliware/demo/actions/runs/2" };
 

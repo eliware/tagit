@@ -1,4 +1,4 @@
-import { validateHelpOptionDuplicates } from "../../../../src/cli/arguments/option-duplicates/help.mjs";
+import validateHelpOptionDuplicates from "../../../../src/cli/arguments/option-duplicates/help.mjs";
 
 test("rejects repeated help aliases", () => {
   expect(() => validateHelpOptionDuplicates(["--help", "-h"])).toThrow("Duplicate option: --help");

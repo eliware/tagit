@@ -1,4 +1,4 @@
-export function validatePackageReleaseVersion(fs, version) {
+export default function validatePackageReleaseVersion(fs, version) {
   if (!fs.existsSync("package.json")) return;
   const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
   if (packageData.version !== version)

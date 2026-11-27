@@ -1,6 +1,6 @@
-import { validateCurrentHead } from "../tags/validate-release-tag.mjs";
+import validateCurrentHead from "../tags/validate-release-tag.mjs";
 
-export function reuseExistingReleaseTag(runGit, head, tag) {
+export default function reuseExistingReleaseTag(runGit, head, tag) {
   const existing = String(runGit(["tag", "--list", tag], { encoding: "utf8" })).trim();
   if (!existing) return { currentHead: head, tagReused: false };
   const { currentHead, existingTagHead } = validateCurrentHead(

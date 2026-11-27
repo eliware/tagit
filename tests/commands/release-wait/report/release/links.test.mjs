@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportReleaseLinks } from "../../../../../src/commands/release-wait/report/release/links.mjs";
+import reportReleaseLinks from "../../../../../src/commands/release-wait/report/release/links.mjs";
 test("reports workflow and available job links", () => {
   const log = { info: jest.fn() };
   reportReleaseLinks(log, "eliware/tagit", "v1.2.3", {

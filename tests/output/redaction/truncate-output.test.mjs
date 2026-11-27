@@ -1,4 +1,4 @@
-import { truncateOutput } from "../../../src/output/redaction/truncate-output.mjs";
+import truncateOutput from "../../../src/output/redaction/truncate-output.mjs";
 
 test("formats empty and bounded output", () => {
   expect(truncateOutput("")).toContain("no output captured");

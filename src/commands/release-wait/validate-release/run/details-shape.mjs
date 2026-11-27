@@ -18,7 +18,7 @@ const RUN_CONCLUSIONS = new Set([
   "startup_failure",
 ]);
 
-export function validateReleaseRunDetailsShape(details, runId) {
+export default function validateReleaseRunDetailsShape(details, runId) {
   if (
     !details ||
     (details.databaseId !== undefined && typeof details.databaseId !== "number") ||

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { handleCliError } from "../../../src/cli/application/handle-cli-error.mjs";
+import handleCliError from "../../../src/cli/application/handle-cli-error.mjs";
 
 test("logs and exits with the error message before rethrowing", () => {
   const log = { error: jest.fn() };

@@ -1,4 +1,4 @@
-export function validateHelpOptionDuplicates(argv) {
+export default function validateHelpOptionDuplicates(argv) {
   if (argv.filter((argument) => ["--help", "-h"].includes(argument)).length > 1)
     throw new Error("Duplicate option: --help");
 }

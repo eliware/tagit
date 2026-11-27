@@ -1,4 +1,4 @@
-import { enforceRequiredPlatformPolicy } from "../../../../../src/github/runs/release/job/required-platform-policy.mjs";
+import enforceRequiredPlatformPolicy from "../../../../../src/github/runs/release/job/required-platform-policy.mjs";
 
 const successful = (job) => job.status === "completed" && job.conclusion === "success";
 const ubuntu = { name: "test", status: "completed", conclusion: "success" };

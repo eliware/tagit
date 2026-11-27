@@ -1,6 +1,6 @@
-import { selectReleaseRunBranches } from "../../../../github/runs/release/run/branch-policy.mjs";
+import selectReleaseRunBranches from "../../../../github/runs/release/run/branch-policy.mjs";
 
-export function validateReleaseRunIdentity(
+export default function validateReleaseRunIdentity(
   details,
   candidate,
   headSha,

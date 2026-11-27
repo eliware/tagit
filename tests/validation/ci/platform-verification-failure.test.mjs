@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { buildPlatformVerificationFailure } from "../../../src/validation/ci/platform-verification-failure.mjs";
+import buildPlatformVerificationFailure from "../../../src/validation/ci/platform-verification-failure.mjs";
 
 test("formats platform evidence failures through the job summarizer", () => {
   const exec = jest.fn(() =>

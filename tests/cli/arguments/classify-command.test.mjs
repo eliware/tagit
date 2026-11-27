@@ -1,4 +1,4 @@
-import { classifyCommand } from "../../../src/cli/arguments/classify-command.mjs";
+import classifyCommand from "../../../src/cli/arguments/classify-command.mjs";
 
 test("classifies supported and absent commands", () => {
   expect(classifyCommand(["release"])).toBe("release");

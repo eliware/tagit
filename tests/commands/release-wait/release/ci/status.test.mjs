@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollReleaseCi } from "../../../../../src/commands/release-wait/release/ci/status.mjs";
+import pollReleaseCi from "../../../../../src/commands/release-wait/release/ci/status.mjs";
 
 const options = {
   repo: "eliware/demo",

@@ -1,4 +1,4 @@
-export function processOptions(command, timeout) {
+export default function processOptions(command, timeout) {
   return {
     stdio: "pipe",
     timeout,

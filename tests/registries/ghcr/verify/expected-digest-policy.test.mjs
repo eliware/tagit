@@ -1,4 +1,4 @@
-import { requireExpectedDigest } from "../../../../src/registries/ghcr/verify/expected-digest-policy.mjs";
+import requireExpectedDigest from "../../../../src/registries/ghcr/verify/expected-digest-policy.mjs";
 
 const digest = `sha256:${"a".repeat(64)}`;
 

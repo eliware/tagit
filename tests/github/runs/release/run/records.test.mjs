@@ -1,4 +1,4 @@
-import { validateReleaseRunRecords } from "../../../../../src/github/runs/release/run/records.mjs";
+import validateReleaseRunRecords from "../../../../../src/github/runs/release/run/records.mjs";
 
 test("requires an array of release run records", () => {
   expect(() => validateReleaseRunRecords(null, "v1.0.0")).toThrow("not an array");

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportReleaseFailure } from "../../../src/git/release/report-release-failure.mjs";
+import reportReleaseFailure from "../../../src/git/release/report-release-failure.mjs";
 
 test("reports failures before and after remote side effects", () => {
   const log = { error: jest.fn() };

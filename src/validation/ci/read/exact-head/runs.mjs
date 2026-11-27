@@ -1,7 +1,7 @@
-import { validateRunRecords } from "../../validate/run-records.mjs";
-import { buildExactHeadRunCommand } from "./command.mjs";
+import validateRunRecords from "../../validate/run-records.mjs";
+import buildExactHeadRunCommand from "./command.mjs";
 
-export function readExactHeadRuns(execFileSync, headSha, repository, selectedRun) {
+export default function readExactHeadRuns(execFileSync, headSha, repository, selectedRun) {
   const { repoArg, args } = buildExactHeadRunCommand(headSha, repository, selectedRun);
   try {
     const parsed = JSON.parse(execFileSync("gh", args, { encoding: "utf8" }));

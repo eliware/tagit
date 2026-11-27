@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runNotesCommand } from "../../../src/commands/notes/run-notes.mjs";
+import runNotesCommand from "../../../src/commands/notes/run-notes.mjs";
 
 test("builds and prints the notes report", () => {
   const output = jest.fn();

@@ -1,5 +1,5 @@
-import { readGithubJson } from "../../../../github/cli/read-json.mjs";
+import readGithubJson from "../../../../github/cli/read-json.mjs";
 
-export function readReleaseCiJson(execFile, args) {
+export default function readReleaseCiJson(execFile, args) {
   return readGithubJson(execFile, "gh", args);
 }

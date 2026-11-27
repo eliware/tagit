@@ -1,4 +1,4 @@
-export function selectPendingRun(runs, headSha) {
+export default function selectPendingRun(runs, headSha) {
   return (
     runs
       .filter((run) => run.headSha === headSha)

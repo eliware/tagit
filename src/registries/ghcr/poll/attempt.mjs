@@ -1,7 +1,7 @@
-import { lookupGhcrVisibleImage } from "../verify/visibility-lookup.mjs";
-import { redactSecrets } from "../../../output/redaction/redact-secrets.mjs";
+import lookupGhcrVisibleImage from "../verify/visibility-lookup.mjs";
+import redactSecrets from "../../../output/redaction/redact-secrets.mjs";
 
-export async function readGhcrVisibilityAttempt(
+export default async function readGhcrVisibilityAttempt(
   execFile,
   log,
   { owner, imageName, version, attempt, retries },

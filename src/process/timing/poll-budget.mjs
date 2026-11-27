@@ -1,4 +1,4 @@
-export function validatePollBudget(maxPolls, npmRetries, pollMs, npmRetryMs) {
+export default function validatePollBudget(maxPolls, npmRetries, pollMs, npmRetryMs) {
   if (
     ![maxPolls, npmRetries].every((value) => Number.isInteger(value) && value > 0) ||
     ![pollMs, npmRetryMs].every((value) => Number.isFinite(value) && value >= 0)

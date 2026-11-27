@@ -1,7 +1,7 @@
-import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
-import { releaseTag } from "../../../policy/tag-policy.mjs";
+import readRepositoryName from "../../../repository/repository-name/read-repository-name.mjs";
+import releaseTag from "../../../policy/tag-policy.mjs";
 
-export function resolveReleaseContext(execFileSync, version, release) {
+export default function resolveReleaseContext(execFileSync, version, release) {
   const tag = releaseTag(version);
   const resolvedSha = execFileSync("git", ["rev-parse", tag]).toString().trim();
   if (resolvedSha !== release.commitSha)

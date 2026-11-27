@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pushReleaseRefs } from "../../../src/git/release/push-release-refs.mjs";
+import pushReleaseRefs from "../../../src/git/release/push-release-refs.mjs";
 
 test("pushes main and the release tag in one atomic operation", () => {
   const runGit = jest.fn();

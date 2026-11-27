@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pushExistingCommits } from "../../../src/commands/push/existing-commits.mjs";
+import pushExistingCommits from "../../../src/commands/push/existing-commits.mjs";
 
 test("pushes existing commits without staging or tagging", () => {
   const exec = jest.fn();

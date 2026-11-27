@@ -1,4 +1,4 @@
-export function pollPendingRun(execFileSync, log, pending, repoArg, attempt) {
+export default function pollPendingRun(execFileSync, log, pending, repoArg, attempt) {
   if (!pending || attempt >= 30) return false;
   if (pending.url)
     log.info(`CI is running. Status: [workflow run ${pending.databaseId}](${pending.url})`);

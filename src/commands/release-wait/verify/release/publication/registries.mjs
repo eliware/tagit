@@ -1,6 +1,6 @@
-import { verifyPublicationRegistries } from "../../../release/publication/registries.mjs";
+import verifyPublicationRegistries from "../../../release/publication/registries.mjs";
 
-export function verifyReleasePublicationRegistries(options, plan) {
+export default function verifyReleasePublicationRegistries(options, plan) {
   const { publication, repo, tag, headSha } = options;
   if (!plan.applicable) return { repo, tag, headSha, ci: true, npm: false, ghcr: false };
   return verifyPublicationRegistries({

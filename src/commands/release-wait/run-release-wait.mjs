@@ -1,6 +1,12 @@
-import { resolveLatestReleaseTag } from "./resolve/latest-tag.mjs";
+import resolveLatestReleaseTag from "./resolve/latest-tag.mjs";
 
-export async function runReleaseWaitCommand({ execFileSync, fs, log, verifyRelease, execFile }) {
+export default async function runReleaseWaitCommand({
+  execFileSync,
+  fs,
+  log,
+  verifyRelease,
+  execFile,
+}) {
   log.info("Starting release-wait checks.");
   const { version, commitSha } = resolveLatestReleaseTag(execFileSync);
   await verifyRelease(execFileSync, fs, log, { version, release: { commitSha }, execFile });

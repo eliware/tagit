@@ -1,11 +1,9 @@
-import { classifyCommand } from "../classify-command.mjs";
-import { parseVersionOption } from "./version-option.mjs";
-import { validateOptions } from "../validate-options.mjs";
+import classifyCommand from "../classify-command.mjs";
+import parseVersionOption from "./version-option.mjs";
+import validateOptions from "../validate-options.mjs";
+import isHelp from "./is-help.mjs";
 
-export function isHelp(argv) {
-  return argv.includes("--help") || argv.includes("-h");
-}
-export function parseOptions(argv) {
+export default function parseOptions(argv) {
   const command = classifyCommand(argv);
   validateOptions(argv, command);
   return {

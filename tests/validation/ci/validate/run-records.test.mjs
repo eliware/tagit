@@ -1,4 +1,4 @@
-import { validateRunRecords } from "../../../../src/validation/ci/validate/run-records.mjs";
+import validateRunRecords from "../../../../src/validation/ci/validate/run-records.mjs";
 
 test("accepts valid run records", () => {
   const runs = [{ databaseId: 1, status: "completed", conclusion: "success", headSha: "abc" }];

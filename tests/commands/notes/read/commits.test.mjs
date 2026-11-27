@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readNotesCommits } from "../../../../src/commands/notes/read/commits.mjs";
+import readNotesCommits from "../../../../src/commands/notes/read/commits.mjs";
 
 test("reads and trims commits since the selected tag", () => {
   const execFileSync = jest.fn(() => "abc Release v1.0.1\n");

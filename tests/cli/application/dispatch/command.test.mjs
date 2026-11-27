@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { dispatchCommand } from "../../../../src/cli/application/dispatch/command.mjs";
+import dispatchCommand from "../../../../src/cli/application/dispatch/command.mjs";
 
 const deps = () => ({
   packageVersion: "1.2.3",
@@ -36,4 +36,25 @@ test("uses console output when no output override is supplied", async () => {
   } finally {
     console.log = original;
   }
+});
+
+test("dispatches simple and preflight commands", async () => {
+  const notes = deps();
+  await dispatchCommand({ command: "notes" }, notes);
+  expect(notes.buildNotesReport).toHaveBeenCalled();
+
+  const push = deps();
+  await dispatchCommand({ command: "push", dryRun: true }, push);
+  expect(push.execFileSync).not.toHaveBeenCalled();
+
+  const preflight = deps();
+  preflight.runPreflight = jest.fn();
+  await dispatchCommand({ command: "preflight" }, preflight);
+  expect(preflight.runPreflight).toHaveBeenCalled();
+
+  const noCommand = deps();
+  await dispatchCommand({}, noCommand);
+  expect(noCommand.output).toHaveBeenCalledWith(
+    expect.stringContaining("Project owners may run only"),
+  );
 });

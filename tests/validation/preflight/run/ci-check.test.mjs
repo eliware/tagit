@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runCiCheck } from "../../../../src/validation/preflight/run/ci-check.mjs";
+import runCiCheck from "../../../../src/validation/preflight/run/ci-check.mjs";
 
 test("returns a CI result without a blocker when verification has no error", () => {
   expect(runCiCheck(() => "", { info: jest.fn() }, "dirty", {})).toEqual({

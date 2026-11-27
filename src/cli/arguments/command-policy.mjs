@@ -1,6 +1,6 @@
-import { parseVersionOption } from "./parse/version-option.mjs";
+import parseVersionOption from "./parse/version-option.mjs";
 
-export function validateCommandPolicy(argv, command) {
+export default function validateCommandPolicy(argv, command) {
   if (argv.includes("--ignore-100x4") && !["preflight", "release"].includes(command))
     throw new Error("--ignore-100x4 requires preflight or release.");
   if (argv.includes("--ignore-monolith-limits") && !["preflight", "release"].includes(command))

@@ -1,4 +1,4 @@
-import { validateOptions } from "../../../src/cli/arguments/validate-options.mjs";
+import validateOptions from "../../../src/cli/arguments/validate-options.mjs";
 
 test("accepts valid command options", () => {
   expect(() => validateOptions(["release", "--version", "1.2.3"], "release")).not.toThrow();

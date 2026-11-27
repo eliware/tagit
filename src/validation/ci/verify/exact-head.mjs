@@ -1,14 +1,14 @@
-import { selectLatestRun } from "../select/run.mjs";
-import { verifyCiCandidates } from "./candidates.mjs";
-import { pollExactHeadCi } from "./poll-exact-head.mjs";
-import { readExactHeadRuns } from "../read/exact-head/runs.mjs";
-import { validateCompletedConclusion } from "../validate/completed-conclusion.mjs";
-import { selectCiCandidate } from "../select/ci-candidate.mjs";
-import { selectPendingRun } from "../select/pending-run.mjs";
-import { createCiVerificationFailure } from "./result-policy.mjs";
-import { readRepositoryName } from "../../../repository/repository-name/read-repository-name.mjs";
+import selectLatestRun from "../select/run.mjs";
+import verifyCiCandidates from "./candidates.mjs";
+import pollExactHeadCi from "./poll-exact-head.mjs";
+import readExactHeadRuns from "../read/exact-head/runs.mjs";
+import validateCompletedConclusion from "../validate/completed-conclusion.mjs";
+import selectCiCandidate from "../select/ci-candidate.mjs";
+import selectPendingRun from "../select/pending-run.mjs";
+import createCiVerificationFailure from "./result-policy.mjs";
+import readRepositoryName from "../../../repository/repository-name/read-repository-name.mjs";
 
-export function verifyLatestCi(
+export default function verifyLatestCi(
   execFileSync,
   log,
   { headSha, repository = null, waitForCompletion = true, runnerLabelsByJobName = {} } = {},

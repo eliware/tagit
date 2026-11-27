@@ -1,4 +1,4 @@
-import { validateHelpVersionPolicy } from "../../../src/cli/arguments/help-version-policy.mjs";
+import validateHelpVersionPolicy from "../../../src/cli/arguments/help-version-policy.mjs";
 
 test.each([
   ["--help", "--version"],

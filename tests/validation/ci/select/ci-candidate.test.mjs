@@ -1,4 +1,4 @@
-import { selectCiCandidate } from "../../../../src/validation/ci/select/ci-candidate.mjs";
+import selectCiCandidate from "../../../../src/validation/ci/select/ci-candidate.mjs";
 
 test("selects successful runs for the requested head", () => {
   const successful = { databaseId: 1, status: "completed", conclusion: "success", headSha: "abc" };

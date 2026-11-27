@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportPushResult } from "../../../src/commands/push/report-result.mjs";
+import reportPushResult from "../../../src/commands/push/report-result.mjs";
 
 test("reads the pushed commit and reports its CI links", () => {
   const execFileSync = jest.fn(() => "abc\n");

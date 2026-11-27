@@ -1,4 +1,4 @@
-import { parseJobs } from "../../../../src/repository/metadata/workflow/jobs-parser.mjs";
+import parseJobs from "../../../../src/repository/metadata/workflow/jobs-parser.mjs";
 
 test("parses job blocks and keeps each block's steps", () => {
   const jobs = parseJobs([

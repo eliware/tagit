@@ -1,4 +1,4 @@
-import { parseWorkflow } from "../../../../src/repository/metadata/workflow/parser.mjs";
+import parseWorkflow from "../../../../src/repository/metadata/workflow/parser.mjs";
 
 test("parses top-level workflow sections and ignores comments and blank lines", () => {
   const sections = parseWorkflow(

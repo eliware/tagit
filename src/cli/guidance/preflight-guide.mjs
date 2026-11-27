@@ -1,4 +1,4 @@
-export function preflightGuide() {
+export default function preflightGuide() {
   return [
     "Preflight checklist:",
     "- Run from the repository root on a clean main worktree.",

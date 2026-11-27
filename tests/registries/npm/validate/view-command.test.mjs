@@ -1,4 +1,4 @@
-import { validateNpmViewCommandInputs } from "../../../../src/registries/npm/validate/view-command.mjs";
+import validateNpmViewCommandInputs from "../../../../src/registries/npm/validate/view-command.mjs";
 
 test.each([
   ["demo", "1.0.0"],

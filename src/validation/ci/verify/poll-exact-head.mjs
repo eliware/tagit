@@ -1,6 +1,6 @@
-import { pollPendingRun } from "../poll-pending-run.mjs";
+import pollPendingRun from "../poll-pending-run.mjs";
 
-export function pollExactHeadCi({
+export default function pollExactHeadCi({
   execFileSync,
   log,
   pending,

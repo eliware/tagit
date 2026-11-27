@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { buildReleaseCiPollOptions } from "../../../../../../src/commands/release-wait/verify/release/ci/options.mjs";
+import buildReleaseCiPollOptions from "../../../../../../src/commands/release-wait/verify/release/ci/options.mjs";
 
 test.each([true, false])("builds shared CI poll options with linksOnly=%s", (linksOnly) => {
   const options = {

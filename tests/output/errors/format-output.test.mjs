@@ -1,4 +1,4 @@
-import { outputText } from "../../../src/output/errors/format-output.mjs";
+import outputText from "../../../src/output/errors/format-output.mjs";
 
 test("formats empty, redacted, and bounded output", () => {
   expect(outputText("")).toContain("(no output captured)");

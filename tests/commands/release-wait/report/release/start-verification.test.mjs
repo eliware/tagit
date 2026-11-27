@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportReleaseVerificationStart } from "../../../../../src/commands/release-wait/report/release/start-verification.mjs";
+import reportReleaseVerificationStart from "../../../../../src/commands/release-wait/report/release/start-verification.mjs";
 
 test("returns release start links as links-only verification evidence", async () => {
   const poll = jest.fn(async () => ({ databaseId: 7, url: "https://ci/7" }));

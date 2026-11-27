@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { checkNpmPublicationAttempt } from "../../../src/registries/npm/poll-publication.mjs";
+import checkNpmPublicationAttempt from "../../../src/registries/npm/poll-publication.mjs";
 
 test("checks one npm visibility attempt", async () => {
   const exec = jest.fn((_command, _args, _options, callback) => callback(null, '"1.2.0"', ""));

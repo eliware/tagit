@@ -2,7 +2,7 @@ function quoteWindowsArgument(argument) {
   return `"${argument}"`;
 }
 
-export function buildWindowsNpmCommand(args) {
+export default function buildWindowsNpmCommand(args) {
   return {
     executable: `npm.cmd ${args.map(quoteWindowsArgument).join(" ")}`,
     args: [],

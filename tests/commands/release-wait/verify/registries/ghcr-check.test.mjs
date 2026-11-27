@@ -5,11 +5,11 @@ const verifyGhcrRegistry = jest.fn();
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/registries/ghcr.mjs",
   () => ({
-    verifyGhcrRegistry,
+    default: verifyGhcrRegistry,
   }),
 );
 
-const { verifyGhcrPublication } =
+const { default: verifyGhcrPublication } =
   await import("../../../../../src/commands/release-wait/verify/registries/ghcr-check.mjs");
 
 beforeEach(() => jest.clearAllMocks());

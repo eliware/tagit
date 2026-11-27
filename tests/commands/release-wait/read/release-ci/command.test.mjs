@@ -1,7 +1,5 @@
-import {
-  createReleaseCiListArgs,
-  createReleaseCiViewArgs,
-} from "../../../../../src/commands/release-wait/read/release-ci/command.mjs";
+import createReleaseCiListArgs from "../../../../../src/commands/release-wait/read/release-ci/command.mjs";
+import createReleaseCiViewArgs from "../../../../../src/commands/release-wait/read/release-ci/view-command.mjs";
 
 test("builds arguments to list release CI runs", () => {
   expect(createReleaseCiListArgs("eliware/demo", "abc", ".github/workflows/ci.yaml")).toEqual([

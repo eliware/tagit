@@ -1,6 +1,6 @@
-import { reportReleaseFailure } from "./report-release-failure.mjs";
+import reportReleaseFailure from "./report-release-failure.mjs";
 
-export function runReleaseTagTransaction({
+export default function runReleaseTagTransaction({
   execFileSync,
   log,
   releaseTag,

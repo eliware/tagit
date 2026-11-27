@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readExactHeadRuns } from "../../../../../src/validation/ci/read/exact-head/runs.mjs";
+import readExactHeadRuns from "../../../../../src/validation/ci/read/exact-head/runs.mjs";
 
 test("reads and validates runs for an exact commit", () => {
   const execFileSync = jest.fn(() =>

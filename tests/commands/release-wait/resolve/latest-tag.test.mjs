@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { resolveLatestReleaseTag } from "../../../../src/commands/release-wait/resolve/latest-tag.mjs";
+import resolveLatestReleaseTag from "../../../../src/commands/release-wait/resolve/latest-tag.mjs";
 
 test("resolves the latest semantic release tag and commit", () => {
   const exec = jest.fn((command, args) => {

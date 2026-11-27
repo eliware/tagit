@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createReleaseCommit } from "../../../src/git/release/create-release-commit.mjs";
+import createReleaseCommit from "../../../src/git/release/create-release-commit.mjs";
 
 test("creates a dated empty release commit", () => {
   const runGit = jest.fn((args) => (args[0] === "rev-parse" ? "abc123\n" : ""));

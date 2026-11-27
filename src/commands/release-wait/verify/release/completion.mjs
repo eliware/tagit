@@ -1,9 +1,9 @@
-import { pollReleaseCi } from "../../release/ci/status.mjs";
-import { checkReleaseCi } from "./ci/check.mjs";
-import { buildReleaseCiPollOptions } from "./ci/options.mjs";
-import { checkReleasePublication } from "./publication-check.mjs";
+import pollReleaseCi from "../../release/ci/status.mjs";
+import checkReleaseCi from "./ci/check.mjs";
+import buildReleaseCiPollOptions from "./ci/options.mjs";
+import checkReleasePublication from "./publication-check.mjs";
 
-export async function verifyReleaseCompletion({
+export default async function verifyReleaseCompletion({
   fs,
   runnerLabelsByJobName,
   execFile,

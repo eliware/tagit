@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readNotesFiles } from "../../../../src/commands/notes/read/files.mjs";
+import readNotesFiles from "../../../../src/commands/notes/read/files.mjs";
 
 test("reads and trims changed file names since the selected tag", () => {
   const execFileSync = jest.fn(() => "M\tREADME.md\n");

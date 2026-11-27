@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { handleUpstreamMergeConflict } from "../../../../src/upstream/merge/conflict/handler.mjs";
+import handleUpstreamMergeConflict from "../../../../src/upstream/merge/conflict/handler.mjs";
 
 test("reports conflict files and returns true when conflicts exist", () => {
   const execFileSync = jest.fn().mockReturnValueOnce("file.mjs");

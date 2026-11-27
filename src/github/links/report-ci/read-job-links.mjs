@@ -1,4 +1,4 @@
-export function readJobLinks(execFileSync, repo, run) {
+export default function readJobLinks(execFileSync, repo, run) {
   const details = JSON.parse(
     execFileSync("gh", ["run", "view", String(run.databaseId), "--repo", repo, "--json", "jobs"], {
       encoding: "utf8",

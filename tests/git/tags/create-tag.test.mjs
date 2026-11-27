@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createTag } from "../../../src/git/tags/create-tag.mjs";
+import createTag from "../../../src/git/tags/create-tag.mjs";
 
 test("creates a tag at the verified commit", () => {
   const runGit = jest.fn();

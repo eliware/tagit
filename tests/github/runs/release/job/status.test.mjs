@@ -1,4 +1,4 @@
-import { normalizeCompletedWorkflowJob } from "../../../../../src/github/runs/release/job/status.mjs";
+import normalizeCompletedWorkflowJob from "../../../../../src/github/runs/release/job/status.mjs";
 
 const stale = {
   name: "validate",

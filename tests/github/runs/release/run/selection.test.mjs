@@ -1,4 +1,4 @@
-import { selectReleaseRun } from "../../../../../src/github/runs/release/run/selection.mjs";
+import selectReleaseRun from "../../../../../src/github/runs/release/run/selection.mjs";
 
 test("selects the newest exact release tag and commit", () => {
   expect(

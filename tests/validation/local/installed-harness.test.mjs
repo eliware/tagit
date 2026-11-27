@@ -1,4 +1,4 @@
-import { hasInstalledSharedHarness } from "../../../src/validation/local/installed-harness.mjs";
+import hasInstalledSharedHarness from "../../../src/validation/local/installed-harness.mjs";
 
 function fileSystem(installedPackage, { linked = false, readable = true, exists = true } = {}) {
   return {

@@ -1,6 +1,6 @@
-import { verifyRemoteTag } from "../tags/verify-remote-tag.mjs";
+import verifyRemoteTag from "../tags/verify-remote-tag.mjs";
 
-export function verifyPushedTag(git, releaseTag, currentHead) {
+export default function verifyPushedTag(git, releaseTag, currentHead) {
   const remoteOutput = git(
     ["ls-remote", "--tags", "origin", `refs/tags/${releaseTag}`, `refs/tags/${releaseTag}^{}`],
     { encoding: "utf8" },

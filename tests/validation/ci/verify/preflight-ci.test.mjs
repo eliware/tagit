@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyPreflightCi } from "../../../../src/validation/ci/verify/preflight-ci.mjs";
+import verifyPreflightCi from "../../../../src/validation/ci/verify/preflight-ci.mjs";
 
 test("blocks CI verification for a dirty worktree", () => {
   expect(verifyPreflightCi(jest.fn(), { info: jest.fn() }, " M file.mjs")).toEqual({

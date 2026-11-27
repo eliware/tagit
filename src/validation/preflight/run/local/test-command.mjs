@@ -1,8 +1,8 @@
-import { failureMessage } from "../../../../output/errors/failure-message.mjs";
-import { processCommand } from "../../../local/process/command.mjs";
-import { processOptions } from "../../../local/process/options.mjs";
+import failureMessage from "../../../../output/errors/failure-message.mjs";
+import processCommand from "../../../local/process/command.mjs";
+import processOptions from "../../../local/process/options.mjs";
 
-export function runLocalTestCommand(execFileSync, check, timeoutMs) {
+export default function runLocalTestCommand(execFileSync, check, timeoutMs) {
   const [executable, args] = check[1];
   try {
     const [command, commandArgs] = processCommand(executable, args);

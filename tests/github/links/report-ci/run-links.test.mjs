@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { reportCiRunLinks } from "../../../../src/github/links/report-ci/run-links.mjs";
+import reportCiRunLinks from "../../../../src/github/links/report-ci/run-links.mjs";
 
 test("reports workflow and job links", () => {
   const log = { info: jest.fn() };

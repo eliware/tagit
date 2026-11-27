@@ -2,9 +2,9 @@ import { jest } from "@jest/globals";
 
 const verifyRegistries = jest.fn(async () => ({ npm: true, ghcr: false }));
 jest.unstable_mockModule("../../../../../src/commands/release-wait/verify/registries.mjs", () => ({
-  verifyRegistries,
+  default: verifyRegistries,
 }));
-const { verifyPublicationRegistries } =
+const { default: verifyPublicationRegistries } =
   await import("../../../../../src/commands/release-wait/release/publication/registries.mjs");
 
 beforeEach(() => jest.clearAllMocks());

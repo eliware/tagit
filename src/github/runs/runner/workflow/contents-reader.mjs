@@ -1,7 +1,7 @@
-import { parseWorkflowRunnerLabels } from "./label/reader.mjs";
-import { mergeWorkflowRunnerLabelEntries } from "./label/merge.mjs";
+import parseWorkflowRunnerLabels from "./label/reader.mjs";
+import mergeWorkflowRunnerLabelEntries from "./label/merge.mjs";
 
-export function parseWorkflowRunnerLabelContents(contentsByPath) {
+export default function parseWorkflowRunnerLabelContents(contentsByPath) {
   const entries = [];
   for (const content of Object.values(contentsByPath)) {
     const workflowLabels = parseWorkflowRunnerLabels(content);

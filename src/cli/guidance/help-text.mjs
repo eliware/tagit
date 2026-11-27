@@ -1,4 +1,4 @@
-export function helpText() {
+export default function helpText() {
   return [
     "Usage: tagit <command> [options]",
     "",

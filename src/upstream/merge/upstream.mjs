@@ -1,6 +1,6 @@
-import { handleUpstreamMergeConflict } from "./conflict/handler.mjs";
+import handleUpstreamMergeConflict from "./conflict/handler.mjs";
 
-export function mergeUpstream(execFileSync, upstreamBranch, message, log) {
+export default function mergeUpstream(execFileSync, upstreamBranch, message, log) {
   try {
     execFileSync("git", ["merge", upstreamBranch, "-m", message], { stdio: "inherit" });
   } catch (error) {

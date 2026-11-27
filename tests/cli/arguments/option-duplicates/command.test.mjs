@@ -1,4 +1,4 @@
-import { validateCommandOptionDuplicates } from "../../../../src/cli/arguments/option-duplicates/command.mjs";
+import validateCommandOptionDuplicates from "../../../../src/cli/arguments/option-duplicates/command.mjs";
 
 test.each(["--dry-run", "--ignore-100x4", "--ignore-monolith-limits"])(
   "rejects a repeated command option %s",

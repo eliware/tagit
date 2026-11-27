@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { recoverReleaseCiPollError } from "../../../../../../../src/commands/release-wait/release/ci/poll/error/recovery.mjs";
+import recoverReleaseCiPollError from "../../../../../../../src/commands/release-wait/release/ci/poll/error/recovery.mjs";
 
 test("does not retry a completed release CI failure", async () => {
   const sleep = jest.fn();

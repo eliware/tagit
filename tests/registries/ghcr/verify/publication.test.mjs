@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyGhcrPublication } from "../../../../src/registries/ghcr/verify/publication.mjs";
+import verifyGhcrPublication from "../../../../src/registries/ghcr/verify/publication.mjs";
 function execWith(value, error = null) {
   return jest.fn((_command, _args, _options, callback) =>
     callback(error, error ? "" : JSON.stringify(value), ""),

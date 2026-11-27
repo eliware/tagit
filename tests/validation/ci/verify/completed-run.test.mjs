@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyCompletedRun } from "../../../../src/validation/ci/verify/completed-run.mjs";
+import verifyCompletedRun from "../../../../src/validation/ci/verify/completed-run.mjs";
 test("recognizes Ubuntu from workflow runner metadata when the job name is test", () => {
   const exec = jest.fn(() =>
     JSON.stringify({

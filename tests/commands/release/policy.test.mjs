@@ -1,4 +1,4 @@
-import { evaluateReleasePolicy } from "../../../src/commands/release/policy.mjs";
+import evaluateReleasePolicy from "../../../src/commands/release/policy.mjs";
 
 const fsWithPackageVersion = (version) => ({
   existsSync: (file) => file === "package.json",

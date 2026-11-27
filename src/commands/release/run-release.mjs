@@ -1,6 +1,6 @@
-import { evaluateReleasePolicy } from "./policy.mjs";
+import evaluateReleasePolicy from "./policy.mjs";
 
-export async function runReleaseCommand({
+export default async function runReleaseCommand({
   options,
   fs,
   execFileSync,

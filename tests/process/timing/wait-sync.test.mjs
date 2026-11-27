@@ -1,4 +1,4 @@
-import { waitSync } from "../../../src/process/timing/wait-sync.mjs";
+import waitSync from "../../../src/process/timing/wait-sync.mjs";
 
 test("does not wait for non-positive durations", () => {
   expect(() => waitSync(0)).not.toThrow();

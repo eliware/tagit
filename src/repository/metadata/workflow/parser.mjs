@@ -2,7 +2,7 @@ function indentation(line) {
   return line.length - line.trimStart().length;
 }
 
-export function parseWorkflow(text) {
+export default function parseWorkflow(text) {
   const lines = text
     .split(/\r?\n/)
     .filter((line) => line.trim() && !line.trimStart().startsWith("#"));

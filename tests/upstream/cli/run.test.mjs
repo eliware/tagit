@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runUpstreamCli } from "../../../src/upstream/cli/run.mjs";
+import runUpstreamCli from "../../../src/upstream/cli/run.mjs";
 
 function dependencies() {
   return {

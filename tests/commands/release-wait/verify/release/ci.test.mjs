@@ -1,4 +1,4 @@
-import { verifyReleaseCi } from "../../../../../src/commands/release-wait/verify/release/ci.mjs";
+import verifyReleaseCi from "../../../../../src/commands/release-wait/verify/release/ci.mjs";
 
 test("returns accepted optional Windows jobs from release CI verification", () => {
   const windowsJob = {

@@ -1,4 +1,4 @@
-export function formatNotesReport(tag, changes) {
+export default function formatNotesReport(tag, changes) {
   const { commits, files, excerpt } = changes;
   return [
     "tagit notes report",

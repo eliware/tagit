@@ -1,4 +1,4 @@
-export function noPublicationTarget() {
+export default function noPublicationTarget() {
   return {
     applicable: false,
     ghcrApplicable: false,

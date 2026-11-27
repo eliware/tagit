@@ -1,4 +1,4 @@
-import { validateCurrentHead } from "../../../src/git/tags/validate-release-tag.mjs";
+import validateCurrentHead from "../../../src/git/tags/validate-release-tag.mjs";
 
 test("validates current and existing tag heads", () => {
   expect(validateCurrentHead("abc", "def")).toEqual({ currentHead: "abc", existingTagHead: "def" });

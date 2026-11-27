@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runProcessAsync } from "../../../src/process/async/run-process.mjs";
+import runProcessAsync from "../../../src/process/async/run-process.mjs";
 
 test("runs an injected asynchronous process and captures output", async () => {
   const exec = jest.fn((command, args, options, callback) => callback(null, "out", "err"));

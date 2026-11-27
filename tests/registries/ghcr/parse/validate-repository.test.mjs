@@ -1,4 +1,4 @@
-import { validateGhcrRepository } from "../../../../src/registries/ghcr/parse/validate-repository.mjs";
+import validateGhcrRepository from "../../../../src/registries/ghcr/parse/validate-repository.mjs";
 
 test("accepts a valid owner and image pair", () => {
   expect(validateGhcrRepository("eliware/tagit")).toBe("eliware/tagit");

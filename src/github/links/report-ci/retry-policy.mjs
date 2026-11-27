@@ -1,6 +1,6 @@
-import { readCiRuns } from "../read/ci-run-links.mjs";
+import readCiRuns from "../read/ci-run-links.mjs";
 
-export function readCiRunsWithRetry(
+export default function readCiRunsWithRetry(
   execFileSync,
   log,
   repo,

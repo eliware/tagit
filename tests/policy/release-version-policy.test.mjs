@@ -1,4 +1,4 @@
-import { requireExplicitReleaseVersion } from "../../src/policy/release-version-policy.mjs";
+import requireExplicitReleaseVersion from "../../src/policy/release-version-policy.mjs";
 
 test("requires release commands to carry a version", () => {
   expect(() => requireExplicitReleaseVersion({ command: "release", version: null })).toThrow(

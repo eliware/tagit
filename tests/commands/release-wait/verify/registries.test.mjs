@@ -5,14 +5,14 @@ const verifyRegistryChecks = jest.fn();
 
 jest.unstable_mockModule(
   "../../../../src/commands/release-wait/verify/registry/policy.mjs",
-  () => ({ selectRegistryPolicy }),
+  () => ({ default: selectRegistryPolicy }),
 );
 jest.unstable_mockModule(
   "../../../../src/commands/release-wait/verify/registry/checks.mjs",
-  () => ({ verifyRegistryChecks }),
+  () => ({ default: verifyRegistryChecks }),
 );
 
-const { verifyRegistries } =
+const { default: verifyRegistries } =
   await import("../../../../src/commands/release-wait/verify/registries.mjs");
 
 const options = {

@@ -1,11 +1,11 @@
-import { validateRepository } from "../../../repository/validate/repository.mjs";
-import { runLocalChecks } from "./local/checks.mjs";
-import { throwPreflightFailures } from "../report.mjs";
-import { collectPreflightContext } from "../collect-context.mjs";
-import { runCiCheck } from "./ci-check.mjs";
+import validateRepository from "../../../repository/validate/repository.mjs";
+import runLocalChecks from "./local/checks.mjs";
+import throwPreflightFailures from "../report.mjs";
+import collectPreflightContext from "../collect-context.mjs";
+import runCiCheck from "./ci-check.mjs";
 
 const CHECK_TIMEOUT_MS = 180000;
-export function runPreflight(
+export default function runPreflight(
   execFileSync,
   fs,
   log,

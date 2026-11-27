@@ -1,4 +1,4 @@
-export function buildExactHeadRunCommand(headSha, repository, selectedRun) {
+export default function buildExactHeadRunCommand(headSha, repository, selectedRun) {
   const repoArg = repository ? ["--repo", repository] : [];
   const args = selectedRun
     ? [

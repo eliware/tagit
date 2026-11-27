@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runReleaseCommand } from "../../../src/commands/release/run-release.mjs";
+import runReleaseCommand from "../../../src/commands/release/run-release.mjs";
 
 const base = () => ({
   options: { version: "1.2.3", dryRun: false },

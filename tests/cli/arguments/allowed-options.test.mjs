@@ -1,4 +1,4 @@
-import { validateAllowedOptions } from "../../../src/cli/arguments/allowed-options.mjs";
+import validateAllowedOptions from "../../../src/cli/arguments/allowed-options.mjs";
 
 test("rejects an option outside the allowed vocabulary", () => {
   expect(() => validateAllowedOptions(["release", "--bad"])).toThrow("Unknown option: --bad");

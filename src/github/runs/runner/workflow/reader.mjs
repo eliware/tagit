@@ -3,7 +3,7 @@ function isMissingWorkflow(error, revision, workflowPath) {
   return details.includes(`fatal: path '${workflowPath}' does not exist in '${revision}'`);
 }
 
-export function readWorkflowContentsFromGit(execFileSync, revision, workflowPaths) {
+export default function readWorkflowContentsFromGit(execFileSync, revision, workflowPaths) {
   const contentsByPath = Object.create(null);
   for (const workflowPath of workflowPaths) {
     try {

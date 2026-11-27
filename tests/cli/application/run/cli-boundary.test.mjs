@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runCliBoundary } from "../../../../src/cli/application/run/cli-boundary.mjs";
+import runCliBoundary from "../../../../src/cli/application/run/cli-boundary.mjs";
 
 test("dispatches help through the CLI boundary", async () => {
   const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});

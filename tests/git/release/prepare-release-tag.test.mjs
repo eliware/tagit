@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { prepareReleaseTag } from "../../../src/git/release/prepare-release-tag.mjs";
+import prepareReleaseTag from "../../../src/git/release/prepare-release-tag.mjs";
 test("adds a tag to the validated release commit", () => {
   const exec = jest.fn();
   const log = { info: jest.fn() };

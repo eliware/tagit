@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { prepareReleaseContext } from "../../../src/commands/release-wait/prepare-release-context.mjs";
+import prepareReleaseContext from "../../../src/commands/release-wait/prepare-release-context.mjs";
 
 const options = {
   version: "1.2.3",

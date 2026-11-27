@@ -1,4 +1,4 @@
-import { classifyJobsByPlatform } from "../../../../src/github/runs/runner/job-platforms.mjs";
+import classifyJobsByPlatform from "../../../../src/github/runs/runner/job-platforms.mjs";
 
 test("classifies Ubuntu and Windows jobs by runner labels", () => {
   const ubuntu = { name: "linux", labels: ["ubuntu-latest"] };

@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { publishesGhcr } from "../../../src/registries/ghcr/discover-publication.mjs";
+import publishesGhcr from "../../../src/registries/ghcr/discover-publication.mjs";
 
 test("detects the declared GHCR publication profile", () => {
   const fs = {

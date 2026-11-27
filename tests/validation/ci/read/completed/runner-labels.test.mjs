@@ -1,4 +1,4 @@
-import { addCompletedRunRunnerLabels } from "../../../../../src/validation/ci/read/completed/runner-labels.mjs";
+import addCompletedRunRunnerLabels from "../../../../../src/validation/ci/read/completed/runner-labels.mjs";
 
 test("adds runner labels to copied job records", () => {
   const jobs = [{ name: "validate", status: "completed" }, { name: "publish" }];

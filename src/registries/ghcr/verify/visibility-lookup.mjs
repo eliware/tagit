@@ -1,7 +1,7 @@
-import { execFileCommand } from "../../../process/async/exec-file-command.mjs";
-import { parseGhcrVersionsResponse } from "../parse/versions-response.mjs";
+import execFileCommand from "../../../process/async/exec-file-command.mjs";
+import parseGhcrVersionsResponse from "../parse/versions-response.mjs";
 
-export async function lookupGhcrVisibleImage(execFile, { owner, imageName, version }) {
+export default async function lookupGhcrVisibleImage(execFile, { owner, imageName, version }) {
   const packagePath = `/orgs/${encodeURIComponent(owner)}/packages/container/${encodeURIComponent(imageName)}/versions`;
   let output;
   try {

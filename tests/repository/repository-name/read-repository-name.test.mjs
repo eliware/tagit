@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readRepositoryName } from "../../../src/repository/repository-name/read-repository-name.mjs";
+import readRepositoryName from "../../../src/repository/repository-name/read-repository-name.mjs";
 
 test.each(["https://github.com/eliware/tagit.git\n", "git@github.com:eliware/tagit.git"])(
   "reads the owner and repository from a GitHub origin remote: %s",

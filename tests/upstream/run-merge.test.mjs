@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { runUpstream } from "../../src/upstream/run-merge.mjs";
+import runUpstream from "../../src/upstream/run-merge.mjs";
 
 test("merges upstream and pushes", () => {
   const exec = jest.fn((command, args) =>

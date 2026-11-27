@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollPendingRun } from "../../../src/validation/ci/poll-pending-run.mjs";
+import pollPendingRun from "../../../src/validation/ci/poll-pending-run.mjs";
 
 test("watches pending runs within the polling budget", () => {
   const exec = jest.fn();

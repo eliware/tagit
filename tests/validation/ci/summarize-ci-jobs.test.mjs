@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { summarizeCiJobs } from "../../../src/validation/ci/summarize-ci-jobs.mjs";
+import summarizeCiJobs from "../../../src/validation/ci/summarize-ci-jobs.mjs";
 
 test("summarizes job statuses for candidates", () => {
   const execFileSync = jest.fn(() =>

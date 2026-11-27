@@ -1,5 +1,5 @@
-import { verifyReleaseJobs } from "../../../../github/runs/release/job/policy.mjs";
+import verifyReleaseJobs from "../../../../github/runs/release/job/policy.mjs";
 
-export function verifyReleaseCi(run, runnerLabelsByJobName = {}) {
+export default function verifyReleaseCi(run, runnerLabelsByJobName = {}) {
   return verifyReleaseJobs(run.jobs, runnerLabelsByJobName, run).windowsJobs;
 }

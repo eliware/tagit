@@ -1,4 +1,4 @@
-import { formatReleasePollFailure } from "../../../../../../src/commands/release-wait/release/ci/poll/failure-message.mjs";
+import formatReleasePollFailure from "../../../../../../src/commands/release-wait/release/ci/poll/failure-message.mjs";
 
 test("returns no message for a passing or pending run", () => {
   expect(

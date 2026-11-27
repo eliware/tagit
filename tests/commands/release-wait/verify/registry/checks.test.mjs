@@ -5,14 +5,14 @@ const verifyGhcrPublication = jest.fn();
 
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/registries/npm-check.mjs",
-  () => ({ verifyNpmRegistry }),
+  () => ({ default: verifyNpmRegistry }),
 );
 jest.unstable_mockModule(
   "../../../../../src/commands/release-wait/verify/registries/ghcr-check.mjs",
-  () => ({ verifyGhcrPublication }),
+  () => ({ default: verifyGhcrPublication }),
 );
 
-const { verifyRegistryChecks } =
+const { default: verifyRegistryChecks } =
   await import("../../../../../src/commands/release-wait/verify/registry/checks.mjs");
 
 const options = {

@@ -1,4 +1,4 @@
-import { validateVersionOptionDuplicates } from "../../../../src/cli/arguments/option-duplicates/version.mjs";
+import validateVersionOptionDuplicates from "../../../../src/cli/arguments/option-duplicates/version.mjs";
 
 test("rejects repeated version options", () => {
   expect(() => validateVersionOptionDuplicates(["--version", "--version"])).toThrow(

@@ -1,4 +1,4 @@
-import { parseUpstreamArguments } from "../../../../src/upstream/merge/arguments/parser.mjs";
+import parseUpstreamArguments from "../../../../src/upstream/merge/arguments/parser.mjs";
 
 test("extracts dry-run options from merge-message arguments", () => {
   const args = ["--dry-run", "sync", "mainline"];

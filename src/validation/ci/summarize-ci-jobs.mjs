@@ -1,7 +1,7 @@
-import { validateJobRecords } from "./validate/job-records.mjs";
-import { readCiRun } from "./read/run.mjs";
+import validateJobRecords from "./validate/job-records.mjs";
+import readCiRun from "./read/run.mjs";
 
-export function summarizeCiJobs(execFileSync, candidates) {
+export default function summarizeCiJobs(execFileSync, candidates) {
   return candidates
     .map((run) => {
       const data = readCiRun(execFileSync, run.databaseId);

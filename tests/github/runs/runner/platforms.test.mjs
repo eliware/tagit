@@ -1,4 +1,4 @@
-import { classifyRunnerPlatforms } from "../../../../src/github/runs/runner/platforms.mjs";
+import classifyRunnerPlatforms from "../../../../src/github/runs/runner/platforms.mjs";
 
 test.each([
   [["ubuntu-latest"], ["ubuntu"]],

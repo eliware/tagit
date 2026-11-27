@@ -1,4 +1,4 @@
-import { readWorkflowJobLabelEntries } from "../../../../../../src/github/runs/runner/workflow/label/identities.mjs";
+import readWorkflowJobLabelEntries from "../../../../../../src/github/runs/runner/workflow/label/identities.mjs";
 
 test("extracts both job ids and display names with their labels", () => {
   expect(

@@ -1,8 +1,8 @@
-import { classifyNpmViewAttempt } from "./attempt.mjs";
-import { reportNpmViewFailure } from "./failure.mjs";
-import { reportNpmViewResult } from "./result.mjs";
+import classifyNpmViewAttempt from "./attempt.mjs";
+import reportNpmViewFailure from "./failure.mjs";
+import reportNpmViewResult from "./result.mjs";
 
-export function reportNpmViewAttempt(log, status, attempt) {
+export default function reportNpmViewAttempt(log, status, attempt) {
   const result = classifyNpmViewAttempt(attempt);
   if (result.type === "failure") {
     reportNpmViewFailure(log, status, result.error);

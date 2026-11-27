@@ -1,4 +1,4 @@
-export function buildPublicationWorkflowTargets(npmWorkflow, ghcrApplicable) {
+export default function buildPublicationWorkflowTargets(npmWorkflow, ghcrApplicable) {
   const workflows = npmWorkflow ? [npmWorkflow] : [];
   if (ghcrApplicable)
     workflows.push({ workflowPath: ".github/workflows/ghcr.yaml", profile: "ghcr" });

@@ -1,6 +1,6 @@
-import { satisfiesDeclaredRange } from "./satisfies-declared-range.mjs";
+import satisfiesDeclaredRange from "./satisfies-declared-range.mjs";
 
-export function hasInstalledSharedHarness(fs, packageData) {
+export default function hasInstalledSharedHarness(fs, packageData) {
   if (packageData.name === "@eliware/test") return true;
   const declaredRange = packageData.devDependencies?.["@eliware/test"];
   if (!declaredRange) return false;

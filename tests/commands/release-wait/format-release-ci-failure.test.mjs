@@ -1,4 +1,4 @@
-import { formatReleaseCiFailure } from "../../../src/commands/release-wait/format-release-ci-failure.mjs";
+import formatReleaseCiFailure from "../../../src/commands/release-wait/format-release-ci-failure.mjs";
 
 test("formats completed CI failures with job evidence", () => {
   expect(

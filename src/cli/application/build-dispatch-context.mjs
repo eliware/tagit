@@ -1,4 +1,4 @@
-export function buildDispatchContext(dependencies) {
+export default function buildDispatchContext(dependencies) {
   const {
     fs,
     execFileSync,

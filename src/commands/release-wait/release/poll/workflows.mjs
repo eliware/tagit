@@ -1,4 +1,4 @@
-export async function pollReleaseWorkflows(poll, common, workflows) {
+export default async function pollReleaseWorkflows(poll, common, workflows) {
   return Promise.all(
     workflows.map(async (workflow) => {
       const run = await poll({

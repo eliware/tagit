@@ -1,8 +1,8 @@
 import { execFile as defaultExecFile } from "node:child_process";
-import { sleep as sleepDefault } from "../../../process/timing/sleep.mjs";
-import { prepareReleaseContext } from "../prepare-release-context.mjs";
-import { verifyReleaseCompletion } from "./release/completion.mjs";
-export async function verifyRelease(
+import sleepDefault from "../../../process/timing/sleep.mjs";
+import prepareReleaseContext from "../prepare-release-context.mjs";
+import verifyReleaseCompletion from "./release/completion.mjs";
+export default async function verifyRelease(
   execFileSync,
   fs,
   log,

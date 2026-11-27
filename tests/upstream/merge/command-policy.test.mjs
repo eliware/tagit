@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { handleUpstreamDryRun } from "../../../src/upstream/merge/command-policy.mjs";
+import handleUpstreamDryRun from "../../../src/upstream/merge/command-policy.mjs";
 
 test("reports the dry-run plan without running a merge", () => {
   const exec = jest.fn(() => "upstream/main");

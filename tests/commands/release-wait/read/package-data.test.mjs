@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readPackageData } from "../../../../src/commands/release-wait/read/package-data.mjs";
+import readPackageData from "../../../../src/commands/release-wait/read/package-data.mjs";
 
 test("reads and parses package metadata", () => {
   const fs = {

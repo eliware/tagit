@@ -3,9 +3,9 @@ import { jest } from "@jest/globals";
 const verifyPublicationRegistries = jest.fn();
 jest.unstable_mockModule(
   "../../../../../../src/commands/release-wait/release/publication/registries.mjs",
-  () => ({ verifyPublicationRegistries }),
+  () => ({ default: verifyPublicationRegistries }),
 );
-const { verifyReleasePublicationRegistries } =
+const { default: verifyReleasePublicationRegistries } =
   await import("../../../../../../src/commands/release-wait/verify/release/publication/registries.mjs");
 
 const options = {

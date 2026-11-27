@@ -1,4 +1,4 @@
-import { defaultDependencies } from "../../../src/cli/application/default-dependencies.mjs";
+import defaultDependencies from "../../../src/cli/application/default-dependencies.mjs";
 test("builds the production dependency boundary", () =>
   expect(defaultDependencies()).toEqual(
     expect.objectContaining({

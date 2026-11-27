@@ -1,6 +1,6 @@
-import { verifyNpmPublication } from "../../../../registries/npm/verify-publication.mjs";
+import verifyNpmPublication from "../../../../registries/npm/verify-publication.mjs";
 
-export async function verifyNpmRegistry({
+export default async function verifyNpmRegistry({
   execFile,
   log,
   packageName,

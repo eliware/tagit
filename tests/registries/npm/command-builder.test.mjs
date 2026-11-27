@@ -1,5 +1,5 @@
-import { buildNpmCommand } from "../../../src/registries/npm/command-builder.mjs";
-import { buildWindowsNpmCommand } from "../../../src/process/commands/windows/npm.mjs";
+import buildNpmCommand from "../../../src/registries/npm/command-builder.mjs";
+import buildWindowsNpmCommand from "../../../src/process/commands/windows/npm.mjs";
 
 const args = ["view", "demo@1.0.0", "version", "--json"];
 

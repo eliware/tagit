@@ -8,7 +8,7 @@ const COMPLETED_CONCLUSIONS = [
   "action_required",
 ];
 
-export function validateCompletedConclusion(run) {
+export default function validateCompletedConclusion(run) {
   if (run?.status !== "completed") return;
   if (!COMPLETED_CONCLUSIONS.includes(run.conclusion))
     throw new Error(

@@ -1,4 +1,4 @@
-export function readRepositoryName(execFileSync) {
+export default function readRepositoryName(execFileSync) {
   const remote = execFileSync("git", ["remote", "get-url", "origin"], { encoding: "utf8" }).trim();
   const match = remote.match(
     /^(?:https?:\/\/github\.com\/|git@github\.com:)([^/]+\/[^/]+?)(?:\.git)?$/i,

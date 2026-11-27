@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { hasGhcrPublicationWorkflow } from "../../../../src/registries/ghcr/publication/workflow-policy.mjs";
+import hasGhcrPublicationWorkflow from "../../../../src/registries/ghcr/publication/workflow-policy.mjs";
 
 test("checks for the canonical GHCR publication workflow", () => {
   const existsSync = jest.fn(() => true);

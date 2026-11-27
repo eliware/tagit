@@ -1,4 +1,4 @@
-export function validateReleaseRunRecords(runs, tag) {
+export default function validateReleaseRunRecords(runs, tag) {
   if (!Array.isArray(runs))
     throw new Error(`Release CI data is malformed for ${tag}: run list is not an array.`);
   if (

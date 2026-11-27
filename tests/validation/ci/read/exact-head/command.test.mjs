@@ -1,4 +1,4 @@
-import { buildExactHeadRunCommand } from "../../../../../src/validation/ci/read/exact-head/command.mjs";
+import buildExactHeadRunCommand from "../../../../../src/validation/ci/read/exact-head/command.mjs";
 
 test("builds a list command for an exact commit", () => {
   expect(buildExactHeadRunCommand("abc", "eliware/demo", null)).toEqual({

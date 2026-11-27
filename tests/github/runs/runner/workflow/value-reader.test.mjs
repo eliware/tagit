@@ -1,4 +1,4 @@
-import { readRunnerValueDeclaration } from "../../../../../src/github/runs/runner/workflow/value-reader.mjs";
+import readRunnerValueDeclaration from "../../../../../src/github/runs/runner/workflow/value-reader.mjs";
 
 test("extracts the runs-on declaration and its indented block", () => {
   expect(

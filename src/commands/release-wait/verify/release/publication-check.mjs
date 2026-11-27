@@ -1,6 +1,6 @@
-import { verifyReleasePublication } from "./publication.mjs";
+import verifyReleasePublication from "./publication.mjs";
 
-export async function checkReleasePublication({
+export default async function checkReleasePublication({
   fs,
   poll,
   common,

@@ -1,4 +1,4 @@
-import { preflightGuide } from "../../../src/cli/guidance/preflight-guide.mjs";
+import preflightGuide from "../../../src/cli/guidance/preflight-guide.mjs";
 test("documents shared validation and optional Windows CI", () => {
   expect(preflightGuide()).toContain(
     "shared harness checks tests, lint, type checks, audit, packaging",

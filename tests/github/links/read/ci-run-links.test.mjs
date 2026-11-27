@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readCiRuns } from "../../../../src/github/links/read/ci-run-links.mjs";
+import readCiRuns from "../../../../src/github/links/read/ci-run-links.mjs";
 
 test("reads and filters exact-head CI runs", () => {
   const exec = jest.fn(() =>

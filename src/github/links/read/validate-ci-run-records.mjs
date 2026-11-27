@@ -1,4 +1,4 @@
-export function validateCiRunRecords(runs) {
+export default function validateCiRunRecords(runs) {
   if (!Array.isArray(runs)) throw new Error("GitHub CI link response must be an array.");
   const malformed = runs.filter(
     (run) =>

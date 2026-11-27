@@ -1,6 +1,6 @@
-import { readGhcrVisibilityAttempt } from "./poll/attempt.mjs";
+import readGhcrVisibilityAttempt from "./poll/attempt.mjs";
 
-export async function pollGhcrVisibility(
+export default async function pollGhcrVisibility(
   execFile,
   log,
   { owner, imageName, version, retries, retryMs, sleep, onVisible = (image) => image },

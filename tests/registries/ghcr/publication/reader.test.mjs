@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readGhcrPublication } from "../../../../src/registries/ghcr/publication/reader.mjs";
+import readGhcrPublication from "../../../../src/registries/ghcr/publication/reader.mjs";
 
 test("reads package metadata when both publication files exist", () => {
   const fs = {

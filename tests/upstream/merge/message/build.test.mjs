@@ -1,4 +1,4 @@
-import { mergeMessage } from "../../../../src/upstream/merge/message/build.mjs";
+import mergeMessage from "../../../../src/upstream/merge/message/build.mjs";
 
 test("builds safe supplied or timestamp merge messages", () => {
   expect(mergeMessage(["merge"], new Date("2026-07-29T18:07:59Z"))).toBe("merge");

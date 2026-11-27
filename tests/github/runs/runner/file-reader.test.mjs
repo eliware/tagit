@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { readWorkflowRunnerLabelsFile } from "../../../../src/github/runs/runner/file-reader.mjs";
-import { parseWorkflowRunnerLabels } from "../../../../src/github/runs/runner/workflow/label/reader.mjs";
+import readWorkflowRunnerLabelsFile from "../../../../src/github/runs/runner/file-reader.mjs";
+import parseWorkflowRunnerLabels from "../../../../src/github/runs/runner/workflow/label/reader.mjs";
 
 test("returns no labels when the requested workflow file is absent", () => {
   expect(

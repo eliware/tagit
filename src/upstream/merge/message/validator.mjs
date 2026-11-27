@@ -1,4 +1,4 @@
-export function validateMergeMessage(message) {
+export default function validateMergeMessage(message) {
   const hasControlCharacter = Array.from(message).some((character) => {
     const code = character.codePointAt(0);
     return code < 32 || code === 127;

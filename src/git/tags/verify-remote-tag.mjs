@@ -1,4 +1,4 @@
-export function verifyRemoteTag(remoteOutput, releaseTag, currentHead) {
+export default function verifyRemoteTag(remoteOutput, releaseTag, currentHead) {
   const lines = String(remoteOutput ?? "")
     .trim()
     .split(/\r?\n/)

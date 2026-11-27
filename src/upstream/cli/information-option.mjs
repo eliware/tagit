@@ -1,4 +1,4 @@
-export function selectInformationOption(args) {
+export default function selectInformationOption(args) {
   if (!Array.isArray(args)) throw new TypeError("Upstream arguments must be an array.");
   const hasHelp = args.some((argument) => ["--help", "-h"].includes(argument));
   const hasVersion = args.some((argument) => ["--version", "-v"].includes(argument));

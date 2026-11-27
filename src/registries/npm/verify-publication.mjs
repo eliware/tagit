@@ -1,9 +1,9 @@
-import { validateNpmViewCommandInputs } from "./validate/view-command.mjs";
-import { buildNpmViewArguments } from "./build-view-command.mjs";
-import { buildNpmCommand } from "./command-builder.mjs";
-import { pollNpmPublication } from "./poll.mjs";
+import validateNpmViewCommandInputs from "./validate/view-command.mjs";
+import buildNpmViewArguments from "./build-view-command.mjs";
+import buildNpmCommand from "./command-builder.mjs";
+import pollNpmPublication from "./poll.mjs";
 
-export async function verifyNpmPublication(
+export default async function verifyNpmPublication(
   execFile,
   log,
   { packageName, version, retries, retryMs, sleep },

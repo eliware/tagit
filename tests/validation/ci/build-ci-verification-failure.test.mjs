@@ -1,4 +1,4 @@
-import { buildCiVerificationFailure } from "../../../src/validation/ci/build-ci-verification-failure.mjs";
+import buildCiVerificationFailure from "../../../src/validation/ci/build-ci-verification-failure.mjs";
 
 test("formats observed run details", () => {
   expect(

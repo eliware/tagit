@@ -1,2 +1,4 @@
-export const ownerGuidance =
+const ownerGuidance =
   "Project owners may run only tagit notes, tagit push, and tagit preflight. Project owners must not run tagit release or tagit release-wait. DevOps runs those commands after preflight passes. DevOps may use --ignore-100x4 only with an approved documented waiver. All other gates remain mandatory.";
+
+export default ownerGuidance;

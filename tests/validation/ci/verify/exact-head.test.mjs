@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyLatestCi } from "../../../../src/validation/ci/verify/exact-head.mjs";
+import verifyLatestCi from "../../../../src/validation/ci/verify/exact-head.mjs";
 
 const log = { info: jest.fn() };
 

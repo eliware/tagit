@@ -1,4 +1,4 @@
-import { shouldNormalizeCompletedWorkflowJob } from "../../../../../src/github/runs/release/job/normalization-policy.mjs";
+import shouldNormalizeCompletedWorkflowJob from "../../../../../src/github/runs/release/job/normalization-policy.mjs";
 
 const passedWorkflow = { status: "completed", conclusion: "success" };
 const staleJob = { status: "in_progress", conclusion: null };

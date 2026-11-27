@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { verifyCiCandidates } from "../../../../src/validation/ci/verify/candidates.mjs";
+import verifyCiCandidates from "../../../../src/validation/ci/verify/candidates.mjs";
 
 test("returns the first passing candidate result", () => {
   const candidates = [{ databaseId: 1 }, { databaseId: 2 }];

@@ -8,7 +8,7 @@ const allowedOptions = new Set([
   "--ignore-monolith-limits",
 ]);
 
-export function validateAllowedOptions(argv) {
+export default function validateAllowedOptions(argv) {
   for (const argument of argv.slice(1))
     if (argument.startsWith("-") && !allowedOptions.has(argument))
       throw new Error(`Unknown option: ${argument}`);

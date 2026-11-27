@@ -1,4 +1,4 @@
-import { normalizeGhcrVersionsResponse } from "../../../../src/registries/ghcr/parse/normalize-versions-response.mjs";
+import normalizeGhcrVersionsResponse from "../../../../src/registries/ghcr/parse/normalize-versions-response.mjs";
 
 test("parses an array response and flattens paginated responses", () => {
   const image = { name: "image" };

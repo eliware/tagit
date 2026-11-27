@@ -1,12 +1,16 @@
 # Release Notes
 
-## 15.1.0 — 2026-11-03
+## 15.2.0 — 2026-11-26
 
 ### Changed
 
-- Check only for the exact-tag CI run during `tagit release`. Report CI and job links, then exit. Keep CI results, publication workflow checks, and registry checks in `tagit release-wait`.
-- Mark the `tagit`, `push`, and `upstream` CLI files executable.
-- Update `@eliware/common` to 15.0.1 and `@eliware/test` to 15.1.0. Refresh compatible dependencies in the lockfile.
+- End `tagit release` after the exact-tag CI run starts and report its links. Keep publication and registry checks in `tagit release-wait`.
+- Mark the `tagit`, `push`, and `upstream` command files executable.
+- Update `@eliware/common` to 15.0.1 and `@eliware/test` to 15.2.0. Refresh compatible dependencies in the lockfile.
+- Add the NAS Knit target for package validation.
+- Expand setup, command, release, and troubleshooting guidance. Align repository rules with the v15 conventions.
+- Split release checks, workflow parsing, registry handling, and CLI policies into focused modules.
+- Use one default export for each implementation module as Eliware Test 15.2.0 requires.
 
 ## 15.0.1 — 2026-10-26
 

@@ -1,4 +1,4 @@
-import { selectSuccessfulPublishJobs } from "../../../../../src/commands/release-wait/verify/publish/job.mjs";
+import selectSuccessfulPublishJobs from "../../../../../src/commands/release-wait/verify/publish/job.mjs";
 
 test("selects only completed successful publish jobs", () => {
   const successful = { name: "publish", status: "completed", conclusion: "success" };

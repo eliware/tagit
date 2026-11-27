@@ -1,6 +1,6 @@
-import { verifyGhcrRegistry } from "./ghcr.mjs";
+import verifyGhcrRegistry from "./ghcr.mjs";
 
-export async function verifyGhcrPublication({
+export default async function verifyGhcrPublication({
   applicable,
   execFile,
   log,

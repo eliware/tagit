@@ -1,7 +1,7 @@
-import { isReleaseVersion } from "../../../versioning/is-release-version.mjs";
-import { verifyReleaseTagStability } from "./tag-stability.mjs";
+import isReleaseVersion from "../../../versioning/is-release-version.mjs";
+import verifyReleaseTagStability from "./tag-stability.mjs";
 
-export function resolveLatestReleaseTag(execFileSync) {
+export default function resolveLatestReleaseTag(execFileSync) {
   const tag = execFileSync("git", ["describe", "--tags", "--abbrev=0"]).toString().trim();
   const version = tag.replace(/^v/, "");
   if (!isReleaseVersion(version))

@@ -1,4 +1,4 @@
-import { parseRunnerValues } from "../../../../../src/github/runs/runner/workflow/values.mjs";
+import parseRunnerValues from "../../../../../src/github/runs/runner/workflow/values.mjs";
 
 test("parses inline runner values", () => {
   expect(parseRunnerValues({ value: "[self-hosted, ubuntu-latest]", blockLines: [] })).toEqual([

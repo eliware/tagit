@@ -1,6 +1,6 @@
-import { readWorkflowJobLabelEntries } from "./identities.mjs";
-import { mergeWorkflowRunnerLabelEntries } from "./merge.mjs";
+import readWorkflowJobLabelEntries from "./identities.mjs";
+import mergeWorkflowRunnerLabelEntries from "./merge.mjs";
 
-export function mapWorkflowJobRunnerLabels(jobs) {
+export default function mapWorkflowJobRunnerLabels(jobs) {
   return mergeWorkflowRunnerLabelEntries(readWorkflowJobLabelEntries(jobs));
 }

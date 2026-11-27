@@ -1,4 +1,4 @@
-export function parseRunnerValues(declaration) {
+export default function parseRunnerValues(declaration) {
   if (declaration === null) return null;
   if (declaration.value) {
     const values =

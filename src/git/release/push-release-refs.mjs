@@ -1,4 +1,4 @@
-export function pushReleaseRefs(runGit, tag) {
+export default function pushReleaseRefs(runGit, tag) {
   return runGit(["push", "--atomic", "origin", "HEAD:refs/heads/main", `refs/tags/${tag}`], {
     stdio: "inherit",
   });

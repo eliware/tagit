@@ -1,4 +1,4 @@
-import { validateBranch } from "../../../src/repository/validate/branch.mjs";
+import validateBranch from "../../../src/repository/validate/branch.mjs";
 
 test("accepts the main branch", () => {
   const failures = [];

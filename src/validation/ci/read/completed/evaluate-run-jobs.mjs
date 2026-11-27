@@ -1,8 +1,8 @@
-import { evaluateJobPolicy } from "../../evaluate-job-policy.mjs";
-import { validateJobRecords } from "../../validate/job-records.mjs";
-import { addCompletedRunRunnerLabels } from "./runner-labels.mjs";
+import evaluateJobPolicy from "../../evaluate-job-policy.mjs";
+import validateJobRecords from "../../validate/job-records.mjs";
+import addCompletedRunRunnerLabels from "./runner-labels.mjs";
 
-export function evaluateCompletedRunJobs(data, runId, runnerLabelsByJobName = {}) {
+export default function evaluateCompletedRunJobs(data, runId, runnerLabelsByJobName = {}) {
   const jobs = addCompletedRunRunnerLabels(
     validateJobRecords(data.jobs, runId),
     runnerLabelsByJobName,

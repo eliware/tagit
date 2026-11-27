@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readUpstreamMergeConflictFiles } from "../../../../src/upstream/merge/conflict/files.mjs";
+import readUpstreamMergeConflictFiles from "../../../../src/upstream/merge/conflict/files.mjs";
 
 test("reads unmerged Git file names", () => {
   const execFileSync = jest.fn(() => "src/file.mjs\n");

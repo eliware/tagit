@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { readJobLinks } from "../../../../src/github/links/report-ci/read-job-links.mjs";
+import readJobLinks from "../../../../src/github/links/report-ci/read-job-links.mjs";
 
 const run = { databaseId: 7 };
 

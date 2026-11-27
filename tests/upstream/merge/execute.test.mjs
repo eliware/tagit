@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { executeUpstreamMerge } from "../../../src/upstream/merge/execute.mjs";
+import executeUpstreamMerge from "../../../src/upstream/merge/execute.mjs";
 
 test("fetches, merges, and pushes the upstream branch", () => {
   const exec = jest.fn((_command, args) => (args[0] === "symbolic-ref" ? "upstream/main\n" : ""));

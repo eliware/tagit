@@ -1,4 +1,4 @@
-import { buildPublicationWorkflowTargets } from "../../../../src/commands/release-wait/read/workflow-targets.mjs";
+import buildPublicationWorkflowTargets from "../../../../src/commands/release-wait/read/workflow-targets.mjs";
 
 test.each([
   [null, false, []],

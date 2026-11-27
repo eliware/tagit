@@ -1,3 +1,3 @@
-export function releaseTag(version) {
+export default function releaseTag(version) {
   return `v${version}`;
 }

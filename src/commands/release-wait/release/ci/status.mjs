@@ -1,7 +1,7 @@
-import { runReleaseCiPollAttempt } from "./poll/attempt.mjs";
-import { recoverReleaseCiPollError } from "./poll/error/recovery.mjs";
+import runReleaseCiPollAttempt from "./poll/attempt.mjs";
+import recoverReleaseCiPollError from "./poll/error/recovery.mjs";
 
-export async function pollReleaseCi({
+export default async function pollReleaseCi({
   execFile,
   repo,
   headSha,

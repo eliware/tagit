@@ -1,4 +1,5 @@
-import { isHelp, parseOptions } from "../../../../src/cli/arguments/parse/options.mjs";
+import parseOptions from "../../../../src/cli/arguments/parse/options.mjs";
+import isHelp from "../../../../src/cli/arguments/parse/is-help.mjs";
 
 test("parses supported command and version results", () => {
   expect(isHelp(["--help"])).toBe(true);

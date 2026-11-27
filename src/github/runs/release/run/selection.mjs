@@ -1,8 +1,13 @@
-import { validateReleaseRunRecords } from "./records.mjs";
-import { selectReleaseRunBranches } from "./branch-policy.mjs";
-import { assertUnambiguousReleaseRunTimestamps } from "./ambiguity-policy.mjs";
+import validateReleaseRunRecords from "./records.mjs";
+import selectReleaseRunBranches from "./branch-policy.mjs";
+import assertUnambiguousReleaseRunTimestamps from "./ambiguity-policy.mjs";
 
-export function selectReleaseRun(runs, headSha, tag, workflowPath = ".github/workflows/ci.yaml") {
+export default function selectReleaseRun(
+  runs,
+  headSha,
+  tag,
+  workflowPath = ".github/workflows/ci.yaml",
+) {
   validateReleaseRunRecords(runs, tag);
   const branches = selectReleaseRunBranches(tag, workflowPath);
   const eligible = runs

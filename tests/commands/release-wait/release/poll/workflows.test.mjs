@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { pollReleaseWorkflows } from "../../../../../src/commands/release-wait/release/poll/workflows.mjs";
+import pollReleaseWorkflows from "../../../../../src/commands/release-wait/release/poll/workflows.mjs";
 
 test("polls each workflow with shared options and returns its run", async () => {
   const poll = jest

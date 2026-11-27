@@ -1,3 +1,3 @@
-export function formatParseError(value) {
+export default function formatParseError(value) {
   return value?.message ?? value;
 }

@@ -1,4 +1,4 @@
-export function buildCompletedRunResult(data, headSha, policy) {
+export default function buildCompletedRunResult(data, headSha, policy) {
   return {
     passed:
       !policy.failed &&

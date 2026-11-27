@@ -1,7 +1,7 @@
-import { verifyLatestCi } from "./exact-head.mjs";
-import { readWorkflowRunnerLabelsFile } from "../../../github/runs/runner/file-reader.mjs";
+import verifyLatestCi from "./exact-head.mjs";
+import readWorkflowRunnerLabelsFile from "../../../github/runs/runner/file-reader.mjs";
 
-export function verifyPreflightCi(execFileSync, log, status, fs = null) {
+export default function verifyPreflightCi(execFileSync, log, status, fs = null) {
   if (status) return { passed: false, blocked: true };
   try {
     const headSha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();

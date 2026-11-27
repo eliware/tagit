@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { processCommand } from "../../../../../src/validation/local/process/command.mjs";
-import { runLocalChecks } from "../../../../../src/validation/preflight/run/local/checks.mjs";
+import processCommand from "../../../../../src/validation/local/process/command.mjs";
+import runLocalChecks from "../../../../../src/validation/preflight/run/local/checks.mjs";
 
 const fs = {
   lstatSync: () => ({ isSymbolicLink: () => false }),

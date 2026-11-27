@@ -1,4 +1,4 @@
-export function runPreflightCommand({
+export default function runPreflightCommand({
   runPreflight,
   execFileSync,
   fs,

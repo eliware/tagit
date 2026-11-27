@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { resolveReleaseContext } from "../../../../src/commands/release-wait/resolve/release-context.mjs";
+import resolveReleaseContext from "../../../../src/commands/release-wait/resolve/release-context.mjs";
 
 test("resolves repository, tag, and release head", () => {
   const execFileSync = jest.fn((command, args) =>

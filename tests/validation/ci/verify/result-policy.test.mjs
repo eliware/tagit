@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { createCiVerificationFailure } from "../../../../src/validation/ci/verify/result-policy.mjs";
+import createCiVerificationFailure from "../../../../src/validation/ci/verify/result-policy.mjs";
 
 test("builds a failure when no exact-head run passes", () => {
   const failure = createCiVerificationFailure(

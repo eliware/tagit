@@ -1,4 +1,4 @@
-import { readWorkflowRunnerLabels } from "../../../../../src/github/runs/runner/workflow/labels.mjs";
+import readWorkflowRunnerLabels from "../../../../../src/github/runs/runner/workflow/labels.mjs";
 
 test("classifies runner labels declared by a workflow job", () => {
   expect(readWorkflowRunnerLabels(["    runs-on: ubuntu-latest"])).toEqual(["ubuntu"]);

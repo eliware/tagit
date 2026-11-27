@@ -1,4 +1,4 @@
-import { classifyNpmErrorSummary } from "../../../../../src/registries/npm/error/summary/classify.mjs";
+import classifyNpmErrorSummary from "../../../../../src/registries/npm/error/summary/classify.mjs";
 
 test.each([
   [{ type: "not-found" }, "404 not found"],

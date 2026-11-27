@@ -1,4 +1,4 @@
-export function readUpstreamMergeConflictFiles(execFileSync) {
+export default function readUpstreamMergeConflictFiles(execFileSync) {
   return execFileSync("git", ["diff", "--name-only", "--diff-filter=U"], {
     encoding: "utf8",
   });

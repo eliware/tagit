@@ -1,4 +1,4 @@
-export function validateJobRecords(jobs, runId) {
+export default function validateJobRecords(jobs, runId) {
   if (!Array.isArray(jobs))
     throw new Error(
       `GitHub Actions run ${runId} returned malformed job records: jobs must be an array. Action: inspect the workflow run metadata, then rerun tagit preflight.`,
