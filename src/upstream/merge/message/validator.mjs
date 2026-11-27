@@ -1,8 +1,7 @@
+import hasUnsupportedControlCharacters from "./control-policy.mjs";
+import isValidMergeMessageLength from "./length-policy.mjs";
+
 export default function validateMergeMessage(message) {
-  const hasControlCharacter = Array.from(message).some((character) => {
-    const code = character.codePointAt(0);
-    return code < 32 || code === 127;
-  });
-  if (message.length > 500 || hasControlCharacter)
+  if (!isValidMergeMessageLength(message) || hasUnsupportedControlCharacters(message))
     throw new Error("Merge message contains unsupported control characters or is too long.");
 }

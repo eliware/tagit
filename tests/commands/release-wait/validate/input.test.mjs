@@ -8,6 +8,11 @@ test("accepts valid release input and polling settings", () =>
     validateReleaseInput("1.2.3", { commitSha: "abc" }, 30, 30, 10000, 10000),
   ).not.toThrow());
 
+test("rejects invalid polling settings after valid release input", () =>
+  expect(() => validateReleaseInput("1.2.3", { commitSha: "abc" }, 0, 30, 10000, 10000)).toThrow(
+    "polling limits",
+  ));
+
 test("rejects a missing commit when the version is valid", () =>
   expect(() => validateReleaseInput("1.2.3", {}, 30, 30, 10000, 10000)).toThrow(
     "version and commit SHA",

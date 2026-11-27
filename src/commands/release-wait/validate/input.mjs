@@ -1,4 +1,4 @@
-import validatePollBudget from "../../../process/timing/poll-budget.mjs";
+import validatePollBudget from "./poll-budget.mjs";
 import isReleaseVersion from "../../../versioning/is-release-version.mjs";
 
 export default function validateReleaseInput(
