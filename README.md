@@ -50,6 +50,13 @@ Read [AGENTS.md](AGENTS.md), the [user guide index](docs/README.md), and the [sp
 
 Run `npm test` for aggregate validation.
 
+Run `npm run lint` for lint checks.
+Run `npm run audit` for dependency checks.
+Run `npm run format` to format files.
+Run `npm run format:check` to check formatting.
+Run `npm run pack` to check the package contents.
+Run `npm run typecheck` to check JavaScript imports.
+
 ## Troubleshooting
 
 Read the [troubleshooting guide](docs/troubleshooting.md).
