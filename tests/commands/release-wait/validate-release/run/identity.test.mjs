@@ -25,9 +25,20 @@ test("rejects a different run id or commit", () => {
   ).toThrow("expected abc");
 });
 
-test("rejects a main branch candidate for a CI run", () => {
-  expect(() =>
+test("accepts a main branch candidate for the exact release commit", () => {
+  expect(
     validateReleaseRunIdentity(validDetails, { ...candidate, headBranch: "main" }, "abc", "v1.0.0"),
+  ).toBe(validDetails);
+});
+
+test("rejects an unrelated branch candidate", () => {
+  expect(() =>
+    validateReleaseRunIdentity(
+      validDetails,
+      { ...candidate, headBranch: "develop" },
+      "abc",
+      "v1.0.0",
+    ),
   ).toThrow("not valid for release tag v1.0.0");
 });
 

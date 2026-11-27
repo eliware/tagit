@@ -1,5 +1,12 @@
 # Release Notes
 
+## 15.2.1 — 2026-11-27
+
+### Fixed
+
+- Find release CI runs by commit and workflow without restricting the branch to the release tag.
+- Accept validation runs for the exact release commit on `main` or the matching release tag.
+
 ## 15.2.0 — 2026-11-27
 
 ### Changed

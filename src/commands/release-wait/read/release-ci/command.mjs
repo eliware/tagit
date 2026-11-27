@@ -1,7 +1,4 @@
-export default function buildReleaseCiArgs(
-  repo,
-  { action, headSha, tag, workflowPath, databaseId },
-) {
+export default function buildReleaseCiArgs(repo, { action, headSha, workflowPath, databaseId }) {
   if (action === "view")
     return [
       "run",
@@ -19,8 +16,6 @@ export default function buildReleaseCiArgs(
     repo,
     "--commit",
     headSha,
-    "--branch",
-    tag,
     "--workflow",
     workflowPath,
     "--limit",

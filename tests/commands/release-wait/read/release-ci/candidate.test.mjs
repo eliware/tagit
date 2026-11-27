@@ -16,8 +16,10 @@ test("reads and selects the release workflow candidate", async () => {
   ).resolves.toMatchObject({
     databaseId: 7,
   });
-  expect(execFile.mock.calls[0][1]).toContain("--branch");
-  expect(execFile.mock.calls[0][1]).toContain("v1.0.0");
+  expect(execFile.mock.calls[0][1]).toContain("--commit");
+  expect(execFile.mock.calls[0][1]).toContain("abc");
+  expect(execFile.mock.calls[0][1]).toContain(".github/workflows/ci.yaml");
+  expect(execFile.mock.calls[0][1]).not.toContain("--branch");
 });
 
 test("marks invalid candidate JSON as a release CI list error", async () => {

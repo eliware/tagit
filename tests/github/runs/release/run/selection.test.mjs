@@ -12,17 +12,17 @@ test("selects the newest exact release tag and commit", () => {
     ).databaseId,
   ).toBe(2);
 });
-test("does not select a main branch CI run for the tagged commit", () => {
+test("selects a main branch CI run for the tagged commit", () => {
   expect(
     selectReleaseRun([{ databaseId: 4, headSha: "abc", headBranch: "main" }], "abc", "v1.0.0"),
-  ).toBeUndefined();
+  ).toMatchObject({ databaseId: 4 });
 });
-test("selects a tagged CI run when a main run also exists for the commit", () => {
+test("selects the newest valid run when main and tag runs exist for the commit", () => {
   expect(
     selectReleaseRun(
       [
-        { databaseId: 4, headSha: "abc", headBranch: "main" },
-        { databaseId: 5, headSha: "abc", headBranch: "v1.0.0" },
+        { databaseId: 4, createdAt: "2026-01-01", headSha: "abc", headBranch: "main" },
+        { databaseId: 5, createdAt: "2026-01-02", headSha: "abc", headBranch: "v1.0.0" },
       ],
       "abc",
       "v1.0.0",

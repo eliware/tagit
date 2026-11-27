@@ -15,8 +15,6 @@ test("builds arguments to list release CI runs", () => {
     "eliware/demo",
     "--commit",
     "abc",
-    "--branch",
-    "v1.0.0",
     "--workflow",
     ".github/workflows/ci.yaml",
     "--limit",
