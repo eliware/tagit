@@ -14,6 +14,9 @@ export default function helpText() {
     "  release --version X.Y.Z  Run the DevOps release workflow.",
     "  release-wait              Check the release after it starts.",
     "",
+    "Standalone command:",
+    "  upstream [--dry-run] [merge-message...]",
+    "",
     "Ownership:",
     "  Project owners can run notes, push, and preflight.",
     "  DevOps can run release and release-wait after preflight passes.",
@@ -24,5 +27,6 @@ export default function helpText() {
     "      --dry-run             For push, skip push and CI lookup.",
     "                            For release, check version data without preflight.",
     "                            Skip preflight, commit, tag, push, and publication.",
+    "                            For upstream, show the merge plan without changes.",
   ].join("\n");
 }

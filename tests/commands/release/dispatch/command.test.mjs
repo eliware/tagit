@@ -30,7 +30,7 @@ test("coordinates preflight output", async () => {
 test("coordinates latest-tag release wait", async () => {
   const deps = base();
   deps.execFileSync.mockImplementation((command, args) =>
-    args[0] === "describe" ? "v1.2.3" : "abc",
+    args[0] === "tag" ? "v1.2.3\n" : args[0] === "rev-list" ? "abc" : "tag-object",
   );
   await runReleaseCommand({ command: "release-wait", version: null }, deps);
   expect(deps.verifyRelease).toHaveBeenCalled();
@@ -39,7 +39,7 @@ test("coordinates latest-tag release wait", async () => {
 test("does not require a release version for release-wait", async () => {
   const deps = base();
   deps.execFileSync.mockImplementation((command, args) =>
-    args[0] === "describe" ? "v1.2.3" : "abc",
+    args[0] === "tag" ? "v1.2.3\n" : args[0] === "rev-list" ? "abc" : "tag-object",
   );
   await expect(runReleaseCommand({ command: "release-wait" }, deps)).resolves.toBeUndefined();
 });

@@ -1,4 +1,4 @@
-export default function reportUpstreamMergeConflict(execFileSync, log) {
+export default function reportUpstreamMergeConflict(log, files) {
   log.log("Merge conflicts detected. Resolve conflicts in these files:");
-  execFileSync("git", ["diff", "--name-only", "--diff-filter=U"], { stdio: "inherit" });
+  log.log(String(files).trim());
 }

@@ -42,6 +42,16 @@ The package includes `bin/`, `src/`, `docs/`, `specs/`, `README.md`, `AGENTS.md`
 
 Run commands from the target repository root. Read the [release notes](RELEASE_NOTES.md) for release history.
 
+```text
+tagit <command> [options]
+tagit notes
+tagit preflight
+tagit push [--dry-run]
+tagit release --version X.Y.Z
+tagit release-wait
+upstream [--dry-run] [merge-message...]
+```
+
 ## Development
 
 Read [AGENTS.md](AGENTS.md), the [user guide index](docs/README.md), and the [specifications index](specs/README.md).

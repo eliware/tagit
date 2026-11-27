@@ -9,6 +9,8 @@ test("documents dry-run behavior for push and release", () => {
   expect(helpText()).toContain("For push, skip push and CI lookup.");
   expect(helpText()).toContain("For release, check version data without preflight.");
   expect(helpText()).toContain("Skip preflight, commit, tag, push, and publication.");
+  expect(helpText()).toContain("For upstream, show the merge plan without changes.");
+  expect(helpText()).toContain("upstream [--dry-run] [merge-message...]");
 });
 
 test("does not advertise removed validation options", () => {

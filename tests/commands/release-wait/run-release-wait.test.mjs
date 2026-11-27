@@ -3,7 +3,9 @@ import { PassThrough } from "node:stream";
 import runReleaseWaitCommand from "../../../src/commands/release-wait/run-release-wait.mjs";
 
 test("verifies the latest release tag", async () => {
-  const execFileSync = jest.fn((command, args) => (args[0] === "describe" ? "v1.2.3\n" : "abc\n"));
+  const execFileSync = jest.fn((command, args) =>
+    args[0] === "tag" ? "v1.2.3\n" : args[0] === "rev-list" ? "abc\n" : "tag-object\n",
+  );
   const verifyRelease = jest.fn();
   await expect(
     runReleaseWaitCommand({
@@ -30,7 +32,9 @@ test("writes a status line before release-wait finishes", async () => {
   let finishVerification;
   const verifyRelease = jest.fn(() => new Promise((resolve) => (finishVerification = resolve)));
   const command = runReleaseWaitCommand({
-    execFileSync: jest.fn((command, args) => (args[0] === "describe" ? "v1.2.3\n" : "abc\n")),
+    execFileSync: jest.fn((command, args) =>
+      args[0] === "tag" ? "v1.2.3\n" : args[0] === "rev-list" ? "abc\n" : "tag-object\n",
+    ),
     fs: {},
     log: { info: (message) => output.write(`${message}\n`) },
     verifyRelease,

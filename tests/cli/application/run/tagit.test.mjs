@@ -19,7 +19,7 @@ test("prints help from the public CLI application", async () => {
 });
 test("release-wait follows the latest tag and rejects explicit versions", async () => {
   const execFileSync = jest.fn((command, args) =>
-    args[0] === "describe" ? `v${packageData.version}` : "abc",
+    args[0] === "tag" ? `v${packageData.version}` : args[0] === "rev-list" ? "abc" : "tag-object",
   );
   const verifyRelease = jest.fn().mockResolvedValue({});
   await runTagit(

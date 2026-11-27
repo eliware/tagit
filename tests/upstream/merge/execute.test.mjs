@@ -25,7 +25,7 @@ test("reports merge conflicts and does not push", () => {
   const log = { log: jest.fn() };
   expect(executeUpstreamMerge(exec, "release sync", log)).toBe(false);
   expect(exec).toHaveBeenCalledWith("git", ["diff", "--name-only", "--diff-filter=U"], {
-    stdio: "inherit",
+    encoding: "utf8",
   });
   expect(exec).not.toHaveBeenCalledWith("git", ["push"], expect.anything());
 });
