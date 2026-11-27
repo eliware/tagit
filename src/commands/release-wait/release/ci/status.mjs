@@ -1,5 +1,6 @@
 import runReleaseCiPollAttempt from "./poll/attempt.mjs";
 import recoverReleaseCiPollError from "./poll/error/recovery.mjs";
+import isCompleteReleaseCiPollResult from "./poll/result.mjs";
 
 export default async function pollReleaseCi({
   execFile,
@@ -29,7 +30,7 @@ export default async function pollReleaseCi({
         workflowLabel,
         runnerLabelsByJobName,
       });
-      if (result && !result.pending) return result;
+      if (isCompleteReleaseCiPollResult(result)) return result;
     } catch (error) {
       const shouldRetry = await recoverReleaseCiPollError(error, poll, maxPolls, pollMs, sleep);
       if (!shouldRetry) throw error;

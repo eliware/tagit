@@ -8,17 +8,8 @@ const validDetails = {
   jobs: [],
 };
 
-test("accepts completed details and pending details with optional conclusions", () => {
+test("accepts completed details", () => {
   expect(validateReleaseRunDetailsShape(validDetails, 1)).toBe(validDetails);
-  expect(
-    validateReleaseRunDetailsShape(
-      { status: "in_progress", conclusion: null, headSha: "abc", jobs: [] },
-      1,
-    ),
-  ).toMatchObject({ conclusion: null });
-  expect(
-    validateReleaseRunDetailsShape({ status: "in_progress", headSha: "abc", jobs: [] }, 1),
-  ).toMatchObject({ status: "in_progress" });
 });
 
 test.each(["queued", "in_progress", "waiting", "requested", "pending"])(
