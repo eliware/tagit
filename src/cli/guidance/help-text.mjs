@@ -24,8 +24,5 @@ export default function helpText() {
     "      --dry-run             For push, skip push and CI lookup.",
     "                            For release, check version data without preflight.",
     "                            Skip preflight, commit, tag, push, and publication.",
-    "      --ignore-100x4        Use an approved coverage waiver",
-    "      --ignore-monolith-limits",
-    "                            Use an approved module-size waiver",
   ].join("\n");
 }

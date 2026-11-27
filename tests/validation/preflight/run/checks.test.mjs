@@ -112,16 +112,17 @@ test("preflight reports an exact-HEAD CI verification error", () => {
   );
 });
 
-test("preflight accepts the shared harness result with the explicit waiver", () => {
-  const execSync = jest.fn((executable, args) =>
-    executable === "git" && args[0] === "status" ? "" : "not 100x4",
-  );
+test("preflight runs the shared test command without waiver arguments", () => {
+  const execSync = jest.fn(() => "");
   const fs = packageFs();
-  expect(runPreflight(execSync, fs, { info: jest.fn() }, { ignore100x4: true })).toHaveProperty(
-    "test.passed",
-    true,
+  const result = runPreflight(execSync, fs, { info: jest.fn() });
+  expect(result.test.passed).toBe(true);
+  const testCall = execSync.mock.calls.find(
+    ([executable, args]) => isNodeNpm(executable, args) && args.at(-1) === "test",
   );
-  expect(execSync.mock.calls.some(([executable, args]) => isNodeNpm(executable, args))).toBe(true);
+  expect(testCall).toBeDefined();
+  expect(testCall[1]).not.toContain("--ignore-100x4");
+  expect(testCall[1]).not.toContain("--ignore-monolith-limits");
 });
 
 test("preflight does not parse or duplicate the shared harness coverage result", () => {

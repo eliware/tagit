@@ -1,12 +1,4 @@
-const allowedOptions = new Set([
-  "--help",
-  "-h",
-  "--version",
-  "-v",
-  "--dry-run",
-  "--ignore-100x4",
-  "--ignore-monolith-limits",
-]);
+const allowedOptions = new Set(["--help", "-h", "--version", "-v", "--dry-run"]);
 
 export default function validateAllowedOptions(argv) {
   for (const argument of argv.slice(1))

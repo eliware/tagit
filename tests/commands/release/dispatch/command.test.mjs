@@ -23,7 +23,7 @@ test("requires an explicit release version", async () => {
 test("coordinates preflight output", async () => {
   const deps = base();
   const output = jest.fn();
-  await runReleaseCommand({ command: "preflight", ignore100x4: false }, { ...deps, output });
+  await runReleaseCommand({ command: "preflight" }, { ...deps, output });
   expect(output).toHaveBeenCalledWith(expect.stringContaining('"ok":true'));
 });
 
@@ -86,27 +86,33 @@ test("blocks a package version mismatch and skips tag creation", async () => {
   expect(deps.gitOperations).not.toHaveBeenCalled();
 });
 
-test("CLI release forwards the explicit version and coverage waiver", async () => {
-  const gitOperations = jest.fn();
-  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
-  await runTagit(
-    {
-      gitOperations,
-      runPreflight,
-      startReleaseVerification: jest.fn(),
-      log: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
-      registerHandlersFn: jest.fn(),
-      registerSignalsFn: jest.fn(),
-    },
-    ["release", "--version", packageData.version, "--ignore-100x4"],
-  );
-  expect(runPreflight).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.anything(),
-    expect.anything(),
-    expect.objectContaining({ ignore100x4: true }),
-  );
-});
+test.each(["--ignore-100x4", "--ignore-monolith-limits"])(
+  "CLI release rejects the removed validation option %s before preflight",
+  async (option) => {
+    const gitOperations = jest.fn();
+    const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+    const exit = jest.fn();
+    const log = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+    await expect(
+      runTagit(
+        {
+          gitOperations,
+          runPreflight,
+          startReleaseVerification: jest.fn(),
+          exit,
+          log,
+          registerHandlersFn: jest.fn(),
+          registerSignalsFn: jest.fn(),
+        },
+        ["release", "--version", packageData.version, option],
+      ),
+    ).rejects.toThrow(`Unknown option: ${option}`);
+    expect(runPreflight).not.toHaveBeenCalled();
+    expect(gitOperations).not.toHaveBeenCalled();
+    expect(exit).toHaveBeenCalledWith(1);
+    expect(log.error).toHaveBeenCalledWith(`Unknown option: ${option}`);
+  },
+);
 
 test("CLI release stops before git when preflight fails", async () => {
   const gitOperations = jest.fn();

@@ -22,12 +22,12 @@ export default async function runReleaseCommand(
     return;
   }
   if (options.command === "preflight") {
-    dispatchPreflight(options, { runPreflight, execFileSync, fs, log, output });
+    dispatchPreflight({ runPreflight, execFileSync, fs, log, output });
     return;
   }
   requireExplicitReleaseVersion(options);
   if (!options.dryRun) {
-    dispatchPreflight(options, { runPreflight, execFileSync, fs, log, output }, false);
+    dispatchPreflight({ runPreflight, execFileSync, fs, log, output }, false);
   }
   await dispatchReleaseOperation(options, {
     fs,

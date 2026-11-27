@@ -11,6 +11,7 @@
 - Expand setup, command, release, and troubleshooting guidance. Align repository rules with the v15 conventions.
 - Split release checks, workflow parsing, registry handling, and CLI policies into focused modules.
 - Use one default export for each implementation module as Eliware Test 15.2.0 requires.
+- Remove the coverage and module-size waiver options. Always run every required validation gate.
 
 ## 15.0.1 — 2026-10-26
 

@@ -10,3 +10,8 @@ test("documents dry-run behavior for push and release", () => {
   expect(helpText()).toContain("For release, check version data without preflight.");
   expect(helpText()).toContain("Skip preflight, commit, tag, push, and publication.");
 });
+
+test("does not advertise removed validation options", () => {
+  expect(helpText()).not.toContain("--ignore-100x4");
+  expect(helpText()).not.toContain("--ignore-monolith-limits");
+});

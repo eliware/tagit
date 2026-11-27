@@ -5,16 +5,20 @@ test("runs and reports exact-HEAD preflight checks", () => {
   const output = jest.fn();
   const log = { info: jest.fn() };
   const checks = { test: { passed: true } };
+  const runPreflight = jest.fn(() => checks);
   expect(
     runPreflightCommand({
-      runPreflight: jest.fn(() => checks),
+      runPreflight,
       execFileSync: jest.fn(),
       fs: {},
       log,
       output,
-      ignore100x4: false,
     }),
   ).toBe(checks);
+  expect(runPreflight).toHaveBeenCalledWith(expect.anything(), expect.anything(), log, {
+    verifyCi: true,
+    strictRepository: true,
+  });
   expect(log.info).toHaveBeenCalledWith(
     "Preflight passed: local gates and exact-HEAD Ubuntu CI are green.",
   );

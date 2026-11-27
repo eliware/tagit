@@ -9,22 +9,13 @@ export default function runPreflight(
   execFileSync,
   fs,
   log,
-  {
-    ignore100x4 = false,
-    ignoreMonolithLimits = false,
-    verifyCi = false,
-    strictRepository = false,
-  } = {},
+  { verifyCi = false, strictRepository = false } = {},
 ) {
   const { status, dirtyFailure } = collectPreflightContext(execFileSync);
   const failures = [];
   if (strictRepository) validateRepository(execFileSync, failures);
   if (dirtyFailure) failures.push(dirtyFailure);
-  const local = runLocalChecks(execFileSync, fs, {
-    ignore100x4,
-    ignoreMonolithLimits,
-    timeoutMs: CHECK_TIMEOUT_MS,
-  });
+  const local = runLocalChecks(execFileSync, fs, { timeoutMs: CHECK_TIMEOUT_MS });
   failures.push(...local.failures);
   const results = local.results;
   // Add a blocked result only for a dirty worktree that was reported above.

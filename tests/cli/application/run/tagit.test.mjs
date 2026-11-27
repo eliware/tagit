@@ -104,19 +104,29 @@ test("preflight runs without release side effects", async () => {
     JSON.stringify({ ok: true, checks: { test: { passed: true } } }),
   );
 });
-test("passes the explicit coverage waiver to preflight", async () => {
-  const runPreflight = jest.fn(() => ({ test: { passed: true } }));
-  await runTagit(
-    { output: jest.fn(), runPreflight, log, registerHandlersFn: noop, registerSignalsFn: noop },
-    ["preflight", "--ignore-100x4"],
-  );
-  expect(runPreflight).toHaveBeenCalledWith(
-    expect.anything(),
-    expect.anything(),
-    log,
-    expect.objectContaining({ ignore100x4: true }),
-  );
-});
+test.each(["--ignore-100x4", "--ignore-monolith-limits"])(
+  "rejects the removed validation option %s before preflight",
+  async (option) => {
+    const runPreflight = jest.fn(() => ({ test: { passed: true } }));
+    const exit = jest.fn();
+    await expect(
+      runTagit(
+        {
+          output: jest.fn(),
+          runPreflight,
+          exit,
+          log,
+          registerHandlersFn: noop,
+          registerSignalsFn: noop,
+        },
+        ["preflight", option],
+      ),
+    ).rejects.toThrow(`Unknown option: ${option}`);
+    expect(runPreflight).not.toHaveBeenCalled();
+    expect(exit).toHaveBeenCalledWith(1);
+    expect(log.error).toHaveBeenCalledWith(`Unknown option: ${option}`);
+  },
+);
 test("notes uses console output when no output override is supplied", async () => {
   const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
   await runTagit(

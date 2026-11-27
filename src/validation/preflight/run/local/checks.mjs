@@ -1,13 +1,9 @@
 import validateLocalTestCheck from "../../validate-local-test-check.mjs";
 import runLocalTestCommand from "./test-command.mjs";
 
-export default function runLocalChecks(
-  execFileSync,
-  fs,
-  { ignore100x4 = false, ignoreMonolithLimits = false, timeoutMs = 180000 } = {},
-) {
+export default function runLocalChecks(execFileSync, fs, { timeoutMs = 180000 } = {}) {
   const failures = [];
-  const testCheck = validateLocalTestCheck(fs, { ignore100x4, ignoreMonolithLimits });
+  const testCheck = validateLocalTestCheck(fs);
   if (testCheck.missing)
     failures.push(
       "BLOCKED: package.json and scripts.test are required.\nAction: add package.json with the required test command, then rerun tagit preflight.",

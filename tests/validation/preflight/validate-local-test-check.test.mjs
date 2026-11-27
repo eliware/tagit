@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import validateLocalTestCheck from "../../../src/validation/preflight/validate-local-test-check.mjs";
 
-test("builds the authoritative shared-harness check with requested waivers", () => {
+test("builds the authoritative shared-harness check without wrapper options", () => {
   const fs = {
     existsSync: jest.fn(() => true),
     lstatSync: jest.fn(() => ({ isSymbolicLink: () => false })),
@@ -17,5 +17,5 @@ test("builds the authoritative shared-harness check with requested waivers", () 
       ),
     ),
   };
-  expect(validateLocalTestCheck(fs, { ignore100x4: true }).check[1][1]).toContain("--ignore-100x4");
+  expect(validateLocalTestCheck(fs).check).toEqual(["test", ["npm", ["test"]]]);
 });

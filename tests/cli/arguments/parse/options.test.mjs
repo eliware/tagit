@@ -8,11 +8,17 @@ test("parses supported command and version results", () => {
     command: "release",
     version: "1.2.3",
   });
-  expect(parseOptions(["preflight", "--ignore-100x4", "--ignore-monolith-limits"])).toMatchObject({
-    command: "preflight",
-    ignore100x4: true,
-    ignoreMonolithLimits: true,
-  });
   expect(parseOptions(["--version"])).toMatchObject({ versionQuery: true });
   expect(parseOptions([])).toMatchObject({ command: undefined, versionQuery: false });
+});
+
+test.each([
+  ["preflight", "--ignore-100x4"],
+  ["preflight", "--ignore-monolith-limits"],
+  ["release", "--ignore-100x4"],
+  ["release", "--ignore-monolith-limits"],
+])("rejects removed validation options for %s", (command, option) => {
+  expect(() =>
+    parseOptions([command, ...(command === "release" ? ["--version", "1.2.3"] : []), option]),
+  ).toThrow(`Unknown option: ${option}`);
 });

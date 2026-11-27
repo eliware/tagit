@@ -1,7 +1,3 @@
-export default function preflightOptions(options, report = true) {
-  return {
-    ignore100x4: options.ignore100x4,
-    ignoreMonolithLimits: options.ignoreMonolithLimits,
-    report,
-  };
+export default function preflightOptions(report = true) {
+  return { report };
 }

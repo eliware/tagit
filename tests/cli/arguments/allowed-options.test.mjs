@@ -4,6 +4,15 @@ test("rejects an option outside the allowed vocabulary", () => {
   expect(() => validateAllowedOptions(["release", "--bad"])).toThrow("Unknown option: --bad");
 });
 
+test.each(["--ignore-100x4", "--ignore-monolith-limits"])(
+  "rejects the removed validation option %s",
+  (option) => {
+    expect(() => validateAllowedOptions(["preflight", option])).toThrow(
+      `Unknown option: ${option}`,
+    );
+  },
+);
+
 test("accepts supported options and positional values", () => {
   expect(() => validateAllowedOptions(["release", "--dry-run", "1.2.3"])).not.toThrow();
 });

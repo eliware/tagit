@@ -3,7 +3,7 @@ export default function releaseGuide() {
     "Release checklist:",
     "- Complete the owner handoff.",
     "- Confirm that Eliware Operations approved the exact version.",
-    "- Run tagit preflight without waivers.",
+    "- Run tagit preflight.",
     "- Set package.json to the requested version.",
     "- Run tagit release --version X.Y.Z.",
     "- The tagit command creates an empty release commit after preflight and pushes both refs atomically.",

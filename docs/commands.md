@@ -24,7 +24,7 @@ Run `tagit <command>` for `notes`, `preflight`, `push`, `release`, and `release-
 
 Run `tagit --help` or `tagit -h` to show command help. Run `tagit --version` or `tagit -v` to show the installed version. Do not combine help and version options.
 
-Put the command before its options. Use `--dry-run` only with `push`, `release`, or `upstream`. Use the waiver options only with `preflight` or `release`.
+Put the command before its options. Use `--dry-run` only with `push`, `release`, or `upstream`.
 
 ## Report changes
 
@@ -37,14 +37,12 @@ This read-only command reports commits, changed files, and a short diff between 
 ## Check release readiness
 
 ```text
-tagit preflight [--ignore-100x4] [--ignore-monolith-limits]
+tagit preflight
 ```
 
 Run preflight from the target repository root on a clean `main` branch. It runs `npm test` and checks Ubuntu CI for the exact current commit. It also checks each Windows CI job when the workflow defines one. It reports blockers and exits with an error when a required check fails.
 
 The installed Eliware Test package runs the repository convention checks. These checks include package data, required files, workflows, tests, lint, type checks, audit, packaging, and coverage when the active profile requires them. Tagit checks the Git branch and worktree, then verifies GitHub Actions results for the current commit.
-
-Use `--ignore-100x4` only with an approved, documented coverage waiver. Use `--ignore-monolith-limits` only with an approved, documented module-size waiver. These options apply to `preflight` and `release`. They do not skip other required checks.
 
 Preflight does not accept `--dry-run`. It does not change files, commits, tags, or registry data.
 
@@ -61,7 +59,7 @@ Use `--dry-run` to skip the push and CI lookup. The command does not require the
 ## Run a release
 
 ```text
-tagit release --version X.Y.Z [--dry-run] [--ignore-100x4] [--ignore-monolith-limits]
+tagit release --version X.Y.Z [--dry-run]
 ```
 
 Replace `X.Y.Z` with the exact three-part version in `package.json`. The command does not select a version. The version must match the package version.
@@ -70,7 +68,7 @@ The command runs preflight on the current commit. It then checks that `package.j
 
 Tagit pushes `main` and the tag to `origin` in one atomic operation. The operation updates both refs or leaves both unchanged. Tagit checks for the exact-tag CI run at 10-second intervals, for 30 attempts maximum. It reports the CI and job links after GitHub lists the run, then exits. It does not check publication workflows or registry visibility. Run `tagit release-wait` to check CI, applicable publication workflows, and registry visibility.
 
-Use `--dry-run` to check that the requested version matches `package.json`. A release dry run skips preflight, the release commit, the tag, the push, and publication. Use the waiver options only with approved, documented waivers. A repository with a `.notag` file skips release actions.
+Use `--dry-run` to check that the requested version matches `package.json`. A release dry run skips preflight, the release commit, the tag, the push, and publication. A repository with a `.notag` file skips release actions.
 
 ## Check a release
 
