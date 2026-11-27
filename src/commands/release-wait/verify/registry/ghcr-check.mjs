@@ -1,17 +1,7 @@
 import verifyGhcrPublication from "../registries/ghcr-check.mjs";
 
-export default function verifyRegistryGhcrCheck({
-  fs,
-  execFile,
-  log,
-  repo,
-  version,
-  release,
-  ghcr,
-  retries,
-  retryMs,
-  sleep,
-}) {
+export default function verifyRegistryGhcrCheck(options) {
+  const { fs, execFile, log, repo, version, release, ghcr, maxPolls, pollMs, sleep } = options;
   return verifyGhcrPublication({
     fs,
     applicable: ghcr,
@@ -19,8 +9,8 @@ export default function verifyRegistryGhcrCheck({
     log,
     repo,
     version,
-    retries,
-    retryMs,
+    retries: maxPolls,
+    retryMs: pollMs,
     release,
     sleep,
   });

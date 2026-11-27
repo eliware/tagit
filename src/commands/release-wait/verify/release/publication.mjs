@@ -1,6 +1,5 @@
-import verifyReleasePublicationWorkflow from "./publication/workflow.mjs";
 import verifyReleasePublicationRegistries from "./publication/registries.mjs";
-import buildReleasePublicationPlan from "./publication/plan.mjs";
+import verifyReleasePublicationWorkflowPlan from "./publication/workflow-plan.mjs";
 
 export default async function verifyReleasePublication({
   fs,
@@ -19,13 +18,8 @@ export default async function verifyReleasePublication({
   npmRetryMs,
   sleep,
 }) {
-  const {
-    targets,
-    ghcrApplicable,
-    applicable: publicationApplies,
-  } = buildReleasePublicationPlan(publication);
-  verifyReleasePublicationWorkflow({
-    targets,
+  const { ghcrApplicable, applicable: publicationApplies } = verifyReleasePublicationWorkflowPlan({
+    publication,
     publicationRuns,
     repo,
     tag,

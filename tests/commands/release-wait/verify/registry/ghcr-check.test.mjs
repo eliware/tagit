@@ -19,8 +19,8 @@ test("forwards registry publication failures", async () => {
       version: "1.0.0",
       release: {},
       ghcr: true,
-      retries: 1,
-      retryMs: 0,
+      maxPolls: 1,
+      pollMs: 0,
       sleep: jest.fn(),
     }),
   ).rejects.toThrow("registry unavailable");
